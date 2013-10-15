@@ -3,10 +3,15 @@
 # TODO
 # ----
 #
-#   o Loop diagrams
-#   o double {simple, wiggly, loopy} lines
+#   o Verticle
+#       - Style
+#       - get_lines
+#   o Line
+#       - double {simple, wiggly, loopy} lines
+#
 #   o Operators
 #   o Text
+#   o 
 #   o Scalability
 #
 
@@ -18,12 +23,22 @@ import matplotlib.pyplot as plt
 
 class Verticle(object):
     """
-    A verticle. 
-    Often represented as a point.
-    """
+    A verticle. Often represented as a point.
+
+    Arguments
+    ---------
+
+        xy :
+            Coordinates.
+
+        **kwargs :
+            Any matplotlib line style argument. 
+
+"""
     def __init__(self, xy=(0,0), *args, **kwargs):
 
         self.xy = xy
+
         self.style = dict(
             marker='o',
             linestyle='',
@@ -34,7 +49,7 @@ class Verticle(object):
 
         self.style.update(kwargs)
 
-        # Should be able to get the lines connected to that verticle.
+        # TODO Should be able to get the lines connected to that verticle.
         self.lines = list()
 
     def draw(self, ax):
@@ -106,6 +121,9 @@ class Line(object):
         The number of wiggles in a wiggly line.
         Can be integer or half-integer (if the phase is 0 or .5).
 
+    nloops : float
+        The number of loops in a loopy line.
+
     phase : float
         Phase in the wiggly or loopy pattern, in units of 2pi.
 
@@ -119,7 +137,7 @@ class Line(object):
         self.xstart, self.ystart = self.vstart.xy
         self.xend, self.yend = self.vend.xy
 
-        # Set default values
+        # Default values
         default = dict(
             linestyle='simple',
             pathtype='linear',
@@ -131,31 +149,47 @@ class Line(object):
             xamp=.025,
             yamp=.05,
             nwiggles=6,
+            nloops=14,
             phase=0,
             )
 
+        # Adjust some default values according to pathtype and linestyle
+        if (kwargs.get('pathtype') == 'circular' and
+            kwarge.get('linestyle') == 'wiggly'):
+            default.update(nwiggles=7)
+            default.update(phase=.25)
+
+
+        # Set default values
         for key, val in default.items():
             kwargs.setdefault(key, val)
 
-
+        # Set attributes values
         for key in (
+
             'linestyle',
             'pathtype',
             'arrow',
+
             # number of points for the line
             'numpoints',
             'ellipseparam',
             'circleparam',
+
             # Amplitude of the wave and such...
             'amplitude',
             'xamp',
             'yamp',
-            # Wiggly line parameters
+
+            # Wiggly and loopy line parameters
             'nwiggles',
+            'nloops',
             'phase',
+
             ):
             self.__dict__[key] = kwargs.pop(key)
 
+        # 'matplotlib' line style
         self.style = dict(
             marker='',
             color='k',
@@ -163,7 +197,6 @@ class Line(object):
             linewidth=3,
             zorder=10,
             )
-
         self.style.update(kwargs)
 
 
@@ -534,18 +567,15 @@ class Line(object):
         normal = self.get_normal(tangent)
 
         # Number of waves
-        numloops = 18
-        omega = 2 * np.pi * numloops
+        omega = 2 * np.pi * self.nloops
+        phi = 2 * np.pi * self.phase
 
-        xyphase = 0.
-
-        yphase = - np.pi / 2
-        dyo = 1.
-        dy = np.sin(omega * t + yphase + xyphase) + dyo - np.sin(xyphase)
+        dy = - np.cos(omega * t + phi)
+        dy -= dy[0]
         dyt = np.tile(dy, (2, 1)).transpose()
 
-        xphase = 0.
-        dx = np.sin(omega * t + xphase + xyphase) - np.sin(xyphase)
+        dx = np.sin(omega * t + phi)
+        dx -= dx[0]
         dxt = np.tile(dx, (2, 1)).transpose()
 
         dxy = self.xamp * dxt * tangent + self.yamp * dyt * normal

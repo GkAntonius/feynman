@@ -27,7 +27,14 @@ class TestLines(TestDiagram):
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
         l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v1, v2, pathtype='elliptic', linestyle='loopy')
+        l2 = dia.line(v1, v2, pathtype='elliptic', linestyle='loopy',
+                      nloops=22)
+
+
+        v3 = dia.verticle(xy=(.2,.2))
+        v4 = dia.verticle(xy=(0.8,.2))
+        l3 = dia.line(v3, v4, pathtype='linear', linestyle='loopy')
+
         
         dia.plot()
 
