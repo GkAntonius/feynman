@@ -4,21 +4,26 @@
 # ----
 #
 #   o Verticle
-#       - Style
 #       - get_lines
+#
 #   o Line
 #       - double {simple, wiggly, loopy} lines
 #
 #   o Operators
-#   o Text
-#   o 
+#       - Text
+#
+#   o Diagram
+#       - add_text
+#
 #   o Scalability
 #
-
+# =========================================================================== #
 
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+from . import vectors
 
 
 class Verticle(object):
@@ -28,11 +33,11 @@ class Verticle(object):
     Arguments
     ---------
 
-        xy :
-            Coordinates.
+    xy :
+        Coordinates.
 
-        **kwargs :
-            Any matplotlib line style argument. 
+    **kwargs :
+        Any matplotlib line style argument. 
 
 """
     def __init__(self, xy=(0,0), *args, **kwargs):
@@ -155,7 +160,7 @@ class Line(object):
 
         # Adjust some default values according to pathtype and linestyle
         if (kwargs.get('pathtype') == 'circular' and
-            kwarge.get('linestyle') == 'wiggly'):
+            kwargs.get('linestyle') == 'wiggly'):
             default.update(nwiggles=7)
             default.update(phase=.25)
 
@@ -198,6 +203,7 @@ class Line(object):
             zorder=10,
             )
         self.style.update(kwargs)
+        self.double_center_color = 'w'
 
 
         # Main parameter for the curve
@@ -321,25 +327,34 @@ class Line(object):
             return self.get_loopy_main_lines()
         else:
             raise ValueError('Wrong value for linestyle.')
+
+    def get_double_main_lines(self):
+        """Get a set of lines forming a double line."""
+        xy = self.get_xy_line().transpose()
+        style = self.style
+        amp = .5 * self.linewidth
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                #dxy = amp * np.array([dx, dy])
+                pass
+        line = mpl.lines.Line2D(*xy, **self.style)
+        return [line]
         
     def get_simple_main_lines(self):
         """Get the main lines."""
         xy = self.get_xy_line().transpose()
-        style = self.style
         line = mpl.lines.Line2D(*xy, **self.style)
         return [line]
 
     def get_wiggly_main_lines(self):
         """Get the main lines."""
         xy = self.get_xy_line().transpose()
-        style = self.style
         line = mpl.lines.Line2D(*xy, **self.style)
         return [line]
 
     def get_loopy_main_lines(self):
         """Get the main lines."""
         xy = self.get_xy_line().transpose()
-        style = self.style
         line = mpl.lines.Line2D(*xy, **self.style)
         return [line]
 
@@ -416,7 +431,6 @@ class Line(object):
 
         # Ellipse center
         ro = self.rstart + dr / 2
-        rot = np.tile(ro, (self.numpoints, 1))
 
         # Axes of the ellipse
         a = l / (2 * np.sin(self.alpha * np.pi))
@@ -428,10 +442,12 @@ class Line(object):
         theta = theta_s + theta_i * self.t
 
         # xy relative to the ellipse center
-        ellipse = np.array([- a * np.cos(theta), b * np.sin(theta)])
+        ellipse = np.array([-a*np.cos(theta), b*np.sin(theta)]).transpose()
 
         # rotate ellipse and shift vector
-        path = np.dot(R, ellipse).transpose() + rot
+        #path = np.dot(R, ellipse).transpose() + rot
+        ellipse = vectors.sqdot(ellipse, R)
+        path = vectors.add(ellipse, ro)
 
         return path
 
@@ -442,7 +458,6 @@ class Line(object):
 
         # Circle center  # TODO: make use of fload value for d to tilt circle.
         ro = self.rend + np.array([0,1]) * self.d * self.r
-        rot = np.tile(ro, (self.numpoints, 1))
 
         # Angular progression along the circle.
         theta_s = 0.
@@ -450,10 +465,10 @@ class Line(object):
         theta = theta_s + theta_i * self.t
 
         # xy relative to the circle center
-        circle = r * np.array([- np.sin(theta), - np.cos(theta)])
+        circle = r * np.array([- np.sin(theta), - np.cos(theta)]).transpose()
 
         # shift vector  # TODO add rotation of the circle (!)
-        path = circle.transpose() + rot
+        path = vectors.add(circle,  ro)
 
         return path
 
@@ -485,8 +500,7 @@ class Line(object):
 
         # normalize the normal
         norm = np.sqrt(sum(v.transpose() * v.transpose()))
-        normt = np.tile(norm, (2,1)).transpose()
-        tangent = v / normt
+        tangent = vectors.dot(v, 1. / norm)
 
         return tangent
 
@@ -505,13 +519,12 @@ class Line(object):
             np.ndarray of shape (N, 2)
 
 """
-        normal = np.zeros((self.numpoints, 2))
         if tangent is None:
             tangent = self.get_tangent()
 
         # Compute normal by rotation of the tangent.
         R = np.array([[0., -1.],[1., 0.]])
-        normal = np.dot(R, tangent.transpose()).transpose()
+        normal = vectors.sqdot(tangent, R)
 
         return normal
 
@@ -550,11 +563,9 @@ class Line(object):
         phi = 2 * np.pi * self.phase
 
         sine = np.sin(omega * t + phi)
-        sinet = np.tile(sine, (2, 1)).transpose()
 
-        dxy = self.amplitude * sinet * normal
-        shiftt = np.tile(dxy[0], (self.numpoints, 1))
-        dxy -= shiftt
+        dxy = self.amplitude * vectors.dot(normal, sine)
+        dxy = vectors.add(dxy, -dxy[0])
         line = linepath + dxy
 
         return line
@@ -572,13 +583,12 @@ class Line(object):
 
         dy = - np.cos(omega * t + phi)
         dy -= dy[0]
-        dyt = np.tile(dy, (2, 1)).transpose()
 
         dx = np.sin(omega * t + phi)
         dx -= dx[0]
-        dxt = np.tile(dx, (2, 1)).transpose()
 
-        dxy = self.xamp * dxt * tangent + self.yamp * dyt * normal
+        dxy = (self.xamp * vectors.dot(tangent, dx) +
+               self.yamp * vectors.dot(normal, dy))
         line = linepath + dxy
 
         return line
