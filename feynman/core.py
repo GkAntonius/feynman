@@ -19,6 +19,8 @@
 #
 # =========================================================================== #
 
+from copy import deepcopy
+
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -308,6 +310,7 @@ class Line(object):
             # Set default style
             for key in ('linewidth', 'color', 'linestyle', 'marker'):
                 style.setdefault(key, self.style[key])
+            style.setdefault('zorder', self.style.get('zorder') + 2)
 
             xy = np.array([rstart, rtip, rend]).transpose()
             arrow_line = mpl.lines.Line2D(*xy, **style)
@@ -319,44 +322,60 @@ class Line(object):
 
     def get_main_lines(self):
         """Get the main lines."""
-        if self.linestyle in ('simple', 's'):
-            return self.get_simple_main_lines()
-        elif self.linestyle in ('wiggly', 'w'):
-            return self.get_wiggly_main_lines()
-        elif self.linestyle in ('loopy', 'l'):
-            return self.get_loopy_main_lines()
+        if 'double' in self.linestyle:
+            return self.get_double_main_lines()
         else:
-            raise ValueError('Wrong value for linestyle.')
+            return self.get_single_main_lines()
+        #if self.linestyle in ('simple', 's'):
+        #    return self.get_simple_main_lines()
+        #elif self.linestyle in ('wiggly', 'w'):
+        #    return self.get_wiggly_main_lines()
+        #elif self.linestyle in ('loopy', 'l'):
+        #    return self.get_loopy_main_lines()
+        #else:
+        #    raise ValueError('Wrong value for linestyle.')
 
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
+        lines = list()
+        xy = self.get_xy_line()
+        style = deepcopy(self.style)
+
+        # Make contour lines
+        style['zorder'] = self.style.get('zorder', 0) -1
+        style['linewidth'] = 1.8 * self.style.get('linewidth')
+        lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
+
+        # Make center lines
+        style['zorder'] = self.style.get('zorder', 0)
+        style['color'] = self.double_center_color
+        style['linewidth'] = .5 * self.style.get('linewidth')
+        lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
+        return lines
+
+    def get_single_main_lines(self):
+        """Get the main lines."""
         xy = self.get_xy_line().transpose()
-        style = self.style
-        amp = .5 * self.linewidth
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                #dxy = amp * np.array([dx, dy])
-                pass
         line = mpl.lines.Line2D(*xy, **self.style)
         return [line]
         
-    def get_simple_main_lines(self):
-        """Get the main lines."""
-        xy = self.get_xy_line().transpose()
-        line = mpl.lines.Line2D(*xy, **self.style)
-        return [line]
+    #def get_simple_main_lines(self):
+    #    """Get the main lines."""
+    #    xy = self.get_xy_line().transpose()
+    #    line = mpl.lines.Line2D(*xy, **self.style)
+    #    return [line]
 
-    def get_wiggly_main_lines(self):
-        """Get the main lines."""
-        xy = self.get_xy_line().transpose()
-        line = mpl.lines.Line2D(*xy, **self.style)
-        return [line]
+    #def get_wiggly_main_lines(self):
+    #    """Get the main lines."""
+    #    xy = self.get_xy_line().transpose()
+    #    line = mpl.lines.Line2D(*xy, **self.style)
+    #    return [line]
 
-    def get_loopy_main_lines(self):
-        """Get the main lines."""
-        xy = self.get_xy_line().transpose()
-        line = mpl.lines.Line2D(*xy, **self.style)
-        return [line]
+    #def get_loopy_main_lines(self):
+    #    """Get the main lines."""
+    #    xy = self.get_xy_line().transpose()
+    #    line = mpl.lines.Line2D(*xy, **self.style)
+    #    return [line]
 
     def distance(self):
         """The distance between the starting point and the end point."""
@@ -537,11 +556,11 @@ class Line(object):
             np.ndarray of shape (N, 2)
 
 """
-        if self.linestyle in ('simple', 's'):
+        if self.linestyle == 'simple' or self.linestyle == 'double':
             return self.get_simple_xy_line()
-        elif self.linestyle in ('wiggly', 'w'):
+        elif 'wiggly' in self.linestyle:
             return self.get_wiggly_xy_line()
-        elif self.linestyle in ('loopy', 'l'):
+        elif 'loopy' in self.linestyle:
             return self.get_loopy_xy_line()
         else:
             raise ValueError('Wrong value for linestyle.')
@@ -600,11 +619,27 @@ class Operator(object):
     A N-point operator.
     Often represented as a polygon, or a circle.
 
+    Arguments
+    ---------
+
+    v1 : feynman.Verticle
+        First verticle.
+
+    n :
+        Number of verticles to the operator
+
+    orientation : 
+        Orientation, in units of 2pi,
+        with respect to the default orientation.
+
 """
-    def __init__(self):
+    def __init__(self, v1, n, *args, **kwargs):
         self.dimensions = 2
         self.shape = 'oval'
-        self.shape = 'polygon'
+        #self.shape = 'polygon'
+
+    def get_verticles(self):
+        """Return the verticles."""
 
     def draw(self, ax):
         """Draw the diagram."""
