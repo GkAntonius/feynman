@@ -27,7 +27,8 @@ class TestLines(TestDiagram):
 
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
-        l1 = dia.line(v1, v2, pathtype='linear', linestyle='double', arrow=True)
+        l1 = dia.line(v1, v2, pathtype='linear', linestyle='double',
+                      arrow=True, arrow_param={'linewidth':2, 'size':.035})
 
         v3 = dia.verticle(xy=(.2,.3))
         v4 = dia.verticle(xy=(0.8,.3))

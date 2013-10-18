@@ -121,8 +121,11 @@ class Line(object):
                       A positive value makes it 'up', while a negative value
                       makes it 'down'.
 
-    arrow: bool = True
+    arrow : bool = True
         Include an arrow in the line.
+
+    arrow_param : dict
+        In case arrow==True, gives a mapping of all parameters for add_arrow.
 
     nwiggles : float
         The number of wiggles in a wiggly line.
@@ -196,7 +199,9 @@ class Line(object):
             ):
             self.__dict__[key] = kwargs.pop(key)
 
-        # 'matplotlib' line style
+        arrow_param = kwargs.pop('arrow_param', dict())
+
+        # all other kwargs are 'matplotlib' line style arguments
         self.style = dict(
             marker='',
             color='k',
@@ -224,7 +229,7 @@ class Line(object):
         self.patches = list()
 
         if self.arrow:
-            self.add_arrow()
+            self.add_arrow(**arrow_param)
 
     @property
     def rstart(self):
@@ -343,13 +348,13 @@ class Line(object):
 
         # Make contour lines
         style['zorder'] = self.style.get('zorder', 0) -1
-        style['linewidth'] = 1.8 * self.style.get('linewidth')
+        style['linewidth'] = 1.8 * self.style.get('linewidth', 2)
         lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
 
         # Make center lines
         style['zorder'] = self.style.get('zorder', 0)
         style['color'] = self.double_center_color
-        style['linewidth'] = .5 * self.style.get('linewidth')
+        style['linewidth'] = .5 * self.style.get('linewidth', 2)
         lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
         return lines
 
