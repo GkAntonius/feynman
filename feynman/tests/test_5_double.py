@@ -23,7 +23,6 @@ class TestLines(TestDiagram):
         ax.set_yticks([])
         
         dia = Diagram(ax)
-        
 
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))

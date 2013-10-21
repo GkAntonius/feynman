@@ -6,9 +6,6 @@
 #   o Verticle
 #       - get_lines
 #
-#   o Line
-#       - double {simple, wiggly, loopy} lines
-#
 #   o Operators
 #       - Text
 #
@@ -25,7 +22,12 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+# Personnal modules
+import mycolors as mc
+
 from . import vectors
+
+# =========================================================================== #
 
 
 class Verticle(object):
@@ -627,24 +629,68 @@ class Operator(object):
     Arguments
     ---------
 
-    v1 : feynman.Verticle
-        First verticle.
+    v1, v2: feynman.Verticle (=2*[Verticle()])
+        First and second verticle, counted clockwise
+        defining an edge (or the starting and ending pointaa)
+        of a patch object. 
 
-    n :
-        Number of verticles to the operator
+    N : int (=2)
+        Number of verticles to the operator.
 
-    orientation : 
-        Orientation, in units of 2pi,
-        with respect to the default orientation.
+    rotate : (=0.)
+        Rotation angle to the operator, in units of 2pi.
+
+    Returns
+    -------
+
+    Vs : list of N verticle.
+
+
+    Properties
+    ----------
+
+    verticle
+
+    N
+
+    shape:
+        default     -   oval if N == 2
+                    -   polygon if N > 2.
 
 """
-    def __init__(self, v1, n, *args, **kwargs):
-        self.dimensions = 2
+    def __init__(self, *vs, N=2, *args, **kwargs):
+        self.N = N
         self.shape = 'oval'
         #self.shape = 'polygon'
 
+        self.style = dict(
+            color="grey"
+
+        self.verticles = list()
+
     def get_verticles(self):
         """Return the verticles."""
+        return self.verticles
+
+    def set_verticles(self, *verticles):
+        """Return the verticles."""
+        self.verticles = verticles
+
+    def get_patch(self, *args, **kwargs):
+        """Return the patch object"""
+
+        if self.shape.lower() == "oval":
+            return self.get_oval(*args, **kwargs)
+        elif self.shape.lower() == "rectangle":
+            return self.get_rectangle(*args, **kwargs)
+        else:
+            raise ValueError("Unrecognized shape: " + self.shape)
+
+    def get_rectangle(self):
+        """Return the rectangle."""
+
+    def get_oval(self):
+        """Return the oval."""
 
     def draw(self, ax):
         """Draw the diagram."""
