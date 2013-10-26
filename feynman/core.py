@@ -21,11 +21,13 @@ from copy import deepcopy
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpa
 
 # Personnal modules
 import mycolors as mc
 
 from . import vectors
+from . import colors
 
 # =========================================================================== #
 
@@ -63,6 +65,9 @@ class Verticle(object):
 
     def draw(self, ax):
         ax.plot(*self.xy, **self.style)
+
+
+# =========================================================================== #
 
 
 class Line(object):
@@ -616,9 +621,10 @@ class Line(object):
         dxy = (self.xamp * vectors.dot(tangent, dx) +
                self.yamp * vectors.dot(normal, dy))
         line = linepath + dxy
-
+ 
         return line
 
+# =========================================================================== #
 
 
 class Operator(object):
@@ -626,10 +632,11 @@ class Operator(object):
     A N-point operator.
     Often represented as a polygon, or a circle.
 
+
     Arguments
     ---------
 
-    v1, v2: feynman.Verticle (=2*[Verticle()])
+    verticles : feynman.Verticle (=2*[Verticle()])
         First and second verticle, counted clockwise
         defining an edge (or the starting and ending pointaa)
         of a patch object. 
@@ -640,6 +647,7 @@ class Operator(object):
     rotate : (=0.)
         Rotation angle to the operator, in units of 2pi.
 
+
     Returns
     -------
 
@@ -649,24 +657,53 @@ class Operator(object):
     Properties
     ----------
 
-    verticle
+    shape :
+        default     -   'oval' if N == 2
+                    -   'polygon' if N > 2.
 
-    N
+    verticles :
 
-    shape:
-        default     -   oval if N == 2
-                    -   polygon if N > 2.
+    N :
 
 """
-    def __init__(self, *vs, N=2, *args, **kwargs):
-        self.N = N
-        self.shape = 'oval'
+    def __init__(self, verticles, *args, **kwargs):
+
+        # Default values
+        default = dict(
+            #N=2,
+            #shape='oval',
+            #rotate=0.,
+            )
+
+        # Set default values
+        for key, val in default.items():
+            kwargs.setdefault(key, val)
+
+        #self.N = kwargs['N']
+        self.verticles = verticles
+        self.N = len(verticles)
+
+#        assert len(verticles) <= self.N and self.N > 1, ("""
+#Wrong value for N: Too many verticles given.
+#""")
+
+        #self.shape = 'oval'
         #self.shape = 'polygon'
 
-        self.style = dict(
-            color="grey"
+        if self.N == 2:
+            self.shape = 'oval'
+        else:
+            self.shape = 'polygon'
 
-        self.verticles = list()
+        self.style = dict(
+            edgecolor="k",
+            facecolor=colors.grey,
+            linewidth=3,
+            )
+
+        self.style.update(kwargs)
+
+        #self.verticles = list()
 
     def get_verticles(self):
         """Return the verticles."""
@@ -676,24 +713,36 @@ class Operator(object):
         """Return the verticles."""
         self.verticles = verticles
 
+    def get_xy(self):
+        """Return the xy coordinates of the verticles, clockwise."""
+        return np.array([v.xy for v in self.verticles])
+        #return np.array(map(lambda v: v.xy, self.verticles))
+
     def get_patch(self, *args, **kwargs):
         """Return the patch object"""
 
         if self.shape.lower() == "oval":
             return self.get_oval(*args, **kwargs)
-        elif self.shape.lower() == "rectangle":
-            return self.get_rectangle(*args, **kwargs)
+        elif self.shape.lower() == "polygon":
+            return self.get_polygon(*args, **kwargs)
         else:
             raise ValueError("Unrecognized shape: " + self.shape)
 
-    def get_rectangle(self):
-        """Return the rectangle."""
+    def get_polygon(self):
+        """Return the polygon."""
+        polygon = mpa.Polygon(self.get_xy(), **self.style)
+        return polygon
 
     def get_oval(self):
         """Return the oval."""
+        raise NotImplementedError('')
 
     def draw(self, ax):
         """Draw the diagram."""
+        patch = self.get_patch()
+        ax.add_patch(patch)
+
+# =========================================================================== #
 
 
 class Diagram(object):
@@ -714,16 +763,22 @@ class Diagram(object):
         self.operators = list()
 
     def verticle(self, *args, **kwargs):
-        """Add a new verticle."""
+        """Add a verticle."""
         v = Verticle(*args, **kwargs)
         self.verticles.append(v)
         return v
 
-    def line(self, v1, v2, *args, **kwargs):
+    def line(self, *args, **kwargs):
         """Add a line."""
-        l = Line(v1, v2, *args, **kwargs)
+        l = Line(*args, **kwargs)
         self.lines.append(l)
         return l
+
+    def operator(self, *args, **kwargs):
+        """Add an operator."""
+        O = Operator(*args, **kwargs)
+        self.operators.append(O)
+        return O
 
     def plot(self):
         """Draw the diagram."""
@@ -733,4 +788,7 @@ class Diagram(object):
 
         for l in self.lines:
             l.draw(self.ax)
+
+        for O in self.operators:
+            O.draw(self.ax)
 
