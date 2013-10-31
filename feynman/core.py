@@ -641,11 +641,16 @@ class Operator(object):
         defining an edge (or the starting and ending pointaa)
         of a patch object. 
 
-    N : int (=2)
+    N : (2)
         Number of verticles to the operator.
 
-    rotate : (=0.)
+    rotate : (0.)
         Rotation angle to the operator, in units of 2pi.
+
+    c : (1.)
+        If the shape is elliptic, c is the excentricity of the ellipse,
+        that is, the ratio of the long axe over the short axe.
+        When c = 1, the shape will be a circle.
 
 
     Returns
@@ -670,6 +675,7 @@ class Operator(object):
 
         # Default values
         default = dict(
+            c=1,
             #N=2,
             #shape='oval',
             #rotate=0.,
@@ -679,7 +685,6 @@ class Operator(object):
         for key, val in default.items():
             kwargs.setdefault(key, val)
 
-        #self.N = kwargs['N']
         self.verticles = verticles
         self.N = len(verticles)
 
@@ -691,9 +696,11 @@ class Operator(object):
         #self.shape = 'polygon'
 
         if self.N == 2:
-            self.shape = 'oval'
+            self.shape = 'ellipse'
         else:
             self.shape = 'polygon'
+
+        self.c = kwargs.pop('c')
 
         self.style = dict(
             edgecolor="k",
@@ -716,13 +723,19 @@ class Operator(object):
     def get_xy(self):
         """Return the xy coordinates of the verticles, clockwise."""
         return np.array([v.xy for v in self.verticles])
-        #return np.array(map(lambda v: v.xy, self.verticles))
+
+    def get_center(self):
+        """Return the xy coordinates of the center."""
+        center = np.array([0., 0.])
+        for xy in self.get_xy():
+            center += xy
+        center /= self.N
+        return center
 
     def get_patch(self, *args, **kwargs):
         """Return the patch object"""
-
-        if self.shape.lower() == "oval":
-            return self.get_oval(*args, **kwargs)
+        if self.shape.lower() == "ellipse":
+            return self.get_ellipse(*args, **kwargs)
         elif self.shape.lower() == "polygon":
             return self.get_polygon(*args, **kwargs)
         else:
@@ -733,9 +746,16 @@ class Operator(object):
         polygon = mpa.Polygon(self.get_xy(), **self.style)
         return polygon
 
-    def get_oval(self):
+    def get_ellipse(self):
         """Return the oval."""
-        raise NotImplementedError('')
+        start, end = self.get_xy()
+        dxy = end - start
+        width = np.linalg.norm(dxy)
+        height = width / self.c
+        center = self.get_center()
+        angle = vectors.angle(dxy)
+        ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
+        return ellipse
 
     def draw(self, ax):
         """Draw the diagram."""

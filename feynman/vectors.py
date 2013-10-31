@@ -80,3 +80,24 @@ def sqdot(vlist, M):
     return np.dot(M, vlist.transpose()).transpose()
 
 
+def angle(v):
+    """
+    Return the angle of a vector.
+
+    Arguments
+    ---------
+
+    v : np.ndarray of shape (2,)
+
+    Returns
+    -------
+
+    angle : the angle in radiant.
+ 
+"""
+    assert v.shape == (2,), "Wrong dimension for the vector argument."
+    angle = np.arctan(v[1] / v[0])
+    if v[0] < 0:
+        angle += np.pi
+    return angle
+

@@ -17,7 +17,7 @@ basename = os.path.splitext(os.path.basename(__file__))[0]
 
 class TestOperator(TestDiagram):
 
-    def test_triangle(self):
+    def test_ellipse(self):
 
         fig = plt.figure(figsize=(6,6))
         ax = fig.add_subplot(111)
@@ -29,22 +29,17 @@ class TestOperator(TestDiagram):
         
         dia = Diagram(ax)
 
-        v1 = dia.verticle(xy=(.2,.6), marker='')
-        v2 = dia.verticle(xy=(.2,.4), marker='')
+        v1 = dia.verticle(xy=(.2,.5), marker='')
+        v2 = dia.verticle(xy=(.4,.5))
+        v3 = dia.verticle(xy=(.6,.5))
+        v4 = dia.verticle(xy=(.8,.5), marker='')
 
-        v3 = dia.verticle(xy=(.3,.6))
-        v4 = dia.verticle(xy=(.3,.4))
 
-        l1 = dia.line(v1, v3)
-        l2 = dia.line(v2, v4)
+        l1 = dia.line(v1, v2, arrow=True)
+        l2 = dia.line(v3, v4, linestyle='wiggly', nwiggles=4)
 
-        v5 = dia.verticle(xy=(.3 + .2 * np.sqrt(3) / 2, .5))
+        o1 = dia.operator([v2,v3])
 
-        triangle = dia.operator([v3, v4, v5])
-
-        v6 = dia.verticle(xy=(.8, .5), marker='')
-        l3 = dia.line(v5, v6, linestyle='wiggly', nwiggles=4)
-        
         dia.plot()
 
         self.show_pdf(basename)

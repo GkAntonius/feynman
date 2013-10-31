@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 from ..core import Diagram
 
+tests_directory = 'Tests'
+os.system('mkdir -p ' + tests_directory)
+
 class TestDiagram(unittest.TestCase):
 
     #def setUp(self):
@@ -24,12 +27,13 @@ class TestDiagram(unittest.TestCase):
     def show(self):
         plt.show()
 
-    def show_pdf(self):
-        fname = "tmp.pdf"
+    def show_pdf(self, fname="tmp.pdf"):
+        fname = fname.split('.pdf')[0] + '.pdf'
+        fname = os.path.join(tests_directory, fname)
         plt.savefig(fname)
         os.system('open ' + fname)
-        time.sleep(.5)
-        os.system('rm ' + fname)  # quite unsafe
+        #time.sleep(.5)
+        #os.system('rm ' + fname)  # quite unsafe
 
 
 

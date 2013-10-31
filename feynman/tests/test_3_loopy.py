@@ -10,6 +10,8 @@ from ..core import Diagram
 
 from . import TestDiagram
 
+basename = os.path.splitext(os.path.basename(__file__))[0]
+
 class TestLines(TestDiagram):
 
     def test_loopy(self):
@@ -38,4 +40,4 @@ class TestLines(TestDiagram):
         
         dia.plot()
 
-        self.show_pdf()
+        self.show_pdf(basename)
