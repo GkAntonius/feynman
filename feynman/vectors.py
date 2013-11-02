@@ -80,7 +80,7 @@ def sqdot(vlist, M):
     return np.dot(M, vlist.transpose()).transpose()
 
 
-def angle(v):
+def angle(v, units='rad'):
     """
     Return the angle of a vector.
 
@@ -88,6 +88,11 @@ def angle(v):
     ---------
 
     v : np.ndarray of shape (2,)
+
+    units : ('rad')
+        Choice of the units.
+        rad  -  radians
+        deg  -  degrees
 
     Returns
     -------
@@ -99,5 +104,7 @@ def angle(v):
     angle = np.arctan(v[1] / v[0])
     if v[0] < 0:
         angle += np.pi
+    if units == 'deg':
+        angle = np.rad2deg(angle)
     return angle
 

@@ -11,6 +11,7 @@
 #
 #   o Diagram
 #       - add_text
+#       - verticles (add multiple verticles at once)
 #
 #   o Scalability
 #
@@ -22,6 +23,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
+import matplotlib.text as mpt
 
 # Personnal modules
 import mycolors as mc
@@ -44,9 +46,8 @@ class Verticle(object):
 
     **kwargs :
         Any matplotlib line style argument. 
-
 """
-    def __init__(self, xy=(0,0), *args, **kwargs):
+    def __init__(self, xy=(0,0), **kwargs):
 
         self.xy = xy
 
@@ -63,8 +64,13 @@ class Verticle(object):
         # TODO Should be able to get the lines connected to that verticle.
         self.lines = list()
 
+    def get_marker(self):
+        """Returns a matplotlib.lines.Line2D instance."""
+        return mpl.lines.Line2D([self.xy[0]],[self.xy[1]], **self.style)
+
     def draw(self, ax):
-        ax.plot(*self.xy, **self.style)
+        marker = self.get_marker()
+        ax.add_line(marker)
 
 
 # =========================================================================== #
@@ -146,7 +152,7 @@ class Line(object):
 
 
 """
-    def __init__(self, vstart, vend, *args, **kwargs):
+    def __init__(self, vstart, vend, **kwargs):
 
         self.vstart = vstart
         self.vend = vend
@@ -282,7 +288,7 @@ class Line(object):
         size :
             The length of the arrow branches.
 
-        **args :
+        **kwargs :
             Any style specification, such as linewidth.
 
 """
@@ -503,22 +509,22 @@ class Line(object):
 
         return path
 
-    def get_tangent(self, linepath=None, *args, **kwargs):
+    def get_tangent(self, linepath=None, **kwargs):
         """
         Get xy vectors for the tangent path.
         These vectors are normalized.
 
         Otional arguments
         -----------------
-            linepath :
-                Line path on which to compute. Compute the path if None.
+        linepath :
+            Line path on which to compute. Compute the path if None.
 
         Returns
         -------
             np.ndarray of shape (N, 2)
 """
         # TODO compute elliptic_tangent.
-        return self.get_tangent_numeric(*args, **kwargs)
+        return self.get_tangent_numeric(linepath, **kwargs)
 
     def get_tangent_numeric(self, linepath=None):
         """Compute tangent numerically."""
@@ -535,15 +541,15 @@ class Line(object):
 
         return tangent
 
-    def get_normal(self, tangent=None, *args, **kwargs):
+    def get_normal(self, tangent=None, **kwargs):
         """
         Return a vector normal to the path for each parameter point.
         The vectors are normalized.
 
         Otional arguments
         -----------------
-            tangent :
-                Line path on which to compute. Compute the path if None.
+        tangent :
+            Line path on which to compute. Compute the path if None.
 
         Returns
         -------
@@ -652,6 +658,8 @@ class Operator(object):
         that is, the ratio of the long axe over the short axe.
         When c = 1, the shape will be a circle.
 
+    **kwargs :
+        Any other style specification for a matplotlib.patches.Patch instance.
 
     Returns
     -------
@@ -671,14 +679,11 @@ class Operator(object):
     N :
 
 """
-    def __init__(self, verticles, *args, **kwargs):
+    def __init__(self, verticles, **kwargs):
 
         # Default values
         default = dict(
             c=1,
-            #N=2,
-            #shape='oval',
-            #rotate=0.,
             )
 
         # Set default values
@@ -691,9 +696,6 @@ class Operator(object):
 #        assert len(verticles) <= self.N and self.N > 1, ("""
 #Wrong value for N: Too many verticles given.
 #""")
-
-        #self.shape = 'oval'
-        #self.shape = 'polygon'
 
         if self.N == 2:
             self.shape = 'ellipse'
@@ -710,7 +712,7 @@ class Operator(object):
 
         self.style.update(kwargs)
 
-        #self.verticles = list()
+        self.texts = list()
 
     def get_verticles(self):
         """Return the verticles."""
@@ -753,14 +755,33 @@ class Operator(object):
         width = np.linalg.norm(dxy)
         height = width / self.c
         center = self.get_center()
-        angle = vectors.angle(dxy)
+        angle = vectors.angle(dxy, 'deg')
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
         return ellipse
+
+    def add_text(self, s, x=0, y=0, **kwargs):
+        """
+        Add text, relative to the center of the diagram.
+        """
+        # TODO adjust default parameters.
+        self.texts.append((s, x, y, kwargs))
+
+    def get_texts(self):
+        """Return a list of matplotlib.text.Text instances."""
+        texts = list()
+        for (s, x, y, kwargs) in self.texts:
+            center = self.get_center()
+            xabs, yabs = center + np.array([x,y])
+            texts.append(mpt.Text(xabs, yabs, s, **kwargs))
+        return texts
 
     def draw(self, ax):
         """Draw the diagram."""
         patch = self.get_patch()
         ax.add_patch(patch)
+        for text in self.get_texts():
+            ax.add_artist(text)
+
 
 # =========================================================================== #
 
@@ -769,8 +790,6 @@ class Diagram(object):
     """A diagram. Can be a global object."""
 
     def __init__(self, fig=None, ax=None):
-
-        self.boxposition = (0,0,1,1)
 
         if fig is None:
             self.fig = plt.gcf()
@@ -782,11 +801,56 @@ class Diagram(object):
         self.lines = list()
         self.operators = list()
 
-    def verticle(self, *args, **kwargs):
-        """Add a verticle."""
-        v = Verticle(*args, **kwargs)
+    def verticle(self, xy=(0,0), **kwargs):
+        """
+        Add a verticle.
+
+        Arguments
+        ---------
+
+        xy :
+            Coordinates.
+
+        **kwargs :
+            Any matplotlib line style argument. 
+
+        Returns
+        -------
+
+        feynman.Verticle instance.
+"""
+        v = Verticle(xy, **kwargs)
         self.verticles.append(v)
         return v
+
+    def verticles(self, xys, **kwargs):
+        """
+        Add a multiple verticles.
+
+        Arguments
+        ---------
+
+        xys :
+            List of xy coordinates.
+
+        **kwargs :
+            Any matplotlib line style argument. 
+
+        Returns
+        -------
+
+        list of feynman.Verticle instance.
+"""
+        xys = np.array(xys)
+        if xys.ndim != 2:
+             raise ValueError("xy must be a list of xy coordinates.")
+ 
+        vs = list()
+        for xy in xys:
+            v = Verticle(xy, **kwargs)
+            self.verticles.append(v)
+            vs.append(v)
+        return vs
 
     def line(self, *args, **kwargs):
         """Add a line."""

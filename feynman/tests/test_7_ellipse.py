@@ -27,19 +27,33 @@ class TestOperator(TestDiagram):
         ax.set_xticks([])
         ax.set_yticks([])
         
-        dia = Diagram(ax)
+        # First diagram
+        D1 = Diagram(ax)
 
-        v1 = dia.verticle(xy=(.2,.5), marker='')
-        v2 = dia.verticle(xy=(.4,.5))
-        v3 = dia.verticle(xy=(.6,.5))
-        v4 = dia.verticle(xy=(.8,.5), marker='')
+        v1 = D1.verticle(xy=(.2,.2), marker='')
+        v2 = D1.verticle(xy=(.4,.2))
+        v3 = D1.verticle(xy=(.6,.2))
+        v4 = D1.verticle(xy=(.8,.2), marker='')
 
+        D1.line(v1, v2, arrow=True)
+        O = D1.operator([v2,v3])
+        O.add_text("$\Sigma$", -.025,-.025, fontsize=28)
+        D1.line(v3, v4, linestyle='double', arrow=True)
 
-        l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v3, v4, linestyle='wiggly', nwiggles=4)
+        D1.plot()
 
-        o1 = dia.operator([v2,v3])
+        # Second diagram
+        D2 = Diagram(ax)
 
-        dia.plot()
+        v1 = D2.verticle(xy=(.2,.4), marker='')
+        v2 = D2.verticle(xy=(.4,.5))
+        v3 = D2.verticle(xy=(.6,.6))
+        v4 = D2.verticle(xy=(.8,.7), marker='')
+
+        D2.line(v1, v2, arrow=True)
+        D2.operator([v2,v3], c=1.5)
+        D2.line(v3, v4, linestyle='wiggly', nwiggles=2)
+
+        D2.plot()
 
         self.show_pdf(basename)
