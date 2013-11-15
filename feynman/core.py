@@ -83,13 +83,13 @@ class Verticle(object):
         y : (-0.025)
             y position, relative to the verticle.
 
-        fontsize : (22)
+        fontsize : (14)
             The font size.
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
 """
-        default = dict(fontsize=22)
+        default = dict(fontsize=14)
         for key, val in default.items():
             kwargs.setdefault(key, val)
         self.texts.append((s, x, y, kwargs))
@@ -338,13 +338,13 @@ class Line(object):
         y : (.1)
             y position, perpendicular to the path direction.
 
-        fontsize : (22)
+        fontsize : (14)
             The font size.
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
 """
-        default = dict(fontsize=22)
+        default = dict(fontsize=14)
         for key, val in default.items():
             kwargs.setdefault(key, val)
         self.texts.append((s, t, y, kwargs))
@@ -354,8 +354,8 @@ class Line(object):
         texts = list()
         for textparams in self.texts:
             (s, t, y, kwargs) = textparams
-            middle = self.get_path_point(.5)
-            normal = self.get_normal_point(.5)
+            middle = self.get_path_point(t)
+            normal = self.get_normal_point(t)
             xtext, ytext = middle + y * normal
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
@@ -744,6 +744,8 @@ class Line(object):
         """Plot the line."""
         for line in self.get_lines():
             ax.add_line(line)
+        for text in self.get_texts():
+            ax.add_artist(text)
         return
 
 # =========================================================================== #
