@@ -208,7 +208,7 @@ class Line(object):
             amplitude=.025,
             xamp=.025,
             yamp=.05,
-            nwiggles=6,
+            nwiggles=5,
             nloops=14,
             phase=0,
             )
@@ -323,7 +323,7 @@ class Line(object):
         param = (t, direction, theta, size, kwargs)
         self.arrows_param.append(param)
 
-    def text(self, s, t=.5, y=.1, **kwargs):
+    def text(self, s, t=.5, y=-.06, **kwargs):
         """
         Add text over the line.
 
@@ -335,7 +335,7 @@ class Line(object):
         t : (.5)
             Position along the line (0 < t < 1).
 
-        y : (.1)
+        y : (-.06)
             y position, perpendicular to the path direction.
 
         fontsize : (14)
@@ -921,15 +921,31 @@ class Operator(object):
 
 
 class Diagram(object):
-    """A diagram. Can be a global object."""
+    """
+    The main object for a feynman diagram.
 
+    Arguments
+    ---------
+
+    fig : A matplotlib Figure. If none is given, a new one is initialized.
+    ax : A matplotlib AxesSubplot. If none is given, a new one is initialized.
+
+"""
     def __init__(self, fig=None, ax=None):
 
         if fig is None:
-            self.fig = plt.gcf()
+            self.fig = plt.figure(figsize=(6,6))
 
-        if ax is None:
-            self.ax = plt.gca()
+        if ax is not None:
+            self.ax = ax
+        elif self.fig.axes:
+            self.ax = self.fig.gca()
+        else:
+            self.ax = self.fig.gca()
+            self.ax.set_xlim(0,1)
+            self.ax.set_ylim(0,1)
+            self.ax.set_xticks([])
+            self.ax.set_yticks([])
 
         self.verticles = list()
         self.lines = list()
@@ -1022,3 +1038,14 @@ class Diagram(object):
         for O in self.operators:
             O.draw(self.ax)
 
+    def show(self):
+        """Show the figure with matplotlib.pyplot.show."""
+        plt.show()
+
+    def gcf(self):
+        """Get the figure."""
+        return self.fig
+
+    def gca(self):
+        """Get the axe."""
+        return self.ax
