@@ -1,12 +1,11 @@
 #
-#
 # TODO
 # ----
 #
 #   o Verticle
 #       - get_lines
 #
-#   o Operators
+#   o Operator
 #       - Text
 #
 #   o Diagram
@@ -240,6 +239,7 @@ class Line(object):
 
         self.lines = list()
         self.patches = list()
+        self.texts = list()
 
         if self.arrow:
             self.add_arrow(**arrow_param)
@@ -253,18 +253,6 @@ class Line(object):
     def rend(self):
         """The end position."""
         return np.array(self.vend.xy)
-
-    def get_lines(self):
-        """Get the lines."""
-        lines = list()
-        lines.extend(self.get_main_lines())
-        lines.extend(self.get_arrow_lines())
-        return lines
-
-    def draw(self, ax):
-        """Plot the line."""
-        for line in self.get_lines():
-            ax.add_line(line)
 
     def add_arrow(self, t=0.5, direction=1, theta=.083, size=.025, **kwargs):
         """
@@ -296,6 +284,35 @@ class Line(object):
             raise ValueError("t should be in range [0,1]")
         param = (t, direction, theta, size, kwargs)
         self.arrows_param.append(param)
+
+    def text(self, s, t=.5, y=.1, **kwargs):
+        """
+        Add text over the line.
+
+        Arguments
+        ---------
+
+        s : Text string.
+
+        t : (.5)
+            Position along the line (0 < t < 1).
+
+        y : (.1)
+            y position, perpendicular to the path direction.
+
+        fontsize : (22)
+            The font size.
+
+        **kwargs :
+            Any other style specification for a matplotlib.text.Text instance.
+"""
+        default = dict(fontsize=22)
+        for key, val in default.items():
+            kwargs.setdefault(key, val)
+        self.texts.append((s, t, y, kwargs))
+
+    def get_texts(self):
+        # TODO
 
     def get_arrow_lines(self):
         """Get the arrow lines."""
@@ -630,6 +647,18 @@ class Line(object):
  
         return line
 
+    def get_lines(self):
+        """Get the lines."""
+        lines = list()
+        lines.extend(self.get_main_lines())
+        lines.extend(self.get_arrow_lines())
+        return lines
+
+    def draw(self, ax):
+        """Plot the line."""
+        for line in self.get_lines():
+            ax.add_line(line)
+
 # =========================================================================== #
 
 
@@ -693,10 +722,6 @@ class Operator(object):
         self.verticles = verticles
         self.N = len(verticles)
 
-#        assert len(verticles) <= self.N and self.N > 1, ("""
-#Wrong value for N: Too many verticles given.
-#""")
-
         if self.N == 2:
             self.shape = 'ellipse'
         else:
@@ -759,11 +784,30 @@ class Operator(object):
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
         return ellipse
 
-    def add_text(self, s, x=0, y=0, **kwargs):
+    def text(self, s, x=-.025, y=-.025, **kwargs):
         """
-        Add text, relative to the center of the diagram.
-        """
-        # TODO adjust default parameters.
+        Add text in the operator.
+
+        Arguments
+        ---------
+
+        s : Text string.
+
+        x : (-0.025)
+            x position, relative to the center of the operator.
+
+        y : (-0.025)
+            y position, relative to the center of the operator.
+
+        fontsize : (28)
+            The font size.
+
+        **kwargs :
+            Any other style specification for a matplotlib.text.Text instance.
+"""
+        default = dict(fontsize=28)
+        for key, val in default.items():
+            kwargs.setdefault(key, val)
         self.texts.append((s, x, y, kwargs))
 
     def get_texts(self):
@@ -803,7 +847,7 @@ class Diagram(object):
 
     def verticle(self, xy=(0,0), **kwargs):
         """
-        Add a verticle.
+        Create a verticle.
 
         Arguments
         ---------
@@ -825,7 +869,7 @@ class Diagram(object):
 
     def verticles(self, xys, **kwargs):
         """
-        Add a multiple verticles.
+        Create multiple verticles.
 
         Arguments
         ---------
@@ -853,16 +897,28 @@ class Diagram(object):
         return vs
 
     def line(self, *args, **kwargs):
-        """Add a line."""
+        """Create a line."""
         l = Line(*args, **kwargs)
         self.lines.append(l)
         return l
 
     def operator(self, *args, **kwargs):
-        """Add an operator."""
+        """Create an operator."""
         O = Operator(*args, **kwargs)
         self.operators.append(O)
         return O
+
+    def add_verticle(self, verticle)
+        """Add a verticle."""
+        self.verticles.append(verticle)
+
+    def add_line(self, line)
+        """Add a line."""
+        self.lines.append(line)
+
+    def add_operator(self, operator)
+        """Add an operator."""
+        self.operators.append(operator)
 
     def plot(self):
         """Draw the diagram."""

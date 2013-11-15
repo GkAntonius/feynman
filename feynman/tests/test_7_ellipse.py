@@ -37,7 +37,7 @@ class TestOperator(TestDiagram):
 
         D1.line(v1, v2, arrow=True)
         O = D1.operator([v2,v3])
-        O.add_text("$\Sigma$", -.025,-.025, fontsize=28)
+        O.text("$\Sigma$", -.025,-.025, fontsize=28)
         D1.line(v3, v4, linestyle='double', arrow=True)
 
         D1.plot()
