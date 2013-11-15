@@ -48,7 +48,7 @@ class Verticle(object):
 """
     def __init__(self, xy=(0,0), **kwargs):
 
-        self.xy = xy
+        self.xy = np.array(xy)
 
         self.style = dict(
             marker='o',
@@ -62,14 +62,52 @@ class Verticle(object):
 
         # TODO Should be able to get the lines connected to that verticle.
         self.lines = list()
+        self.texts = list()
 
     def get_marker(self):
         """Returns a matplotlib.lines.Line2D instance."""
         return mpl.lines.Line2D([self.xy[0]],[self.xy[1]], **self.style)
 
+    def text(self, s, x=-.025, y=-.025, **kwargs):
+        """
+        Add text near the verticle.
+
+        Arguments
+        ---------
+
+        s : Text string.
+
+        x : (-0.025)
+            x position, relative to the verticle.
+
+        y : (-0.025)
+            y position, relative to the verticle.
+
+        fontsize : (22)
+            The font size.
+
+        **kwargs :
+            Any other style specification for a matplotlib.text.Text instance.
+"""
+        default = dict(fontsize=22)
+        for key, val in default.items():
+            kwargs.setdefault(key, val)
+        self.texts.append((s, x, y, kwargs))
+
+    def get_texts(self):
+        """Return a list of matplotlib.text.Text instances."""
+        texts = list()
+        for (s, x, y, kwargs) in self.texts:
+            xtext, ytext = self.xy + np.array([x,y])
+            texts.append(mpt.Text(xtext, ytext, s, **kwargs))
+        return texts
+
     def draw(self, ax):
         marker = self.get_marker()
         ax.add_line(marker)
+        for text in self.get_texts():
+            ax.add_artist(text)
+        return
 
 
 # =========================================================================== #
@@ -312,7 +350,15 @@ class Line(object):
         self.texts.append((s, t, y, kwargs))
 
     def get_texts(self):
-        # TODO
+        """Return a list of matplotlib.text.Text instances."""
+        texts = list()
+        for textparams in self.texts:
+            (s, t, y, kwargs) = textparams
+            middle = self.get_path_point(.5)
+            normal = self.get_normal_point(.5)
+            xtext, ytext = middle + y * normal
+            texts.append(mpt.Text(xtext, ytext, s, **kwargs))
+        return texts
 
     def get_arrow_lines(self):
         """Get the arrow lines."""
@@ -458,6 +504,20 @@ class Line(object):
             return self.get_circular_linepath(*args, **kwargs)
         else:
             raise ValueError('Wrong value for pathtype')
+
+    def get_path_point(self, t):
+        """
+        Get xy vector for a particular position along the path.
+
+        t: Distance parameter along the path. 0. <= t <= 1.
+
+        Returns: np.ndarray of shape (2)
+"""
+        # This function is not optimized at all.
+        linepath = self.get_linepath()
+        i_xy = min(int(t * self.numpoints), self.numpoints)
+        xy = linepath[i_xy]
+        return xy.reshape(2)
         
     def get_linear_linepath(self):
         """Get xy vectors for the path."""
@@ -543,6 +603,19 @@ class Line(object):
         # TODO compute elliptic_tangent.
         return self.get_tangent_numeric(linepath, **kwargs)
 
+    def get_tangent_point(self, t):
+        """
+        Get a particular tangent vector for a point along the path.
+
+        t: Distance parameter along the path. 0. <= t <= 1.
+
+        Returns: np.ndarray of shape (2)
+"""
+        tangent = self.get_tangent()
+        i_v = min(int(t * self.numpoints), self.numpoints)
+        v = tangent[i_v]
+        return v.reshape(2)
+
     def get_tangent_numeric(self, linepath=None):
         """Compute tangent numerically."""
         if linepath is None:
@@ -581,6 +654,19 @@ class Line(object):
         normal = vectors.sqdot(tangent, R)
 
         return normal
+
+    def get_normal_point(self, t):
+        """
+        Get a particular normal vector for a point along the path.
+
+        t: Distance parameter along the path. 0. <= t <= 1.
+
+        Returns: np.ndarray of shape (2)
+"""
+        normal = self.get_normal()
+        i_v = min(int(t * self.numpoints), self.numpoints)
+        v = normal[i_v]
+        return v.reshape(2)
 
     def get_xy_line(self):
         """
@@ -658,6 +744,7 @@ class Line(object):
         """Plot the line."""
         for line in self.get_lines():
             ax.add_line(line)
+        return
 
 # =========================================================================== #
 
@@ -815,8 +902,8 @@ class Operator(object):
         texts = list()
         for (s, x, y, kwargs) in self.texts:
             center = self.get_center()
-            xabs, yabs = center + np.array([x,y])
-            texts.append(mpt.Text(xabs, yabs, s, **kwargs))
+            xtext, ytext = center + np.array([x,y])
+            texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
 
     def draw(self, ax):
@@ -825,6 +912,7 @@ class Operator(object):
         ax.add_patch(patch)
         for text in self.get_texts():
             ax.add_artist(text)
+        return
 
 
 # =========================================================================== #
@@ -908,15 +996,15 @@ class Diagram(object):
         self.operators.append(O)
         return O
 
-    def add_verticle(self, verticle)
+    def add_verticle(self, verticle):
         """Add a verticle."""
         self.verticles.append(verticle)
 
-    def add_line(self, line)
+    def add_line(self, line):
         """Add a line."""
         self.lines.append(line)
 
-    def add_operator(self, operator)
+    def add_operator(self, operator):
         """Add an operator."""
         self.operators.append(operator)
 
