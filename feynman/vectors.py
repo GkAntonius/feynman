@@ -108,3 +108,22 @@ def angle(v, units='rad'):
         angle = np.rad2deg(angle)
     return angle
 
+def rotate(v, angle):
+    """
+    Return the rotation of a vector by a given angle.
+
+    Arguments
+    ---------
+    v : np.ndarray of shape (2,) or shape (N, 2).
+    angle : float, the angle, in units of 2pi.
+
+    Returns
+    -------
+    vnew : np.ndarray of shape (2,) or shape (N, 2).
+        The rotated vector.
+    """
+    theta = angle * 2 * np.pi
+    R = np.array([[np.cos(theta), - np.sin(theta)],
+                  [np.sin(theta),   np.cos(theta)]])
+    return np.dot(v, R)
+

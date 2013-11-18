@@ -6,7 +6,6 @@
 #       - get_lines
 #
 #   o Operator
-#       - Text
 #
 #   o Diagram
 #       - add_text
@@ -162,19 +161,17 @@ class Line(object):
                       A positive value makes it 'up', while a negative value
                       makes it 'down'.
 
-    circleparam : (float, int) = (.25, 1)
-        Two parameters governing the shape of a circular path: (r, d).
+    circleradius : float (.1)
+        The radius of the circle.
 
-            r      -  The radius of the circle.
-
-            d      -  Controls wether the curve is 'up' or 'down'.
-                      A positive value makes it 'up', while a negative value
-                      makes it 'down'.
+    circlepos : float (0.)
+        The position of the center, relative to the anchor verticle.
+        It is an angle, in units of 2pi.
 
     arrow : bool = True
         Include an arrow in the line.
 
-    arrow_param : dict
+    arrowparam : dict
         In case arrow==True, gives a mapping of all parameters for add_arrow.
 
     nwiggles : float
@@ -187,7 +184,8 @@ class Line(object):
     phase : float
         Phase in the wiggly or loopy pattern, in units of 2pi.
 
-
+    numpoints : int
+        Number of points that makes up the line.
 """
     def __init__(self, vstart, vend, **kwargs):
 
@@ -204,7 +202,8 @@ class Line(object):
             arrow=False,
             numpoints=400,
             ellipseparam=(.5, 1.2, 1),
-            circleparam=(.25, 1),
+            circleradius=.1,
+            circlepos=0.,
             amplitude=.025,
             xamp=.025,
             yamp=.05,
@@ -231,10 +230,10 @@ class Line(object):
             'pathtype',
             'arrow',
 
-            # number of points for the line
             'numpoints',
             'ellipseparam',
-            'circleparam',
+            'circleradius',
+            'circlepos',
 
             # Amplitude of the wave and such...
             'amplitude',
@@ -249,7 +248,7 @@ class Line(object):
             ):
             self.__dict__[key] = kwargs.pop(key)
 
-        arrow_param = kwargs.pop('arrow_param', dict())
+        arrowparam = kwargs.pop('arrowparam', dict())
 
         # all other kwargs are 'matplotlib' line style arguments
         self.style = dict(
@@ -269,9 +268,6 @@ class Line(object):
         # Elliptic parameters.
         self.alpha, self.c, self.d = self.ellipseparam
 
-        # Circular parameters.
-        self.r, self.d = self.circleparam  # TODO avoid redundancy
-
         # Arrows parameters
         self.arrows_param = list()
 
@@ -280,7 +276,7 @@ class Line(object):
         self.texts = list()
 
         if self.arrow:
-            self.add_arrow(**arrow_param)
+            self.add_arrow(**arrowparam)
 
     @property
     def rstart(self):
@@ -316,8 +312,8 @@ class Line(object):
 
         **kwargs :
             Any style specification, such as linewidth.
-
 """
+        # TODO: arrow style to allow a full triangle shape
         if not (t >= 0 and t <= 1):
             raise ValueError("t should be in range [0,1]")
         param = (t, direction, theta, size, kwargs)
@@ -559,7 +555,6 @@ class Line(object):
         ellipse = np.array([-a*np.cos(theta), b*np.sin(theta)]).transpose()
 
         # rotate ellipse and shift vector
-        #path = np.dot(R, ellipse).transpose() + rot
         ellipse = vectors.sqdot(ellipse, R)
         path = vectors.add(ellipse, ro)
 
@@ -568,10 +563,12 @@ class Line(object):
     def get_circular_linepath(self):
         """Get xy vectors for the path."""
 
-        r = self.r
+        r = self.circleradius
 
         # Circle center  # TODO: make use of fload value for d to tilt circle.
-        ro = self.rend + np.array([0,1]) * self.d * self.r
+        drcenter = np.array([0,r])
+        drcenter = vectors.rotate(drcenter, self.circlepos)
+        ro = self.rend + drcenter
 
         # Angular progression along the circle.
         theta_s = 0.
@@ -580,8 +577,9 @@ class Line(object):
 
         # xy relative to the circle center
         circle = r * np.array([- np.sin(theta), - np.cos(theta)]).transpose()
+        vectors.rotate(circle, self.circlepos)
 
-        # shift vector  # TODO add rotation of the circle (!)
+        # shift vector
         path = vectors.add(circle,  ro)
 
         return path
@@ -644,7 +642,6 @@ class Line(object):
         Returns
         -------
             np.ndarray of shape (N, 2)
-
 """
         if tangent is None:
             tangent = self.get_tangent()
@@ -929,19 +926,14 @@ class Diagram(object):
 
     fig : A matplotlib Figure. If none is given, a new one is initialized.
     ax : A matplotlib AxesSubplot. If none is given, a new one is initialized.
-
 """
-    def __init__(self, fig=None, ax=None):
-
-        if fig is None:
-            self.fig = plt.figure(figsize=(6,6))
+    def __init__(self, ax=None):
 
         if ax is not None:
             self.ax = ax
-        elif self.fig.axes:
-            self.ax = self.fig.gca()
         else:
-            self.ax = self.fig.gca()
+            fig = plt.figure(figsize=(6,6))
+            self.ax = fig.gca()
             self.ax.set_xlim(0,1)
             self.ax.set_ylim(0,1)
             self.ax.set_xticks([])
@@ -1037,6 +1029,10 @@ class Diagram(object):
 
         for O in self.operators:
             O.draw(self.ax)
+
+    def text(*args, **kwargs):
+        """Add text using matplotlib.axes.Axes.text."""
+        self.ax.text(*args, **kwargs)
 
     def show(self):
         """Show the figure with matplotlib.pyplot.show."""
