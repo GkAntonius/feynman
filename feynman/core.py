@@ -45,9 +45,12 @@ class Verticle(object):
     **kwargs :
         Any matplotlib line style argument. 
 """
+
+    _xy = np.zeros(2)
+
     def __init__(self, xy=(0,0), **kwargs):
 
-        self.xy = np.array(xy)
+        self.xy = xy
 
         self.style = dict(
             marker='o',
@@ -62,6 +65,17 @@ class Verticle(object):
         # TODO Should be able to get the lines connected to that verticle.
         self.lines = list()
         self.texts = list()
+
+    @Property
+    def xy(self):
+        return self._xy
+
+    @xy.setter
+    def set_xy(self, xy):
+        self._xy = np.array(xy)
+
+    def set_xy(self, xy):
+        self.xy = xy
 
     def get_marker(self):
         """Returns a matplotlib.lines.Line2D instance."""
@@ -138,7 +152,7 @@ class Line(object):
             'dashed'
             'doubledashed'
 
-    pathtype :
+    linetype :
         The shape of the line path.
 
             linear    -  A straight line between two points.
@@ -180,9 +194,36 @@ class Line(object):
     phase : float
         Phase in the wiggly or loopy pattern, in units of 2pi.
 
-    numpoints : int
+    npoints : int
         Number of points that makes up the line.
+
+
+    Properties
+    ----------
+
+    npoints : int
+        Number of points that makes up the line.
+
+    xy : np.ndarray, shape (npoints, 2)
+        The xy coordinates of the line.
+
+    linepath : np.ndarray, shape (npoints, 2)
+        The director line arount which the xy points are placed (with style).
+
+    tangent : np.ndarray, shape (npoints, 2)
+        The unitary vectors tangent to the linepath.
+
+    normal : np.ndarray, shape (npoints, 2)
+        The unitary vectors normal to the linepath.
+
 """
+
+    _numpoints = 2
+    _xy = np.zeros(2, 2)
+    _linepath = np.zeros(2, 2)
+    _tangent = np.zeros(2,2)
+    _normal = np.zeros(2,2)
+
     def __init__(self, vstart, vend, **kwargs):
 
         self.vstart = vstart
@@ -194,9 +235,9 @@ class Line(object):
         # Default values
         default = dict(
             linestyle='simple',
-            pathtype='linear',
+            linetype='linear',
             arrow=False,
-            numpoints=400,
+            npoints=400,
             ellipse_spread=.5,
             ellipse_exc=1.2,
             circle_radius=.1,
@@ -209,12 +250,11 @@ class Line(object):
             phase=0,
             )
 
-        # Adjust some default values according to pathtype and linestyle
-        if (kwargs.get('pathtype') == 'circular' and
+        # Adjust some default values according to linetype and linestyle
+        if (kwargs.get('linetype') == 'circular' and
             kwargs.get('linestyle') == 'wiggly'):
             default.update(nwiggles=7)
             default.update(phase=.25)
-
 
         # Set default values
         for key, val in default.items():
@@ -224,10 +264,10 @@ class Line(object):
         for key in (
 
             'linestyle',
-            'pathtype',
+            'linetype',
             'arrow',
 
-            'numpoints',
+            'npoints',
             'ellipse_spread',
             'ellipse_exc',
             'circle_radius',
@@ -246,6 +286,9 @@ class Line(object):
             ):
             self.__dict__[key] = kwargs.pop(key)
 
+        # Set the line type
+        self.set_linetype(kwargs.pop('linetype'))
+
         arrowparam = kwargs.pop('arrowparam', dict())
 
         # all other kwargs are 'matplotlib' line style arguments
@@ -261,7 +304,7 @@ class Line(object):
 
 
         # Main parameter for the curve
-        self.t = np.linspace(0, 1, self.numpoints)
+        self.t = np.linspace(0, 1, self.npoints)
 
         # Arrows parameters
         self.arrows_param = list()
@@ -273,15 +316,104 @@ class Line(object):
         if self.arrow:
             self.add_arrow(**arrowparam)
 
-    @property
-    def rstart(self):
-        """The starting position."""
-        return np.array(self.vstart.xy)
+        # Compute the linepath
+        self._set_linepath()
+
+        # Compute the tangent
+        self._set_tangent()
+
+        # Compute the normal
+        self._set_tangent()
+
+        # Compute the line points
+        self._set_xy()
+
+    def _set_linepath(self):
+        """Compute the line path."""
+        self._set_linear_linepath()
 
     @property
-    def rend(self):
-        """The end position."""
-        return np.array(self.vend.xy)
+    def rstart(self): return self.vstart.xy
+
+    @property
+    def rend(self): return self.vend.xy
+
+    @property
+    def dr(self): return self.rend - self.rstart
+
+    @property
+    def angle(self):
+        """The angle (in rad) of the direct line between end points."""
+        dx, dy = self.dr
+        angle = np.arctan(dy / dx)
+        if dx < 0: angle += np.pi
+        return angle
+
+    @property
+    def xy(self):
+        return self._xy
+
+    @xy.setter
+    def set_xy(self, xy):
+        self._xy = np.array(xy)
+        assert self.xy.ndim == 2, "Wrong dimension for line xy."
+        assert self.xy.shape[1] == 2, "Wrong dimension for line xy."
+
+    @property
+    def npoints(self):
+        return self.xy.shape[1]
+
+    def _set_tangent(self):
+        """Compute the tangent points."""
+        self._set_tangent_numeric()
+
+    @property
+    def tangent(self):
+        return self._tangent
+
+    @tangent.setter
+    def tangent(self, xy):
+        self._tangent = np.array(xy)
+
+    def _set_tangent_numeric(self):
+        """Compute tangent numerically."""
+        v = np.zeros((self.npoints, 2))
+        v[:-1] = self.xy[1:] - self.xy[:-1]
+        v[-1] = self.xy[-1] - self.xy[-2]
+        norms = np.array(map(lambda n: max(np.linalg.norm(n), 1e-8), v))
+        self.tangent = vectors.dot(v, 1. / norms)
+
+    @property
+    def normal(self):
+        return self._normal
+
+    def _set_normal(self):
+        """Compute the normal vector along the curve."""
+        R = np.array([[0., -1.],[1., 0.]])
+        self.normal = vectors.sqdot(self.tangent, R)
+
+    def set_linetype(self, lt):
+        if lt in ('linear', 'l', 'straight'):
+            self._set_linepath = self._set_linear_linepath
+        elif lt in ('elliptic', 'e', 'ellipse'):
+            self._set_linepath = self._set_elliptic_linepath
+        elif lt in ('circular', 'c', 'circle'):
+            self._set_linepath = self._set_circular_linepath
+        else:
+            raise ValueError('Wrong value for linetype')
+
+    # User
+    def get_xy(self)
+        """Return the xy array of the line points, of shape (numpoins, 2)."""
+        return self.xy
+
+    # User
+    def set_xy(self, xy)
+        """Set the xy array of the line points, of shape (numpoins, 2)."""
+        self.xy = xy
+
+
+    #   -------------------------------------------------------------------   #
 
     def add_arrow(self, t=0.5, direction=1, theta=.083, size=.025, **kwargs):
         """
@@ -354,8 +486,6 @@ class Line(object):
     def get_arrow_lines(self):
         """Get the arrow lines."""
         linepath = self.get_linepath()
-        tangent = self.get_tangent(linepath)
-        normal = self.get_normal(tangent)
 
         lines = list()
         for param in self.arrows_param:
@@ -364,12 +494,12 @@ class Line(object):
             th = 2 * np.pi * theta
 
             # Index of t
-            it = int(t * self.numpoints)
+            it = int(t * self.npoints)
 
             # Find the position and tangent vector at point t
             rtip = linepath[it]
-            tan = tangent[it]
-            norm = normal[it]
+            tan = self.tangent[it]
+            norm = self.normal[it]
 
             # Starting point
             drstart = - d * np.cos(th) * tan + np.sin(th) * norm
@@ -398,14 +528,6 @@ class Line(object):
             return self.get_double_main_lines()
         else:
             return self.get_single_main_lines()
-        #if self.linestyle in ('simple', 's'):
-        #    return self.get_simple_main_lines()
-        #elif self.linestyle in ('wiggly', 'w'):
-        #    return self.get_wiggly_main_lines()
-        #elif self.linestyle in ('loopy', 'l'):
-        #    return self.get_loopy_main_lines()
-        #else:
-        #    raise ValueError('Wrong value for linestyle.')
 
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
@@ -431,29 +553,9 @@ class Line(object):
         line = mpl.lines.Line2D(*xy, **self.style)
         return [line]
         
-    #def get_simple_main_lines(self):
-    #    """Get the main lines."""
-    #    xy = self.get_xy_line().transpose()
-    #    line = mpl.lines.Line2D(*xy, **self.style)
-    #    return [line]
-
-    #def get_wiggly_main_lines(self):
-    #    """Get the main lines."""
-    #    xy = self.get_xy_line().transpose()
-    #    line = mpl.lines.Line2D(*xy, **self.style)
-    #    return [line]
-
-    #def get_loopy_main_lines(self):
-    #    """Get the main lines."""
-    #    xy = self.get_xy_line().transpose()
-    #    line = mpl.lines.Line2D(*xy, **self.style)
-    #    return [line]
-
     def distance(self):
         """The distance between the starting point and the end point."""
-        #return np.sqrt((self.ystart - self.yend) ** 2 + 
-        #               (self.xstart - self.xend) ** 2)
-        return np.linalg.norm(self.rend - self.rstart)
+        return np.linalg.norm(self.dr)
 
     def pathlength(self, linepath=None):
         """The length of the path."""
@@ -478,23 +580,30 @@ class Line(object):
 
         return l
 
+    @property
+    def linepath(self):
+        return self._linepath
+
+    @linepath.setter
+    def set_linepath(self, linepath):
+        self._linepath = np.array(linepath)
+        assert self.linepath.ndim == 2, "Wrong dimension for line path."
+        assert self.linepath.shape[1] == 2, "Wrong dimension for line path."
+        self._set_tangent()
+        self._set_normal()
+        self._set_xy()
+
+    # User
     def get_linepath(self, *args, **kwargs):
         """
-        Get xy vectors for the path.
+        Get the director line arount which the line exhibits style.
 
         Returns
         -------
         xy: np.ndarray of shape (N, 2)
 
 """
-        if self.pathtype in ('linear', 'l', 'straight'):
-            return self.get_linear_linepath(*args, **kwargs)
-        elif self.pathtype in ('elliptic', 'e', 'ellipse'):
-            return self.get_elliptic_linepath(*args, **kwargs)
-        elif self.pathtype in ('circular', 'c', 'circle'):
-            return self.get_circular_linepath(*args, **kwargs)
-        else:
-            raise ValueError('Wrong value for pathtype')
+        return self.linepath
 
     def get_path_point(self, t):
         """
@@ -506,36 +615,28 @@ class Line(object):
 """
         # This function is not optimized at all.
         linepath = self.get_linepath()
-        i_xy = min(int(t * self.numpoints), self.numpoints)
+        i_xy = min(int(t * self.npoints), self.npoints)
         xy = linepath[i_xy]
         return xy.reshape(2)
         
-    def get_linear_linepath(self):
-        """Get xy vectors for the path."""
-        dr = self.rend - self.rstart
-        v, t = np.meshgrid(dr, self.t)
-        path = self.rstart + v * t
-
-        return path
+    def _set_linear_linepath(self):
+        """Compute the xy eectors for a linear line path."""
+        v, t = np.meshgrid(self.dr, self.t)
+        self.linepath = self.rstart + v * t
         
-    def get_elliptic_linepath(self):
-        """Get xy vectors for the path."""
+    def _set_elliptic_linepath(self):
+        """Compute the xy vectors for an elliptic line path."""
 
         # Geometry of the starting and end points
-        dr = self.rend - self.rstart
-        dx, dy = dr
         l = self.distance()
 
-        # Line angle
-        gamma = np.arctan(dy / dx)
-        if dx < 0:
-            gamma += np.pi
-
+        # Rotation matrix.
+        gamma = self.angle
         R = np.array([[np.cos(gamma), - np.sin(gamma)],
                       [np.sin(gamma),   np.cos(gamma)]])
 
         # Ellipse center
-        ro = self.rstart + dr / 2
+        ro = self.rstart + self.dr / 2
 
         # Axes of the ellipse
         a = l / (2 * np.sin(self.ellipse_spread * np.pi))
@@ -551,11 +652,9 @@ class Line(object):
 
         # rotate ellipse and shift vector
         ellipse = vectors.sqdot(ellipse, R)
-        path = vectors.add(ellipse, ro)
+        self.linepath = vectors.add(ellipse, ro)
 
-        return path
-
-    def get_circular_linepath(self):
+    def _set_circular_linepath(self):
         """Get xy vectors for the path."""
 
         r = self.circle_radius
@@ -575,11 +674,10 @@ class Line(object):
         vectors.rotate(circle, self.circle_pos)
 
         # shift vector
-        path = vectors.add(circle,  ro)
+        self.linepath = vectors.add(circle,  ro)
 
-        return path
-
-    def get_tangent(self, linepath=None, **kwargs):
+    # User
+    def get_tangent(self):
         """
         Get xy vectors for the tangent path.
         These vectors are normalized.
@@ -593,8 +691,7 @@ class Line(object):
         -------
             np.ndarray of shape (N, 2)
 """
-        # TODO compute elliptic_tangent.
-        return self.get_tangent_numeric(linepath, **kwargs)
+        return self.tangent
 
     def get_tangent_point(self, t):
         """
@@ -604,26 +701,10 @@ class Line(object):
 
         Returns: np.ndarray of shape (2)
 """
-        tangent = self.get_tangent()
-        i_v = min(int(t * self.numpoints), self.numpoints)
-        v = tangent[i_v]
-        return v.reshape(2)
+        i_v = min(int(t * self.npoints), self.npoints)
+        return self.tangent[i_v].reshape(2)
 
-    def get_tangent_numeric(self, linepath=None):
-        """Compute tangent numerically."""
-        if linepath is None:
-            linepath = self.get_linepath()
-
-        v = np.zeros((self.numpoints, 2))
-        v[:-1] = linepath[1:] - linepath[:-1]
-        v[-1] = linepath[-1] - linepath[-2]  # Gross approximation.
-
-        # normalize the normal
-        norm = np.sqrt(sum(v.transpose() * v.transpose()))
-        tangent = vectors.dot(v, 1. / norm)
-
-        return tangent
-
+    # User
     def get_normal(self, tangent=None, **kwargs):
         """
         Return a vector normal to the path for each parameter point.
@@ -638,14 +719,7 @@ class Line(object):
         -------
             np.ndarray of shape (N, 2)
 """
-        if tangent is None:
-            tangent = self.get_tangent()
-
-        # Compute normal by rotation of the tangent.
-        R = np.array([[0., -1.],[1., 0.]])
-        normal = vectors.sqdot(tangent, R)
-
-        return normal
+        return self.normal
 
     def get_normal_point(self, t):
         """
@@ -655,10 +729,12 @@ class Line(object):
 
         Returns: np.ndarray of shape (2)
 """
-        normal = self.get_normal()
-        i_v = min(int(t * self.numpoints), self.numpoints)
-        v = normal[i_v]
+        i_v = min(int(t * self.npoints), self.npoints)
+        v = self.normal[i_v]
         return v.reshape(2)
+
+    def _set_xy_wiggly(self):
+        """Compute the xy wiggly path.""" 
 
     def get_xy_line(self):
         """
@@ -686,8 +762,6 @@ class Line(object):
         """Get the xy vectors for the line points."""
         t = self.t
         linepath = self.get_linepath()
-        tangent = self.get_tangent(linepath)
-        normal = self.get_normal(tangent)
 
         # Number of waves
         numhalfwaves = int(2 * self.nwiggles)
@@ -696,7 +770,7 @@ class Line(object):
 
         sine = np.sin(omega * t + phi)
 
-        dxy = self.amplitude * vectors.dot(normal, sine)
+        dxy = self.amplitude * vectors.dot(self.normal, sine)
         dxy = vectors.add(dxy, -dxy[0])
         line = linepath + dxy
 
@@ -706,8 +780,6 @@ class Line(object):
         """Get the xy vectors for the line points."""
         t = self.t
         linepath = self.get_linepath()
-        tangent = self.get_tangent(linepath)
-        normal = self.get_normal(tangent)
 
         # Number of waves
         omega = 2 * np.pi * self.nloops
@@ -720,7 +792,7 @@ class Line(object):
         dx -= dx[0]
 
         dxy = (self.xamp * vectors.dot(tangent, dx) +
-               self.yamp * vectors.dot(normal, dy))
+               self.yamp * vectors.dot(self.normal, dy))
         line = linepath + dxy
  
         return line
