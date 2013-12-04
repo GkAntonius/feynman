@@ -145,26 +145,22 @@ class Line(object):
             elliptic  -  An ellipse arc.
             circular  -  A circle starting and ending at the same verticle.
 
-    ellipseparam : (float, float, int) = (.5, 1.2, 1)
-        Three parameters governing the shape of an elliptic path:
-
-            alpha  -  The angle (in units of 2pi) spread by the ellipse arc.
+    ellipse_spread :  The angle (in units of 2pi) spread by the ellipse arc.
                       When alpha --> 0 the curve will tend to a straight ligne,
                       when alpha = 0.5 the curve will be half an ellipse,
                       when alpha --> 1 the curve will tend to a closed ellipse. 
 
-            c      -  The excentricity of the ellipse, that is, the ratio
+    ellipse_exc :     The excentricity of the ellipse, that is, the ratio
                       of the long axe over the short axe.
                       When c = 1, the curve will be a circle arc.
-
-            d      -  Controls wether the curve is 'up' or 'down'.
+                      Also Controls wether the curve is 'up' or 'down'.
                       A positive value makes it 'up', while a negative value
                       makes it 'down'.
 
-    circleradius : float (.1)
+    circle_radius : float (.1)
         The radius of the circle.
 
-    circlepos : float (0.)
+    circle_pos : float (0.)
         The position of the center, relative to the anchor verticle.
         It is an angle, in units of 2pi.
 
@@ -201,9 +197,10 @@ class Line(object):
             pathtype='linear',
             arrow=False,
             numpoints=400,
-            ellipseparam=(.5, 1.2, 1),
-            circleradius=.1,
-            circlepos=0.,
+            ellipse_spread=.5,
+            ellipse_exc=1.2,
+            circle_radius=.1,
+            circle_pos=0.,
             amplitude=.025,
             xamp=.025,
             yamp=.05,
@@ -231,9 +228,10 @@ class Line(object):
             'arrow',
 
             'numpoints',
-            'ellipseparam',
-            'circleradius',
-            'circlepos',
+            'ellipse_spread',
+            'ellipse_exc',
+            'circle_radius',
+            'circle_pos',
 
             # Amplitude of the wave and such...
             'amplitude',
@@ -264,9 +262,6 @@ class Line(object):
 
         # Main parameter for the curve
         self.t = np.linspace(0, 1, self.numpoints)
-
-        # Elliptic parameters.
-        self.alpha, self.c, self.d = self.ellipseparam
 
         # Arrows parameters
         self.arrows_param = list()
@@ -543,12 +538,12 @@ class Line(object):
         ro = self.rstart + dr / 2
 
         # Axes of the ellipse
-        a = l / (2 * np.sin(self.alpha * np.pi))
-        b = a / self.c * np.sign(self.d)
+        a = l / (2 * np.sin(self.ellipse_spread * np.pi))
+        b = a / self.ellipse_exc
 
         # Angular progression along the ellipse.
-        theta_s = np.pi * (1 - 2 * self.alpha) / 2.
-        theta_i = 2 * np.pi * self.alpha
+        theta_s = np.pi * (1 - 2 * self.ellipse_spread) / 2.
+        theta_i = 2 * np.pi * self.ellipse_spread
         theta = theta_s + theta_i * self.t
 
         # xy relative to the ellipse center
@@ -563,11 +558,11 @@ class Line(object):
     def get_circular_linepath(self):
         """Get xy vectors for the path."""
 
-        r = self.circleradius
+        r = self.circle_radius
 
         # Circle center  # TODO: make use of fload value for d to tilt circle.
         drcenter = np.array([0,r])
-        drcenter = vectors.rotate(drcenter, self.circlepos)
+        drcenter = vectors.rotate(drcenter, self.circle_pos)
         ro = self.rend + drcenter
 
         # Angular progression along the circle.
@@ -577,7 +572,7 @@ class Line(object):
 
         # xy relative to the circle center
         circle = r * np.array([- np.sin(theta), - np.cos(theta)]).transpose()
-        vectors.rotate(circle, self.circlepos)
+        vectors.rotate(circle, self.circle_pos)
 
         # shift vector
         path = vectors.add(circle,  ro)
@@ -813,7 +808,7 @@ class Operator(object):
         else:
             self.shape = 'polygon'
 
-        self.c = kwargs.pop('c')
+        self.ellipse_exc = kwargs.pop('c')
 
         self.style = dict(
             edgecolor="k",
@@ -864,7 +859,7 @@ class Operator(object):
         start, end = self.get_xy()
         dxy = end - start
         width = np.linalg.norm(dxy)
-        height = width / self.c
+        height = width / self.ellipse_exc
         center = self.get_center()
         angle = vectors.angle(dxy, 'deg')
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
