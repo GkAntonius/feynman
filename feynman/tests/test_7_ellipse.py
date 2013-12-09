@@ -52,7 +52,7 @@ class TestOperator(TestDiagram):
 
         D2.line(v1, v2, arrow=True)
         D2.operator([v2,v3], c=1.5)
-        D2.line(v3, v4, linestyle='wiggly', nwiggles=2)
+        D2.line(v3, v4, linetype='wiggly', nwiggles=2)
 
         D2.plot()
 

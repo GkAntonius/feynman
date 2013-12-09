@@ -29,8 +29,8 @@ class TestLines(TestDiagram):
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
         l1 = dia.line(v1, v2)
-        l2 = dia.line(v1, v2, pathtype='elliptic')
-        
+        l2 = dia.line(v1, v2, pathtype='elliptic', npoints = 400)
+
         dia.plot()
 
         self.show_pdf(basename)

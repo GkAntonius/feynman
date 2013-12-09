@@ -43,7 +43,7 @@ class TestOperator(TestDiagram):
         triangle = dia.operator([v3, v4, v5])
 
         v6 = dia.verticle(xy=(.8, .5), marker='')
-        l3 = dia.line(v5, v6, linestyle='wiggly', nwiggles=4)
+        l3 = dia.line(v5, v6, linetype='wiggly', nwiggles=4)
         
         dia.plot()
 

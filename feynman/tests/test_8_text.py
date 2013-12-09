@@ -56,7 +56,7 @@ class TestText(TestDiagram):
         v4 = D2.verticle(xy=(.9,.5), marker='')
 
         l12 = D2.line(v1, v2, arrow=True)
-        w23 = D2.line(v2, v3, pathtype='elliptic', linestyle='loopy',
+        w23 = D2.line(v2, v3, pathtype='elliptic', linetype='loopy',
                 nloops=18)
         l23 = D2.line(v2, v3, arrow=True)
         l34 = D2.line(v3, v4, arrow=True)

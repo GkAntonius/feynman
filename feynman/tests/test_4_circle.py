@@ -30,7 +30,7 @@ class TestLines(TestDiagram):
         v2 = dia.verticle(xy=(0.5,.2))
         v3 = dia.verticle(xy=(0.8,.2), marker='')
         l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v2, v2, pathtype='circular', linestyle='simple')
+        l2 = dia.line(v2, v2, pathtype='circular', linetype='simple')
         l3 = dia.line(v2, v3, arrow=True)
         
         dia.plot()
@@ -53,7 +53,7 @@ class TestLines(TestDiagram):
         v2 = dia.verticle(xy=(0.5,.2))
         v3 = dia.verticle(xy=(0.8,.2), marker='')
         l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v2, v2, pathtype='circular', linestyle='wiggly',
+        l2 = dia.line(v2, v2, pathtype='circular', linetype='wiggly',
                       nwiggles=7, phase=.25)
         l3 = dia.line(v2, v3, arrow=True)
         

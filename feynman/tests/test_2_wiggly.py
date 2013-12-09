@@ -29,7 +29,7 @@ class TestLines(TestDiagram):
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
         l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v1, v2, pathtype='elliptic', linestyle='wiggly')
+        l2 = dia.line(v1, v2, pathtype='elliptic', linetype='wiggly')
         
         dia.plot()
 

@@ -66,12 +66,12 @@ class Verticle(object):
         self.lines = list()
         self.texts = list()
 
-    @Property
+    @property
     def xy(self):
         return self._xy
 
     @xy.setter
-    def set_xy(self, xy):
+    def xy(self, xy):
         self._xy = np.array(xy)
 
     # User
@@ -219,11 +219,12 @@ class Line(object):
 
 """
 
-    _numpoints = 2
-    _xy = np.zeros(2, 2)
-    _linepath = np.zeros(2, 2)
-    _tangent = np.zeros(2,2)
-    _normal = np.zeros(2,2)
+    _xy = np.zeros((2, 2))
+    _linepath = np.zeros((2, 2))
+    _tangent = np.zeros((2,2))
+    _normal = np.zeros((2,2))
+    _main_lines = None
+    t =  np.linspace(0, 1, 2)
 
     def __init__(self, vstart, vend, **kwargs):
 
@@ -235,6 +236,7 @@ class Line(object):
 
         # Default values
         default = dict(
+            linestyle='single',
             linetype='simple',
             pathtype='linear',
             arrow=False,
@@ -266,7 +268,6 @@ class Line(object):
 
             'arrow',
 
-            'npoints',
             'ellipse_spread',
             'ellipse_exc',
             'circle_radius',
@@ -288,8 +289,34 @@ class Line(object):
         # Set the line type
         self.set_pathtype(kwargs.pop('pathtype'))
         self.set_linetype(kwargs.pop('linetype'))
+        self.set_linestyle(kwargs.pop('linestyle'))
 
         arrowparam = kwargs.pop('arrowparam', dict())
+
+        # Arrows parameters
+        self.arrows_param = list()
+
+        self.lines = list()
+        self.patches = list()
+        self.texts = list()
+
+        if self.arrow:
+            self.add_arrow(**arrowparam)
+
+        # Set the main paramter
+        self._set_t(kwargs.pop('npoints'))
+
+        # Compute the linepath
+        self._set_linepath()
+
+        # Compute the tangent
+        self._set_tangent()
+
+        # Compute the normal
+        self._set_normal()
+
+        # Compute the line points
+        self._set_xy()
 
         # all other kwargs are 'matplotlib' line style arguments
         self.style = dict(
@@ -303,31 +330,11 @@ class Line(object):
         self.double_center_color = 'w'
 
 
-        # Main parameter for the curve
-        self.t = np.linspace(0, 1, self.npoints)
+    def _set_t(self, npoints):
+        """Set the main parameter for the curve."""
+        self.t = np.linspace(0, 1, npoints)
 
-        # Arrows parameters
-        self.arrows_param = list()
-
-        self.lines = list()
-        self.patches = list()
-        self.texts = list()
-
-        if self.arrow:
-            self.add_arrow(**arrowparam)
-
-        # Compute the linepath
-        self._set_linepath()
-
-        # Compute the tangent
-        self._set_tangent()
-
-        # Compute the normal
-        self._set_tangent()
-
-        # Compute the line points
-        self._set_xy()
-
+    # Morphable
     def _set_linepath(self):
         """Compute the line path."""
         return self._set_linear_linepath()
@@ -354,14 +361,18 @@ class Line(object):
         return self._xy
 
     @xy.setter
-    def set_xy(self, xy):
+    def xy(self, xy):
         self._xy = np.array(xy)
         assert self.xy.ndim == 2, "Wrong dimension for line xy."
         assert self.xy.shape[1] == 2, "Wrong dimension for line xy."
 
     @property
     def npoints(self):
-        return self.xy.shape[1]
+        return self.t.size
+
+    @npoints.setter
+    def npoints(self, n):
+        self._set_t(n)
 
     def _set_tangent(self):
         """Compute the tangent points."""
@@ -390,9 +401,16 @@ class Line(object):
     def _set_normal(self):
         """Compute the normal vector along the curve."""
         R = np.array([[0., -1.],[1., 0.]])
-        self.normal = vectors.sqdot(self.tangent, R)
+        self._normal = vectors.sqdot(self.tangent, R)
 
     def set_pathtype(self, pathtype):
+        """
+        Set the path type.
+
+            linear    -  A straight line between two points.
+            elliptic  -  An ellipse arc.
+            circular  -  A circle starting and ending at the same verticle.
+"""
         if pathtype in ('linear', 'l', 'straight'):
             self._set_linepath = self._set_linear_linepath
         elif pathtype in ('elliptic', 'e', 'ellipse'):
@@ -403,12 +421,12 @@ class Line(object):
             raise ValueError('Wrong value for pathtype')
 
     # User
-    def get_xy(self)
+    def get_xy(self):
         """Return the xy array of the line points, of shape (numpoins, 2)."""
         return self.xy
 
     # User
-    def set_xy(self, xy)
+    def set_xy(self, xy):
         """Set the xy array of the line points, of shape (numpoins, 2)."""
         self.xy = xy
 
@@ -521,13 +539,33 @@ class Line(object):
 
         return lines
 
+    @property
+    def main_lines(self):
+        return self._main_lines
 
+    def set_linestyle(self, linestyle):
+        """
+        Set the linestyle.
+
+            single  -  A simple line.
+            double  -  A double line.
+"""
+        if linestyle in ('simple', 's', 'single'):
+            self.get_main_lines = self.get_single_main_lines
+        elif linestyle in ('double', 'd'):
+            self.get_main_lines = self.get_double_main_lines
+        else:
+            raise ValueError('Wrong value for linestyle')
+
+    # Morphable
+    def _set_main_lines(self):
+        """Set the main lines."""
+        self._set_single_main_line()
+
+    # Morphable
     def get_main_lines(self):
         """Get the main lines."""
-        if 'double' in self.linetype:
-            return self.get_double_main_lines()
-        else:
-            return self.get_single_main_lines()
+        return self.get_single_main_lines()
 
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
@@ -546,11 +584,14 @@ class Line(object):
         style['linewidth'] = .5 * self.style.get('linewidth', 2)
         lines.append(mpl.lines.Line2D(x, y, **style))
         return lines
+    def _set_double_main_lines(self): self.main_lines = get_double_main_lines()
 
     def get_single_main_lines(self):
         """Get the main lines."""
         line = mpl.lines.Line2D(*self.xy.transpose(), **self.style)
+        #self.main_lines = [line]
         return [line]
+    def _set_single_main_lines(self): self.main_lines = get_single_main_lines()
         
     def distance(self):
         """The distance between the starting point and the end point."""
@@ -584,7 +625,7 @@ class Line(object):
         return self._linepath
 
     @linepath.setter
-    def set_linepath(self, linepath):
+    def linepath(self, linepath):
         self._linepath = np.array(linepath)
         assert self.linepath.ndim == 2, "Wrong dimension for line path."
         assert self.linepath.shape[1] == 2, "Wrong dimension for line path."
@@ -732,12 +773,19 @@ class Line(object):
         v = self.normal[i_v]
         return v.reshape(2)
 
+    # Morphable
     def _set_xy(self):
         """Compute the xy coordinates of the line."""
         return self._set_xy_simple()
 
     def set_linetype(self, linetype):
-        """Set the line style."""
+        """
+        Set the line style.
+
+            simple  -  A straight line.
+            wiggly  -  A wavy line.
+            loopy   -  A spring.
+"""
         if linetype in ('simple', 's', 'straight'):
             self._set_xy = self._set_xy_simple
         elif linetype in ('wiggly', 'w', 'wiggle'):
@@ -778,74 +826,13 @@ class Line(object):
         dx = np.sin(omega * self.t + phi)
         dx -= dx[0]
 
-        dxy = (self.xamp * vectors.dot(tangent, dx) +
+        dxy = (self.xamp * vectors.dot(self.tangent, dx) +
                self.yamp * vectors.dot(self.normal, dy))
 
         self.xy = self.linepath + dxy
 
-    # TODO remove
-    def get_xy_line(self):
-        """
-        Get the xy vectors for the line points.
-
-        Returns
-        -------
-            np.ndarray of shape (N, 2)
-
-"""
-        if self.linetype == 'simple' or self.linetype == 'double':
-            return self.get_simple_xy_line()
-        elif 'wiggly' in self.linetype:
-            return self.get_wiggly_xy_line()
-        elif 'loopy' in self.linetype:
-            return self.get_loopy_xy_line()
-        else:
-            raise ValueError('Wrong value for linetype.')
-
-    # TODO remove
-    def get_simple_xy_line(self):
-        """Get the xy vectors for the line points."""
-        return self.get_linepath()
-
-    # TODO remove
-    def get_wiggly_xy_line(self):
-        """Get the xy vectors for the line points."""
-
-        # Number of waves
-        numhalfwaves = int(2 * self.nwiggles)
-        omega = np.pi * numhalfwaves
-        phi = 2 * np.pi * self.phase
-
-        sine = np.sin(omega * self.t + phi)
-
-        dxy = self.amplitude * vectors.dot(self.normal, sine)
-        dxy = vectors.add(dxy, -dxy[0])
-        line = self.linepath + dxy
-
-        return line
-
-    # TODO remove
-    def get_loopy_xy_line(self):
-        """Get the xy vectors for the line points."""
-
-        # Number of waves
-        omega = 2 * np.pi * self.nloops
-        phi = 2 * np.pi * self.phase
-
-        dy = - np.cos(omega * self.t + phi)
-        dy -= dy[0]
-
-        dx = np.sin(omega * self.t + phi)
-        dx -= dx[0]
-
-        dxy = (self.xamp * vectors.dot(tangent, dx) +
-               self.yamp * vectors.dot(self.normal, dy))
-        line = self.linepath + dxy
- 
-        return line
-
     def get_lines(self):
-        """Get the lines."""
+        """Get the lines."""  # Could be faster
         lines = list()
         lines.extend(self.get_main_lines())
         lines.extend(self.get_arrow_lines())

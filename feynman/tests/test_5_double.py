@@ -33,13 +33,17 @@ class TestLines(TestDiagram):
 
         v3 = dia.verticle(xy=(.2,.3))
         v4 = dia.verticle(xy=(0.8,.3))
-        l2 = dia.line(v3, v4, pathtype='linear', linestyle='doublewiggly')
+        l2 = dia.line(v3, v4,
+                    pathtype='linear', linestyle='double', linetype='wiggly',)
 
         v5 = dia.verticle(xy=(.2,.1))
         v6 = dia.verticle(xy=(0.8,.1))
-        l3 = dia.line(v5, v6, pathtype='linear', linestyle='doubleloopy')
+        l3 = dia.line(v5, v6,
+                    pathtype='linear', linestyle='double', linetype='loopy',)
 
-        l4 = dia.line(v1, v2, pathtype='elliptic', linestyle='doublewiggly')
+        l4 = dia.line(v1, v2,
+                    pathtype='elliptic', linestyle='double', linetype='wiggly',)
+
         
         dia.plot()
 
