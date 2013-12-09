@@ -74,6 +74,7 @@ class Verticle(object):
     def set_xy(self, xy):
         self._xy = np.array(xy)
 
+    # User
     def set_xy(self, xy):
         self.xy = xy
 
@@ -139,25 +140,25 @@ class Line(object):
     vend :
         End vericle.
 
-    linestyle :
-        This is just the style of the line.
-            'simple'
-            'wiggly'
-            'double'
-            'doublewiggly'
-            'loopy'
-            'doubleloopy'
-            'dotted'
-            'doubledotted'
-            'dashed'
-            'doubledashed'
-
-    linetype :
+    pathtype :
         The shape of the line path.
 
             linear    -  A straight line between two points.
             elliptic  -  An ellipse arc.
             circular  -  A circle starting and ending at the same verticle.
+
+    linetype :
+        The type of line.
+
+            simple  -  A straight line.
+            wiggly  -  A wavy line.
+            loopy   -  A spring.
+
+    linestyle :
+        The style for the line.
+
+            single  -  A simple line.
+            double  -  A double line.
 
     ellipse_spread :  The angle (in units of 2pi) spread by the ellipse arc.
                       When alpha --> 0 the curve will tend to a straight ligne,
@@ -234,8 +235,8 @@ class Line(object):
 
         # Default values
         default = dict(
-            linestyle='simple',
-            linetype='linear',
+            linetype='simple',
+            pathtype='linear',
             arrow=False,
             npoints=400,
             ellipse_spread=.5,
@@ -250,9 +251,9 @@ class Line(object):
             phase=0,
             )
 
-        # Adjust some default values according to linetype and linestyle
-        if (kwargs.get('linetype') == 'circular' and
-            kwargs.get('linestyle') == 'wiggly'):
+        # Adjust some default values according to pathtype and linetype
+        if (kwargs.get('pathtype') == 'circular' and
+            kwargs.get('linetype') == 'wiggly'):
             default.update(nwiggles=7)
             default.update(phase=.25)
 
@@ -263,8 +264,6 @@ class Line(object):
         # Set attributes values
         for key in (
 
-            'linestyle',
-            'linetype',
             'arrow',
 
             'npoints',
@@ -287,6 +286,7 @@ class Line(object):
             self.__dict__[key] = kwargs.pop(key)
 
         # Set the line type
+        self.set_pathtype(kwargs.pop('pathtype'))
         self.set_linetype(kwargs.pop('linetype'))
 
         arrowparam = kwargs.pop('arrowparam', dict())
@@ -330,7 +330,7 @@ class Line(object):
 
     def _set_linepath(self):
         """Compute the line path."""
-        self._set_linear_linepath()
+        return self._set_linear_linepath()
 
     @property
     def rstart(self): return self.vstart.xy
@@ -392,15 +392,15 @@ class Line(object):
         R = np.array([[0., -1.],[1., 0.]])
         self.normal = vectors.sqdot(self.tangent, R)
 
-    def set_linetype(self, lt):
-        if lt in ('linear', 'l', 'straight'):
+    def set_pathtype(self, pathtype):
+        if pathtype in ('linear', 'l', 'straight'):
             self._set_linepath = self._set_linear_linepath
-        elif lt in ('elliptic', 'e', 'ellipse'):
+        elif pathtype in ('elliptic', 'e', 'ellipse'):
             self._set_linepath = self._set_elliptic_linepath
-        elif lt in ('circular', 'c', 'circle'):
+        elif pathtype in ('circular', 'c', 'circle'):
             self._set_linepath = self._set_circular_linepath
         else:
-            raise ValueError('Wrong value for linetype')
+            raise ValueError('Wrong value for pathtype')
 
     # User
     def get_xy(self)
@@ -524,7 +524,7 @@ class Line(object):
 
     def get_main_lines(self):
         """Get the main lines."""
-        if 'double' in self.linestyle:
+        if 'double' in self.linetype:
             return self.get_double_main_lines()
         else:
             return self.get_single_main_lines()
@@ -532,25 +532,24 @@ class Line(object):
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
         lines = list()
-        xy = self.get_xy_line()
         style = deepcopy(self.style)
+        x, y = self.xy.transpose()
 
         # Make contour lines
         style['zorder'] = self.style.get('zorder', 0) -1
         style['linewidth'] = 1.8 * self.style.get('linewidth', 2)
-        lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
+        lines.append(mpl.lines.Line2D(x, y, **style))
 
         # Make center lines
         style['zorder'] = self.style.get('zorder', 0)
         style['color'] = self.double_center_color
         style['linewidth'] = .5 * self.style.get('linewidth', 2)
-        lines.append(mpl.lines.Line2D(*xy.transpose(), **style))
+        lines.append(mpl.lines.Line2D(x, y, **style))
         return lines
 
     def get_single_main_lines(self):
         """Get the main lines."""
-        xy = self.get_xy_line().transpose()
-        line = mpl.lines.Line2D(*xy, **self.style)
+        line = mpl.lines.Line2D(*self.xy.transpose(), **self.style)
         return [line]
         
     def distance(self):
@@ -733,9 +732,58 @@ class Line(object):
         v = self.normal[i_v]
         return v.reshape(2)
 
+    def _set_xy(self):
+        """Compute the xy coordinates of the line."""
+        return self._set_xy_simple()
+
+    def set_linetype(self, linetype):
+        """Set the line style."""
+        if linetype in ('simple', 's', 'straight'):
+            self._set_xy = self._set_xy_simple
+        elif linetype in ('wiggly', 'w', 'wiggle'):
+            self._set_xy = self._set_xy_wiggly
+        elif linetype in ('loopy', 'l', 'loop'):
+            self._set_xy = self._set_xy_loopy
+        else:
+            raise ValueError('Wrong value for linetype')
+
+    def _set_xy_simple(self):
+        """Compute the xy simple path.""" 
+        self.xy = self.linepath
+
     def _set_xy_wiggly(self):
         """Compute the xy wiggly path.""" 
 
+        numhalfwaves = int(2 * self.nwiggles)
+
+        omega = np.pi * numhalfwaves
+        phi = 2 * np.pi * self.phase
+
+        sine = np.sin(omega * self.t + phi)
+
+        dxy = self.amplitude * vectors.dot(self.normal, sine)
+        dxy = vectors.add(dxy, -dxy[0])
+
+        self.xy = self.linepath + dxy
+
+    def _set_xy_loopy(self):
+        """Compute the xy wiggly path.""" 
+
+        omega = 2 * np.pi * self.nloops
+        phi = 2 * np.pi * self.phase
+
+        dy = - np.cos(omega * self.t + phi)
+        dy -= dy[0]
+
+        dx = np.sin(omega * self.t + phi)
+        dx -= dx[0]
+
+        dxy = (self.xamp * vectors.dot(tangent, dx) +
+               self.yamp * vectors.dot(self.normal, dy))
+
+        self.xy = self.linepath + dxy
+
+    # TODO remove
     def get_xy_line(self):
         """
         Get the xy vectors for the line points.
@@ -745,55 +793,54 @@ class Line(object):
             np.ndarray of shape (N, 2)
 
 """
-        if self.linestyle == 'simple' or self.linestyle == 'double':
+        if self.linetype == 'simple' or self.linetype == 'double':
             return self.get_simple_xy_line()
-        elif 'wiggly' in self.linestyle:
+        elif 'wiggly' in self.linetype:
             return self.get_wiggly_xy_line()
-        elif 'loopy' in self.linestyle:
+        elif 'loopy' in self.linetype:
             return self.get_loopy_xy_line()
         else:
-            raise ValueError('Wrong value for linestyle.')
+            raise ValueError('Wrong value for linetype.')
 
+    # TODO remove
     def get_simple_xy_line(self):
         """Get the xy vectors for the line points."""
         return self.get_linepath()
 
+    # TODO remove
     def get_wiggly_xy_line(self):
         """Get the xy vectors for the line points."""
-        t = self.t
-        linepath = self.get_linepath()
 
         # Number of waves
         numhalfwaves = int(2 * self.nwiggles)
         omega = np.pi * numhalfwaves
         phi = 2 * np.pi * self.phase
 
-        sine = np.sin(omega * t + phi)
+        sine = np.sin(omega * self.t + phi)
 
         dxy = self.amplitude * vectors.dot(self.normal, sine)
         dxy = vectors.add(dxy, -dxy[0])
-        line = linepath + dxy
+        line = self.linepath + dxy
 
         return line
 
+    # TODO remove
     def get_loopy_xy_line(self):
         """Get the xy vectors for the line points."""
-        t = self.t
-        linepath = self.get_linepath()
 
         # Number of waves
         omega = 2 * np.pi * self.nloops
         phi = 2 * np.pi * self.phase
 
-        dy = - np.cos(omega * t + phi)
+        dy = - np.cos(omega * self.t + phi)
         dy -= dy[0]
 
-        dx = np.sin(omega * t + phi)
+        dx = np.sin(omega * self.t + phi)
         dx -= dx[0]
 
         dxy = (self.xamp * vectors.dot(tangent, dx) +
                self.yamp * vectors.dot(self.normal, dy))
-        line = linepath + dxy
+        line = self.linepath + dxy
  
         return line
 
