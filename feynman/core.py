@@ -140,37 +140,38 @@ class Line(object):
     vend :
         End vericle.
 
-    pathtype :
+    pathtype : ( linear)
         The shape of the line path.
 
             linear    -  A straight line between two points.
             elliptic  -  An ellipse arc.
             circular  -  A circle starting and ending at the same verticle.
 
-    linetype :
+    linetype : ( simple )
         The type of line.
 
             simple  -  A straight line.
             wiggly  -  A wavy line.
             loopy   -  A spring.
 
-    linestyle :
+    linestyle : ( single )
         The style for the line.
 
             single  -  A simple line.
             double  -  A double line.
 
-    ellipse_spread :  The angle (in units of 2pi) spread by the ellipse arc.
-                      When alpha --> 0 the curve will tend to a straight ligne,
-                      when alpha = 0.5 the curve will be half an ellipse,
-                      when alpha --> 1 the curve will tend to a closed ellipse. 
+    ellipse_spread : (0.5)
+        The angle (in units of 2pi) spread by the ellipse arc.
+        The limit cases are
+            0.0 --> the curve will tend to a straight ligne,
+            0.5 --> the curve will be half an ellipse,
+            1.0 --> the curve will tend to a closed ellipse. 
 
-    ellipse_exc :     The excentricity of the ellipse, that is, the ratio
-                      of the long axe over the short axe.
-                      When c = 1, the curve will be a circle arc.
-                      Also Controls wether the curve is 'up' or 'down'.
-                      A positive value makes it 'up', while a negative value
-                      makes it 'down'.
+    ellipse_exc : (1.2)
+        The excentricity of the ellipse, that is, the ratio of the long axe
+        over the short axe. At 1.0, the curve will be a circle arc.
+        Also Controls wether the curve is 'up' or 'down'.
+        A positive value makes it 'up', while a negative value makes it 'down'.
 
     circle_radius : float (.1)
         The radius of the circle.
@@ -179,7 +180,7 @@ class Line(object):
         The position of the center, relative to the anchor verticle.
         It is an angle, in units of 2pi.
 
-    arrow : bool = True
+    arrow : bool ( True )
         Include an arrow in the line.
 
     arrowparam : dict
