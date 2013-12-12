@@ -110,7 +110,7 @@ def angle(v, units='rad'):
 
 def rotate(v, angle):
     """
-    Return the rotation of a vector by a given angle.
+    Return the anti-clockwise rotation of a vector by a given angle.
 
     Arguments
     ---------
@@ -125,5 +125,5 @@ def rotate(v, angle):
     theta = angle * 2 * np.pi
     R = np.array([[np.cos(theta), - np.sin(theta)],
                   [np.sin(theta),   np.cos(theta)]])
-    return np.dot(v, R)
+    return np.dot(R, v)
 

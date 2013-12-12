@@ -48,7 +48,7 @@ class Verticle(object):
 
     _xy = np.zeros(2)
 
-    def __init__(self, xy=(0,0), **kwargs):
+    def __init__(self, xy, **kwargs):
 
         self.xy = xy
 
@@ -73,6 +73,8 @@ class Verticle(object):
     @xy.setter
     def xy(self, xy):
         self._xy = np.array(xy)
+        assert self.xy.ndim == 1, "Wrong dimension for line xy."
+        assert self.xy.size == 2, "Wrong dimension for line xy."
 
     # User
     def set_xy(self, xy):
@@ -176,9 +178,9 @@ class Line(object):
     circle_radius : float (.1)
         The radius of the circle.
 
-    circle_pos : float (0.)
+    circle_angle : float (0.25)
         The position of the center, relative to the anchor verticle.
-        It is an angle, in units of 2pi.
+        It is an angle, in units of 2pi, anti-clockwise, starting up.
 
     arrow : bool ( True )
         Include an arrow in the line.
@@ -245,7 +247,7 @@ class Line(object):
             ellipse_spread=.5,
             ellipse_exc=1.2,
             circle_radius=.1,
-            circle_pos=0.,
+            circle_angle=0.25,
             amplitude=.025,
             xamp=.025,
             yamp=.05,
@@ -272,7 +274,7 @@ class Line(object):
             'ellipse_spread',
             'ellipse_exc',
             'circle_radius',
-            'circle_pos',
+            'circle_angle',
 
             # Amplitude of the wave and such...
             'amplitude',
@@ -351,11 +353,11 @@ class Line(object):
 
     @property
     def angle(self):
-        """The angle (in rad) of the direct line between end points."""
+        """The angle (units of 2pi) of the direct line between end points."""
         dx, dy = self.dr
         angle = np.arctan(dy / dx)
         if dx < 0: angle += np.pi
-        return angle
+        return angle / (2 * np.pi)
 
     @property
     def xy(self):
@@ -699,20 +701,16 @@ class Line(object):
         """Get xy vectors for the path."""
 
         r = self.circle_radius
+        alpha = self.circle_angle
 
-        # Circle center  # TODO: make use of fload value for d to tilt circle.
-        drcenter = np.array([0,r])
-        drcenter = vectors.rotate(drcenter, self.circle_pos)
-        ro = self.rend + drcenter
+        # Circle center
+        ro = self.rend + vectors.rotate([r,0], alpha)
 
         # Angular progression along the circle.
-        theta_s = 0.
-        theta_i = 2 * np.pi
-        theta = theta_s + theta_i * self.t
+        theta = 2 * np.pi * (self.t + alpha)
 
         # xy relative to the circle center
-        circle = r * np.array([- np.sin(theta), - np.cos(theta)]).transpose()
-        vectors.rotate(circle, self.circle_pos)
+        circle = r * np.array([- np.cos(theta), - np.sin(theta)]).transpose()
 
         # shift vector
         self.linepath = vectors.add(circle,  ro)
