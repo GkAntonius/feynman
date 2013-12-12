@@ -179,8 +179,7 @@ class Line(object):
         The radius of the circle.
 
     circle_angle : float (0.25)
-        The position of the center, relative to the anchor verticle.
-        It is an angle, in units of 2pi, anti-clockwise, starting up.
+        The angle of the anchor verticle to the circle center, in units of 2pi.
 
     arrow : bool ( True )
         Include an arrow in the line.

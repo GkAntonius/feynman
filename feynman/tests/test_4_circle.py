@@ -54,7 +54,7 @@ class TestLines(TestDiagram):
         v3 = dia.verticle(xy=(0.8,.2), marker='')
         l1 = dia.line(v1, v2, arrow=True)
         l2 = dia.line(v2, v2, pathtype='circular', linetype='wiggly',
-                      circle_radius=.15, nwiggles=6, phase=.0)
+                      circle_radius=.15, nwiggles=6.25, phase=.75)
         l3 = dia.line(v2, v3, arrow=True)
         
         dia.plot()
