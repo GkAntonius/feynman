@@ -246,6 +246,7 @@ class Line(object):
     _tangent = np.zeros((2,2))
     _normal = np.zeros((2,2))
     _main_lines = None
+
     t =  np.linspace(0, 1, 2)
 
     def __init__(self, vstart, vend, **kwargs):
