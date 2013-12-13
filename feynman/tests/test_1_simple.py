@@ -26,10 +26,20 @@ class TestLines(TestDiagram):
         
         dia = Diagram(ax)
         
+        v11 = dia.verticle(xy=(.2,.1))
+        v21 = dia.verticle(xy=(0.8,.1))
+        l11 = dia.line(v11, v21)
+
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
-        l1 = dia.line(v1, v2)
-        l2 = dia.line(v1, v2, pathtype='elliptic', npoints = 400)
+        l1 = dia.line(v1, v2, pathtype='elliptic', ellipse_excentricity=1.5)
+        l2 = dia.line(v2, v1, pathtype='elliptic', ellipse_excentricity=1.5)
+        #l2 = dia.line(v2, v1)
+        print ''
+        for l in (l1, l2):
+            print l.rstart, l.rend
+        print 'linepath:', l1.linepath[0], l2.linepath[-1]
+        print 'tangent:', l1.tangent[0], l2.tangent[-1]
 
         dia.plot()
 

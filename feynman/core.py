@@ -32,6 +32,9 @@ from . import colors
 # =========================================================================== #
 
 
+tau = 2 * np.pi
+
+
 class Verticle(object):
     """
     A verticle. Often represented as a point.
@@ -125,6 +128,12 @@ class Verticle(object):
             ax.add_artist(text)
         return
 
+    #@classmethod
+    #def _add_relative(cls, other, radius, angle):
+    #    """
+    #    Return a new instance relative to some other existing verticle.
+    #    """
+
 
 # =========================================================================== #
 
@@ -163,23 +172,26 @@ class Line(object):
             double  -  A double line.
 
     ellipse_spread : (0.5)
-        The angle (in units of 2pi) spread by the ellipse arc.
+        The angle (in units of tau) spread by the ellipse arc.
         The limit cases are
             0.0 --> the curve will tend to a straight ligne,
             0.5 --> the curve will be half an ellipse,
             1.0 --> the curve will tend to a closed ellipse. 
 
-    ellipse_exc : (1.2)
+    ellipse_excentricity : (1.2)
         The excentricity of the ellipse, that is, the ratio of the long axe
         over the short axe. At 1.0, the curve will be a circle arc.
         Also Controls wether the curve is 'up' or 'down'.
         A positive value makes it 'up', while a negative value makes it 'down'.
 
+    ellipse_position :  ['up' | 1] or ['down', -1]
+        In case ellipse_excentricity is not defined:
+
     circle_radius : float (.1)
         The radius of the circle.
 
     circle_angle : float (0.25)
-        The angle of the anchor verticle to the circle center, in units of 2pi.
+        The angle of the anchor verticle to the circle center, in units of tau.
 
     arrow : bool ( True )
         Include an arrow in the line.
@@ -195,7 +207,7 @@ class Line(object):
         The number of loops in a loopy line.
 
     phase : float
-        Phase in the wiggly or loopy pattern, in units of 2pi.
+        Phase in the wiggly or loopy pattern, in units of tau.
 
     npoints : int
         Number of points that makes up the line.
@@ -221,6 +233,14 @@ class Line(object):
 
 """
 
+    _pathtype_linear_aliases = ('linear','line',  'lin', 'l',)
+    _pathtype_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
+    _pathtype_circular_aliases = ('circular', 'circle', 'cir', 'c')
+
+    _linetype_simple_aliases = ('simple', 's', 'straight')
+    _linetype_wiggly_aliases = ('wiggly', 'w', 'wiggle')
+    _linetype_loopy_aliases = ('loopy', 'l', 'loop')
+
     _xy = np.zeros((2, 2))
     _linepath = np.zeros((2, 2))
     _tangent = np.zeros((2,2))
@@ -241,11 +261,13 @@ class Line(object):
             linestyle='single',
             linetype='simple',
             pathtype='linear',
-            arrow=False,
+            arrow=True,
             npoints=400,
             ellipse_spread=.5,
-            ellipse_exc=1.2,
-            circle_radius=.1,
+            ellipse_excentricity=1.2,
+            ellipse_position='up',
+            # Conditional default : depends on: pathtype, linetype
+            circle_radius=.15,
             circle_angle=0.25,
             amplitude=.025,
             xamp=.025,
@@ -256,10 +278,26 @@ class Line(object):
             )
 
         # Adjust some default values according to pathtype and linetype
-        if (kwargs.get('pathtype') == 'circular' and
-            kwargs.get('linetype') == 'wiggly'):
-            default.update(nwiggles=7)
-            default.update(phase=.25)
+        if kwargs.get('linetype') in self._linetype_simple_aliases:
+            default.update(arrow=True)
+        elif (kwargs.get('linetype') in self._linetype_wiggly_aliases
+           or kwargs.get('linetype') in self._linetype_loopy_aliases):
+            default.update(arrow=False)
+
+        if kwargs.get('pathtype') in self._pathtype_circular_aliases:
+            if kwargs.get('linetype') == 'simple':
+                default.update(circle_radius=.1)
+            elif kwargs.get('linetype') == 'wiggly':
+                default.update(nwiggles=6.25)
+                default.update(phase=.75)
+                default.update(circle_radius=.15)
+
+        elif kwargs.get('pathtype') in self._pathtype_elliptic_aliases:
+            if ('ellipse_position' in kwargs and
+                kwargs['ellipse_position'] in ('down', -1)
+                ):
+                if 'ellipse_excentricity' not in kwargs:
+                    default['ellipse_excentricity'] *= -1
 
         # Set default values
         for key, val in default.items():
@@ -271,7 +309,8 @@ class Line(object):
             'arrow',
 
             'ellipse_spread',
-            'ellipse_exc',
+            'ellipse_excentricity',
+            'ellipse_position',
             'circle_radius',
             'circle_angle',
 
@@ -301,6 +340,7 @@ class Line(object):
         self.lines = list()
         self.patches = list()
         self.texts = list()
+        self.arrows = list()
 
         if self.arrow:
             self.add_arrow(**arrowparam)
@@ -352,11 +392,11 @@ class Line(object):
 
     @property
     def angle(self):
-        """The angle (units of 2pi) of the direct line between end points."""
+        """The angle (units of tau) of the direct line between end points."""
         dx, dy = self.dr
         angle = np.arctan(dy / dx)
         if dx < 0: angle += np.pi
-        return angle / (2 * np.pi)
+        return angle / (tau)
 
     @property
     def xy(self):
@@ -402,8 +442,8 @@ class Line(object):
 
     def _set_normal(self):
         """Compute the normal vector along the curve."""
-        R = np.array([[0., -1.],[1., 0.]])
-        self._normal = vectors.sqdot(self.tangent, R)
+        R = vectors.rotation_matrix(.25)
+        self._normal = vectors.sqdot(R, self.tangent)
 
     def set_pathtype(self, pathtype):
         """
@@ -413,11 +453,11 @@ class Line(object):
             elliptic  -  An ellipse arc.
             circular  -  A circle starting and ending at the same verticle.
 """
-        if pathtype in ('linear', 'l', 'straight'):
+        if pathtype in      self._pathtype_linear_aliases:
             self._set_linepath = self._set_linear_linepath
-        elif pathtype in ('elliptic', 'e', 'ellipse'):
+        elif pathtype in    self._pathtype_elliptic_aliases:
             self._set_linepath = self._set_elliptic_linepath
-        elif pathtype in ('circular', 'c', 'circle'):
+        elif pathtype in    self._pathtype_circular_aliases:
             self._set_linepath = self._set_circular_linepath
         else:
             raise ValueError('Wrong value for pathtype')
@@ -452,7 +492,7 @@ class Line(object):
 
         theta :
             The angle the arrow branches make with the path
-            in units of 2pi
+            in units of tau
 
         size :
             The length of the arrow branches.
@@ -465,6 +505,40 @@ class Line(object):
             raise ValueError("t should be in range [0,1]")
         param = (t, direction, theta, size, kwargs)
         self.arrows_param.append(param)
+
+    def _add_fancy_arrow(self, t=.5, width=.01, length=.02, assymetry=0.,
+                         fancyness=.005,):
+        """
+        Add a fancy arrow.
+
+        Arguments
+        ---------
+
+        t :
+        width :
+        length :
+        assymetry :
+        fancyness :
+"""
+
+        tip = self.path_point(t)
+        back = tip - length * self.tangent_point(t)
+        corners1 = back + .5 * fancyness * self.normal_point(i)
+        corners2 = back - .5 * fancyness * self.normal_point(i)
+
+        #arrow_patch = 
+
+        pass
+
+    def _add_normal_arrow(self, t=.5, width=.01, length=.02, assymetry=0.):
+        """
+        Add a normal (triangular) arrow.
+        """
+
+    def _add_line_arrow(self):
+        """
+        Add an arrow made with lines.
+        """
 
     def text(self, s, t=.5, y=-.06, **kwargs):
         """
@@ -511,7 +585,7 @@ class Line(object):
         for param in self.arrows_param:
             (t, d, theta, size, style) = param
 
-            th = 2 * np.pi * theta
+            th = tau * theta
 
             # Index of t
             it = int(t * self.npoints)
@@ -660,6 +734,9 @@ class Line(object):
         i_xy = min(int(t * self.npoints), self.npoints)
         xy = linepath[i_xy]
         return xy.reshape(2)
+
+    def path_point(self, t): return get_path_point(t)
+    
         
     def _set_linear_linepath(self):
         """Compute the xy eectors for a linear line path."""
@@ -673,27 +750,25 @@ class Line(object):
         l = self.distance()
 
         # Rotation matrix.
-        gamma = self.angle
-        R = np.array([[np.cos(gamma), - np.sin(gamma)],
-                      [np.sin(gamma),   np.cos(gamma)]])
+        R = vectors.rotation_matrix(self.angle)
 
         # Ellipse center
         ro = self.rstart + self.dr / 2
 
         # Axes of the ellipse
         a = l / (2 * np.sin(self.ellipse_spread * np.pi))
-        b = a / self.ellipse_exc
+        b = a / self.ellipse_excentricity
 
         # Angular progression along the ellipse.
         theta_s = np.pi * (1 - 2 * self.ellipse_spread) / 2.
-        theta_i = 2 * np.pi * self.ellipse_spread
+        theta_i = tau * self.ellipse_spread
         theta = theta_s + theta_i * self.t
 
         # xy relative to the ellipse center
         ellipse = np.array([-a*np.cos(theta), b*np.sin(theta)]).transpose()
 
         # rotate ellipse and shift vector
-        ellipse = vectors.sqdot(ellipse, R)
+        ellipse = vectors.sqdot(R, ellipse)
         self.linepath = vectors.add(ellipse, ro)
 
     def _set_circular_linepath(self):
@@ -706,7 +781,7 @@ class Line(object):
         ro = self.rend + vectors.rotate([r,0], alpha)
 
         # Angular progression along the circle.
-        theta = 2 * np.pi * (self.t + alpha)
+        theta = tau * (self.t + alpha)
 
         # xy relative to the circle center
         circle = r * np.array([- np.cos(theta), - np.sin(theta)]).transpose()
@@ -741,6 +816,8 @@ class Line(object):
 """
         i_v = min(int(t * self.npoints), self.npoints)
         return self.tangent[i_v].reshape(2)
+
+    def tangent_point(self, t): return get_tangent_point(t)
 
     # User
     def get_normal(self, tangent=None, **kwargs):
@@ -784,11 +861,11 @@ class Line(object):
             wiggly  -  A wavy line.
             loopy   -  A spring.
 """
-        if linetype in ('simple', 's', 'straight'):
+        if linetype in self._linetype_simple_aliases:
             self._set_xy = self._set_xy_simple
-        elif linetype in ('wiggly', 'w', 'wiggle'):
+        elif linetype in self._linetype_wiggly_aliases:
             self._set_xy = self._set_xy_wiggly
-        elif linetype in ('loopy', 'l', 'loop'):
+        elif linetype in self._linetype_loopy_aliases:
             self._set_xy = self._set_xy_loopy
         else:
             raise ValueError('Wrong value for linetype')
@@ -803,7 +880,7 @@ class Line(object):
         numhalfwaves = int(2 * self.nwiggles)
 
         omega = np.pi * numhalfwaves
-        phi = 2 * np.pi * self.phase
+        phi = tau * self.phase
 
         sine = np.sin(omega * self.t + phi)
 
@@ -815,8 +892,8 @@ class Line(object):
     def _set_xy_loopy(self):
         """Compute the xy wiggly path.""" 
 
-        omega = 2 * np.pi * self.nloops
-        phi = 2 * np.pi * self.phase
+        omega = tau * self.nloops
+        phi = tau * self.phase
 
         dy = - np.cos(omega * self.t + phi)
         dy -= dy[0]
@@ -865,7 +942,7 @@ class Operator(object):
         Number of verticles to the operator.
 
     rotate : (0.)
-        Rotation angle to the operator, in units of 2pi.
+        Rotation angle to the operator, in units of tau.
 
     c : (1.)
         If the shape is elliptic, c is the excentricity of the ellipse,
@@ -912,7 +989,7 @@ class Operator(object):
         else:
             self.shape = 'polygon'
 
-        self.ellipse_exc = kwargs.pop('c')
+        self.ellipse_excentricity = kwargs.pop('c')
 
         self.style = dict(
             edgecolor="k",
@@ -963,7 +1040,7 @@ class Operator(object):
         start, end = self.get_xy()
         dxy = end - start
         width = np.linalg.norm(dxy)
-        height = width / self.ellipse_exc
+        height = width / self.ellipse_excentricity
         center = self.get_center()
         angle = vectors.angle(dxy, 'deg')
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
@@ -1026,6 +1103,10 @@ class Diagram(object):
     fig : A matplotlib Figure. If none is given, a new one is initialized.
     ax : A matplotlib AxesSubplot. If none is given, a new one is initialized.
 """
+
+    _scaling = 1.
+
+
     def __init__(self, ax=None):
 
         if ax is not None:

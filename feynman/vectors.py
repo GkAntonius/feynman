@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib as mpl
 
+tau = 2 * np.pi
 
 def add(vlist, v):
     """
@@ -56,7 +57,7 @@ def dot(vlist, v):
     return vlist * vt
 
 
-def sqdot(vlist, M):
+def sqdot(M, vlist):
     """
     Multiply each vector of a list by a square matrix M.
 
@@ -108,6 +109,16 @@ def angle(v, units='rad'):
         angle = np.rad2deg(angle)
     return angle
 
+def rotation_matrix(angle):
+    """
+    Return a 2x2 rotation matrix.
+    angle : float, the angle, in units of tau.
+    """
+    theta = angle * tau
+    R = np.array([[np.cos(theta), - np.sin(theta)],
+                  [np.sin(theta),   np.cos(theta)]])
+    return R
+
 def rotate(v, angle):
     """
     Return the anti-clockwise rotation of a vector by a given angle.
@@ -115,15 +126,13 @@ def rotate(v, angle):
     Arguments
     ---------
     v : np.ndarray of shape (2,) or shape (N, 2).
-    angle : float, the angle, in units of 2pi.
+    angle : float, the angle, in units of tau.
 
     Returns
     -------
     vnew : np.ndarray of shape (2,) or shape (N, 2).
         The rotated vector.
     """
-    theta = angle * 2 * np.pi
-    R = np.array([[np.cos(theta), - np.sin(theta)],
-                  [np.sin(theta),   np.cos(theta)]])
+    R = rotation_matrix(angle)
     return np.dot(R, v)
 
