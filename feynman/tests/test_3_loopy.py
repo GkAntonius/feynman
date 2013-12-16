@@ -6,7 +6,7 @@ import unittest
 import os
 import time
 import matplotlib.pyplot as plt
-from ..core import Diagram
+from ..diagrams import Diagram
 
 from . import TestDiagram
 

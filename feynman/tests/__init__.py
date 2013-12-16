@@ -4,7 +4,7 @@ import os
 import time
 import matplotlib.pyplot as plt
 
-from ..core import Diagram
+from ..diagrams import Diagram
 
 tests_directory = 'Tests'
 os.system('mkdir -p ' + tests_directory)
