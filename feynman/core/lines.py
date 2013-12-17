@@ -13,7 +13,7 @@ import mycolors as mc
 
 from .. import vectors
 from .. import colors
-from ..constants import tau
+from ..constants import tau, pi
 
 class Line(object):
     """
@@ -166,7 +166,7 @@ class Line(object):
             if kwargs.get('linetype') == 'simple':
                 default.update(circle_radius=.1)
             elif kwargs.get('linetype') == 'wiggly':
-                default.update(nwiggles=6.25)
+                default.update(nwiggles=7.25)
                 default.update(phase=.75)
                 default.update(circle_radius=.15)
 
@@ -184,8 +184,10 @@ class Line(object):
         # Set attributes values
         for key in (
 
+            # Options
             'arrow',
 
+            # Path parameters
             'ellipse_spread',
             'ellipse_excentricity',
             'ellipse_position',
@@ -220,9 +222,6 @@ class Line(object):
         self.texts = list()
         self.arrows = list()
 
-        if self.arrow:
-            self.add_arrow(**arrowparam)
-
         # Set the main paramter
         self._set_t(kwargs.pop('npoints'))
 
@@ -238,6 +237,22 @@ class Line(object):
         # Compute the line points
         self._set_xy()
 
+        # Add the arrow
+        if self.arrow:
+            _arrow_kwargs = """
+                arrow_t
+                arrow_width
+                arrow_length
+                arrow_fancyness
+                """.split()
+
+            arrow_kwargs = {}
+            for key in _arrow_kwargs:
+                skey = key.split('arrow_')[-1]
+                if skey in kwargs:
+                    arrow_kwargs[skey] = kwargs.pop(key)
+            self.add_arrow(**arrow_kwargs)
+
         # all other kwargs are 'matplotlib' line style arguments
         self.style = dict(
             marker='',
@@ -249,6 +264,8 @@ class Line(object):
         self.style.update(kwargs)
         self.double_center_color = 'w'
 
+    def t_index(self, t):
+        return int(t * self.npoints)
 
     def _set_t(self, npoints):
         """Set the main parameter for the curve."""
@@ -353,12 +370,15 @@ class Line(object):
 
     #   -------------------------------------------------------------------   #
 
-    def add_arrow(self, t=0.5, direction=1, theta=.083, size=.025, **kwargs):
+    def add_arrow(self, t=0.5, direction=1, theta=.083, size=.025,
+                  *args, **kwargs):
         """
         Add an arrow on the line.
 
         Arguments
         ---------
+
+        arrowstyle : ['normal', 'fancy', 'line']
 
         t : float
             The position of the arrow along the line.
@@ -375,22 +395,25 @@ class Line(object):
         size :
             The length of the arrow branches.
 
-        **kwargs :
-            Any style specification, such as linewidth.
+        width :
+
+        length :
 """
 
-        arrowstyle = kwargs.pop('arrowstyle', 'normal')
+        _arrow_style = 'normal', 'fancy', 'line'
 
-        #if self.linestyle in ('normal',):
-            #self._add_normal_arrow()
+        arrowstyle = kwargs.pop('arrowstyle', 'fancy')
 
-        # TODO: arrow style to allow a full triangle shape
-        if not (t >= 0 and t <= 1):
-            raise ValueError("t should be in range [0,1]")
-        param = (t, direction, theta, size, kwargs)
-        self.arrows_param.append(param)
+        if arrowstyle == 'normal':
+            return self._add_normal_arrow(*args, **kwargs)
+        elif arrowstyle == 'fancy':
+            return self._add_fancy_arrow(*args, **kwargs)
+        elif arrowstyle == 'line':
+            return self._add_line_arrow(*args, **kwargs)
+        else:
+            raise ValueError("Wrong value for arrowstyle. Allowed values : " + self._arrow_style)
 
-    def _add_normal_arrow(self, t=.5, width=.01, length=.02, **kwargs):
+    def _add_normal_arrow(self, t=.5, width=.03, length=.09, **kwargs):
         """
         Add a normal, triangular arrow.
 
@@ -399,17 +422,24 @@ class Line(object):
         length :
         **kwargs :
 """
+
+        for key, val in dict(
+            color='k',
+            zorder=12,
+            ).items():
+            kwargs.setdefault(key, val)
+
         center = self.path_point(t)
         tip = center + .5 * length * self.tangent_point(t)
         back = tip - .5 * length * self.tangent_point(t)
-        c1 = back + .5 * width * self.normal_point(i)
-        c2 = back - .5 * width * self.normal_point(i)
+        c1 = back + .5 * width * self.normal_point(t)
+        c2 = back - .5 * width * self.normal_point(t)
+
         arrow = mpa.Polygon([tip, c1, c2], **kwargs)
 
         self.arrows.append(arrow)
 
-    def _add_fancy_arrow(self, t=.5, width=.01, length=.02,
-                         fancyness=.005,):
+    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09, **kwargs):
         """
         Add a fancy arrow.
 
@@ -422,10 +452,34 @@ class Line(object):
         fancyness :
 """
 
-    def _add_line_arrow(self):
+        for key, val in dict(
+            color='k',
+            zorder=12,
+            ).items():
+            kwargs.setdefault(key, val)
+
+        center = self.path_point(t)
+        tangent = self.tangent_point(min(1, t+.025))
+        normal = self.normal_point(t)
+
+        tip = center + .5 * length * tangent
+        back = tip - .5 * length * tangent
+        c1 = back + .5 * width * normal
+        c2 = back - .5 * width * normal
+        antitip = back + fancyness * length * self.tangent_point(t)
+
+        arrow = mpa.Polygon([tip, c1, antitip, c2], **kwargs)
+
+        self.arrows.append(arrow)
+
+
+
+    def _add_line_arrow(self, **kwargs):
         """
         Add an arrow made with lines.
-        """
+"""
+        raise NotImplementedError()
+
 
     def text(self, s, t=.5, y=-.06, **kwargs):
         """
@@ -474,8 +528,7 @@ class Line(object):
 
             th = tau * theta
 
-            # Index of t
-            it = int(t * self.npoints)
+            it = self.t_index(t)
 
             # Find the position and tangent vector at point t
             rtip = linepath[it]
@@ -622,7 +675,7 @@ class Line(object):
         xy = linepath[i_xy]
         return xy.reshape(2)
 
-    def path_point(self, t): return get_path_point(t)
+    def path_point(self, t): return self.get_path_point(t)
     
         
     def _set_linear_linepath(self):
@@ -658,6 +711,8 @@ class Line(object):
         ellipse = vectors.sqdot(R, ellipse)
         self.linepath = vectors.add(ellipse, ro)
 
+        return
+
     def _set_circular_linepath(self):
         """Get xy vectors for the path."""
 
@@ -675,6 +730,8 @@ class Line(object):
 
         # shift vector
         self.linepath = vectors.add(circle,  ro)
+
+        return
 
     # User
     def get_tangent(self):
@@ -704,7 +761,7 @@ class Line(object):
         i_v = min(int(t * self.npoints), self.npoints)
         return self.tangent[i_v].reshape(2)
 
-    def tangent_point(self, t): return get_tangent_point(t)
+    def tangent_point(self, t): return self.get_tangent_point(t)
 
     # User
     def get_normal(self, tangent=None, **kwargs):
@@ -735,6 +792,8 @@ class Line(object):
         v = self.normal[i_v]
         return v.reshape(2)
 
+    def normal_point(self, t): return self.get_normal_point(t)
+
     # Morphable
     def _set_xy(self):
         """Compute the xy coordinates of the line."""
@@ -750,10 +809,13 @@ class Line(object):
 """
         if linetype in self._linetype_simple_aliases:
             self._set_xy = self._set_xy_simple
+            return
         elif linetype in self._linetype_wiggly_aliases:
             self._set_xy = self._set_xy_wiggly
+            return
         elif linetype in self._linetype_loopy_aliases:
             self._set_xy = self._set_xy_loopy
+            return
         else:
             raise ValueError('Wrong value for linetype')
 
@@ -800,15 +862,24 @@ class Line(object):
         lines.extend(self.get_arrow_lines())
         return lines
 
-    def get_patches(self):
+    def get_arrows(self):
         """Get the patches, such as arrows."""
         return self.arrows
 
     def draw(self, ax):
         """Plot the line."""
+
+        # Lines
         for line in self.get_lines():
             ax.add_line(line)
+
+        # Arrows
+        for arrow in self.get_arrows():
+            ax.add_patch(arrow)
+
+        # Text
         for text in self.get_texts():
             ax.add_artist(text)
+
         return
 

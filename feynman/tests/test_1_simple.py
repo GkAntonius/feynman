@@ -1,5 +1,5 @@
 """
-Create two lines. One straight and one elliptic.
+Create one straight and two elliptic lines.
 """
 
 import unittest
