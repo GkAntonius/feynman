@@ -138,7 +138,7 @@ class Operator(object):
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
         return ellipse
 
-    def text(self, s, x=-.025, y=-.025, **kwargs):
+    def text(self, s, x=0., y=0., **kwargs):
         """
         Add text in the operator.
 
@@ -147,19 +147,19 @@ class Operator(object):
 
         s : Text string.
 
-        x : (-0.025)
+        x : (0.)
             x position, relative to the center of the operator.
 
-        y : (-0.025)
+        y : (0.)
             y position, relative to the center of the operator.
 
-        fontsize : (28)
+        fontsize : (30)
             The font size.
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
 """
-        default = dict(fontsize=28)
+        default = dict(fontsize=30)
         for key, val in default.items():
             kwargs.setdefault(key, val)
         self.texts.append((s, x, y, kwargs))
@@ -168,6 +168,8 @@ class Operator(object):
         """Return a list of matplotlib.text.Text instances."""
         texts = list()
         for (s, x, y, kwargs) in self.texts:
+            kwargs.setdefault('ha', 'center')
+            kwargs.setdefault('va', 'center')
             center = self.get_center()
             xtext, ytext = center + np.array([x,y])
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))

@@ -1,6 +1,6 @@
 
 
-from copy import deepcopy
+from copy import copy, deepcopy
 
 import numpy as np
 import matplotlib as mpl
@@ -592,6 +592,8 @@ class Line(object):
         # Make contour lines
         style['zorder'] = self.style.get('zorder', 0) -1
         style['linewidth'] = 1.8 * self.style.get('linewidth', 2)
+        #i0 = int(self.npoints / 25)  # TODO use the line width for the offset
+        #lines.append(mpl.lines.Line2D(x[i0:-i0], y[i0:-i0], **style))
         lines.append(mpl.lines.Line2D(x, y, **style))
 
         # Make center lines

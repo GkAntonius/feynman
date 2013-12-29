@@ -42,24 +42,25 @@ class Diagram(object):
     Arguments
     ---------
 
-    fig : A matplotlib Figure. If none is given, a new one is initialized.
-    ax : A matplotlib AxesSubplot. If none is given, a new one is initialized.
+    fig : A :class:`matplotlib.figure.Figure`  instante.
+    ax : A :class:`matplotlib.axes.AxesSubplot`  instance.
 """
 
-    _scaling = 1.
+    _scale = (1., 1.)
+    _transform = None
 
-
-    def __init__(self, ax=None):
+    def __init__(self, ax=None, xy0=(0.,0.), set_ticks=True):
 
         if ax is not None:
             self.ax = ax
+            if set_ticks:
+                self.ax.set_xticks([])
+                self.ax.set_yticks([])
         else:
             fig = plt.figure(figsize=(6,6))
             self.ax = fig.gca()
             self.ax.set_xlim(0,1)
             self.ax.set_ylim(0,1)
-            self.ax.set_xticks([])
-            self.ax.set_yticks([])
 
         self.verticles = list()
         self.lines = list()
@@ -72,16 +73,12 @@ class Diagram(object):
         Arguments
         ---------
 
-        xy :
-            Coordinates.
-
-        **kwargs :
-            Any matplotlib line style argument. 
+        xy :        Coordinates.
+        **kwargs :  Any matplotlib line style argument. 
 
         Returns
         -------
-
-        feynman.Verticle instance.
+        feynman.core.Verticle instance.
 """
         v = Verticle(xy, **kwargs)
         self.verticles.append(v)
@@ -103,7 +100,7 @@ class Diagram(object):
         Returns
         -------
 
-        list of feynman.Verticle instance.
+        list of feynman.core.Verticle instance.
 """
         xys = np.array(xys)
         if xys.ndim != 2:
@@ -117,27 +114,27 @@ class Diagram(object):
         return vs
 
     def line(self, *args, **kwargs):
-        """Create a line."""
+        """Create a feynman.core.line instance."""
         l = Line(*args, **kwargs)
         self.lines.append(l)
         return l
 
     def operator(self, *args, **kwargs):
-        """Create an operator."""
+        """Create an feynman.core.operator instance."""
         O = Operator(*args, **kwargs)
         self.operators.append(O)
         return O
 
     def add_verticle(self, verticle):
-        """Add a verticle."""
+        """Add a feynman.core.verticle instance."""
         self.verticles.append(verticle)
 
     def add_line(self, line):
-        """Add a line."""
+        """Add a feynman.core.line instance."""
         self.lines.append(line)
 
     def add_operator(self, operator):
-        """Add an operator."""
+        """Add an feynman.core.operator instance."""
         self.operators.append(operator)
 
     def plot(self):
@@ -152,8 +149,11 @@ class Diagram(object):
         for O in self.operators:
             O.draw(self.ax)
 
-    def text(*args, **kwargs):
+    def text(self, *args, **kwargs):
         """Add text using matplotlib.axes.Axes.text."""
+        kwargs.setdefault('ha', 'center')
+        kwargs.setdefault('va', 'center')
+        kwargs.setdefault('fontsize', 30)
         self.ax.text(*args, **kwargs)
 
     def show(self):

@@ -67,7 +67,7 @@ class Verticle(object):
         """Returns a matplotlib.lines.Line2D instance."""
         return mpl.lines.Line2D([self.xy[0]],[self.xy[1]], **self.style)
 
-    def text(self, s, x=-.025, y=-.025, **kwargs):
+    def text(self, s, x=-.025, y=+.025, **kwargs):
         """
         Add text near the verticle.
 
