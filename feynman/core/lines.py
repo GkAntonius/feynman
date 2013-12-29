@@ -260,6 +260,7 @@ class Line(object):
             linestyle='-',
             linewidth=3,
             zorder=10,
+            solid_capstyle="butt",
             )
         self.style.update(kwargs)
         self.double_center_color = 'w'
