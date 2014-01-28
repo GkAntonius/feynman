@@ -1,2 +1,3 @@
 recursive-include examples *.py
 exclude TODO
+recursive-exclude Work

@@ -3,6 +3,8 @@
 from copy import copy, deepcopy
 
 import numpy as np
+from numpy import sin, cos, sqrt
+from numpy.linalg import norm
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
@@ -239,19 +241,20 @@ class Line(object):
 
         # Add the arrow
         if self.arrow:
-            _arrow_kwargs = """
-                arrow_t
-                arrow_width
-                arrow_length
-                arrow_fancyness
-                """.split()
+            #_arrow_kwargs = """
+            #    arrow_t
+            #    arrow_size
+            #    arrow_length
+            #    arrow_fancyness
+            #    """.split()
 
-            arrow_kwargs = {}
-            for key in _arrow_kwargs:
-                skey = key.split('arrow_')[-1]
-                if skey in kwargs:
-                    arrow_kwargs[skey] = kwargs.pop(key)
-            self.add_arrow(**arrow_kwargs)
+            #arrow_kwargs = {}
+            #for key in _arrow_kwargs:
+            #    skey = key.split('arrow_')[-1]
+            #    if skey in kwargs:
+            #        arrow_kwargs[skey] = kwargs.pop(key)
+            ##self.add_arrow(**arrow_kwargs)
+            self.add_arrow(**arrowparam)
 
         # all other kwargs are 'matplotlib' line style arguments
         self.style = dict(
@@ -371,7 +374,7 @@ class Line(object):
 
     #   -------------------------------------------------------------------   #
 
-    def add_arrow(self, t=0.5, direction=1, theta=.083, size=.025,
+    def add_arrow(self, #t=0.5, direction=1, theta=.083, size=.025,
                   *args, **kwargs):
         """
         Add an arrow on the line.
@@ -519,42 +522,42 @@ class Line(object):
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
 
-    def get_arrow_lines(self):
-        """Get the arrow lines."""
-        linepath = self.get_linepath()
+    #def get_arrow_lines(self):
+    #    """Get the arrow lines."""
+    #    linepath = self.get_linepath()
 
-        lines = list()
-        for param in self.arrows_param:
-            (t, d, theta, size, style) = param
+    #    lines = list()
+    #    for param in self.arrows_param:
+    #        (t, d, theta, size, style) = param
 
-            th = tau * theta
+    #        th = tau * theta
 
-            it = self.t_index(t)
+    #        it = self.t_index(t)
 
-            # Find the position and tangent vector at point t
-            rtip = linepath[it]
-            tan = self.tangent[it]
-            norm = self.normal[it]
+    #        # Find the position and tangent vector at point t
+    #        rtip = linepath[it]
+    #        tan = self.tangent[it]
+    #        norm = self.normal[it]
 
-            # Starting point
-            drstart = - d * np.cos(th) * tan + np.sin(th) * norm
-            rstart = rtip + size * drstart
+    #        # Starting point
+    #        drstart = - d * cos(th) * tan + sin(th) * norm
+    #        rstart = rtip + size * drstart
 
-            # End point
-            drend = - d * np.cos(th) * tan - np.sin(th) * norm
-            rend = rtip + size * drend
+    #        # End point
+    #        drend = - d * cos(th) * tan - sin(th) * norm
+    #        rend = rtip + size * drend
 
-            # Set default style
-            for key in ('linewidth', 'color', 'linestyle', 'marker'):
-                style.setdefault(key, self.style[key])
-            style.setdefault('zorder', self.style.get('zorder') + 2)
+    #        # Set default style
+    #        for key in ('linewidth', 'color', 'linestyle', 'marker'):
+    #            style.setdefault(key, self.style[key])
+    #        style.setdefault('zorder', self.style.get('zorder') + 2)
 
-            xy = np.array([rstart, rtip, rend]).transpose()
-            arrow_line = mpl.lines.Line2D(*xy, **style)
+    #        xy = np.array([rstart, rtip, rend]).transpose()
+    #        arrow_line = mpl.lines.Line2D(*xy, **style)
 
-            lines.append(arrow_line)
+    #        lines.append(arrow_line)
 
-        return lines
+    #    return lines
 
     @property
     def main_lines(self):
@@ -623,7 +626,7 @@ class Line(object):
 
         # Integrate the linepath
         dl = linepath[1:] - linepath[:-1]
-        norms = np.sqrt(sum(dl.transpose() * dl.transpose()))
+        norms = sqrt(sum(dl.transpose() * dl.transpose()))
         l = sum(norms)
         return l
 
@@ -634,7 +637,7 @@ class Line(object):
 
         # Integrate the line
         dl = line[1:] - line[:-1]
-        norms = np.sqrt(sum(dl.transpose() * dl.transpose()))
+        norms = sqrt(sum(dl.transpose() * dl.transpose()))
         l = sum(norms)
 
         return l
@@ -691,28 +694,33 @@ class Line(object):
 
         # Geometry of the starting and end points
         l = self.distance()
+        c = self.ellipse_excentricity
 
         # Rotation matrix.
         R = vectors.rotation_matrix(self.angle)
 
-        # Ellipse center
-        ro = self.rstart + self.dr / 2
-
         # Axes of the ellipse
-        a = l / (2 * np.sin(self.ellipse_spread * np.pi))
-        b = a / self.ellipse_excentricity
+        alpha = self.ellipse_spread * tau / 2
+        beta = tau / 4 - alpha
+
+        a = l / (2 * cos(beta))
+        b = a / c
 
         # Angular progression along the ellipse.
-        theta_s = np.pi * (1 - 2 * self.ellipse_spread) / 2.
-        theta_i = tau * self.ellipse_spread
-        theta = theta_s + theta_i * self.t
+        theta = tau/2 - beta - 2 * alpha * self.t
 
         # xy relative to the ellipse center
-        ellipse = np.array([-a*np.cos(theta), b*np.sin(theta)]).transpose()
+        ellipse = np.array([a * cos(theta), b * sin(theta)]).transpose()
+
+        # Ellipse center
+        ro = (self.rstart + self.dr / 2 +
+              vectors.rotate(self.dr, -.25) * b * sin(beta) / norm(self.dr))
 
         # rotate ellipse and shift vector
         ellipse = vectors.sqdot(R, ellipse)
-        self.linepath = vectors.add(ellipse, ro)
+        ellipse = vectors.add(ellipse, ro)
+
+        self.linepath = ellipse
 
         return
 
@@ -729,7 +737,7 @@ class Line(object):
         theta = tau * (self.t + alpha)
 
         # xy relative to the circle center
-        circle = r * np.array([- np.cos(theta), - np.sin(theta)]).transpose()
+        circle = r * np.array([- cos(theta), - sin(theta)]).transpose()
 
         # shift vector
         self.linepath = vectors.add(circle,  ro)
@@ -834,7 +842,7 @@ class Line(object):
         omega = np.pi * numhalfwaves
         phi = tau * self.phase
 
-        sine = np.sin(omega * self.t + phi)
+        sine = sin(omega * self.t + phi)
 
         dxy = self.amplitude * vectors.dot(self.normal, sine)
         dxy = vectors.add(dxy, -dxy[0])
@@ -847,10 +855,10 @@ class Line(object):
         omega = tau * self.nloops
         phi = tau * self.phase
 
-        dy = - np.cos(omega * self.t + phi)
+        dy = - cos(omega * self.t + phi)
         dy -= dy[0]
 
-        dx = np.sin(omega * self.t + phi)
+        dx = sin(omega * self.t + phi)
         dx -= dx[0]
 
         dxy = (self.xamp * vectors.dot(self.tangent, dx) +
@@ -862,7 +870,7 @@ class Line(object):
         """Get the lines."""  # Could be faster
         lines = list()
         lines.extend(self.get_main_lines())
-        lines.extend(self.get_arrow_lines())
+        #lines.extend(self.get_arrow_lines())
         return lines
 
     def get_arrows(self):
