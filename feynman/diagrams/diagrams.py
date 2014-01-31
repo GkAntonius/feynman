@@ -64,8 +64,6 @@ class Diagram(Plotter):
 
         self._init_objects()
 
-        self.x0 = .2
-        self.y0 = .2
         self.line_length =  .2
         self.operator_size =  1.5
 
@@ -75,20 +73,6 @@ class Diagram(Plotter):
         self.lines = list()
         self.operators = list()
 
-
-    def set_size_inches(self, w=8, h=6):
-        """Set the figure size, and set xlim, ylim, x0 and y0 accordingly."""
-        # Geometry
-        w, h = 8, 6
-        aspectratio = float(h) / float(w)
-        self.fig.set_size_inches(w, h)
-
-        self.ax.set_xlim(.0, w)
-
-        #self.ax.set_xlim(.0, 10.)
-        self.ax.set_ylim(np.array(self.ax.get_xlim()) * aspectratio)
-        self.y0 = sum(self.ax.get_ylim()) / 2.
-        self.x0 = sum(self.ax.get_xlim()) * .05
 
 
     def verticle(self, xy=(0,0), **kwargs):

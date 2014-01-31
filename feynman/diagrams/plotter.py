@@ -7,7 +7,7 @@ class Plotter(object):
     as well as a styliser
     """
 
-    def _init_figure(self, fig=None, ax=None, **kwargs):
+    def _init_figure(self, ax=None, **kwargs):
         """Init internal figure object."""
         # Init diagram and ax
 
@@ -17,6 +17,7 @@ class Plotter(object):
         else:
             self.fig = plt.figure()
             self.ax = self.fig.add_axes([0., 0., 1.,1.])
+            self.set_size_inches(*kwargs.get('figsize', (8, 6)))
             for spine in self.ax.spines.values():
                 spine.set_visible(False)
         
@@ -63,7 +64,7 @@ class Plotter(object):
         """Save a single figure"""
         fname = self.get_fname(ftype, dname)
         self.check_mkdir(fname)
-        self.fig.savefig(fname)
+        self.fig.savefig(fname, transparent=self.transparent_background)
         if show:
             from subprocess import call
             call(['open', fname])
@@ -71,5 +72,18 @@ class Plotter(object):
     def multisave(self, dname, ftype=('.svg', '.pdf'), show=True, showtype='pdf'):
         """Save figure under multiple formats."""
         for ftype in ('svg', 'pdf'):
-            fname = self.get_fname(ftype, dname)
-            self.singlesave(fname, show=(ftype == showtype))
+            self.singlesave(dname, ftype, show=(ftype == showtype))
+
+    def set_size_inches(self, w=8, h=6):
+        """Set the figure size, and set xlim, ylim, x0 and y0 accordingly."""
+        # Geometry
+        aspectratio = float(h) / float(w)
+        self.fig.set_size_inches(w, h)
+
+        self.ax.set_xlim(.0, w)
+
+        #self.ax.set_xlim(.0, 10.)
+        self.ax.set_ylim(np.array(self.ax.get_xlim()) * aspectratio)
+        self.y0 = sum(self.ax.get_ylim()) / 2.
+        self.x0 = sum(self.ax.get_xlim()) * .05
+

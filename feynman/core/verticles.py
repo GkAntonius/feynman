@@ -63,6 +63,18 @@ class Verticle(object):
         self.texts = list()
 
     @property
+    def x(self): return self._xy[0]
+
+    @x.setter
+    def x(self, val): self._xy[0] = val
+
+    @property
+    def y(self): return self._xy[1]
+
+    @y.setter
+    def y(self, val): self._xy[1] = val
+
+    @property
     def xy(self):
         return self._xy
 
