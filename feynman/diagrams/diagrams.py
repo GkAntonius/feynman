@@ -11,7 +11,11 @@
 #
 #   o Diagram
 #       - add_text
+#       - text as an option on init
 #       - verticles (add multiple verticles at once)
+#       - set_center
+#       - set_angles
+#       - get_dimensions
 #
 #
 #   o Scalability
@@ -26,16 +30,17 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
+from .. import colors as mc
+from .. import vectors
+from .. import colors
+from .. import core
+from ..core import Verticle, Line, Operator
+
+from .plotter import Plotter
+
 # Personnal modules
-import mycolors as mc
 
-from . import vectors
-from . import colors
-from . import core
-
-from core import Verticle, Line, Operator
-
-class Diagram(object):
+class Diagram(Plotter):
     """
     The main object for a feynman diagram.
 
@@ -44,27 +49,47 @@ class Diagram(object):
 
     fig : A :class:`matplotlib.figure.Figure`  instante.
     ax : A :class:`matplotlib.axes.AxesSubplot`  instance.
+
+    transparent : True to set the background as transparent. 
+
+
 """
 
     _scale = (1., 1.)
     _transform = None
 
-    def __init__(self, ax=None, xy0=(0.,0.), set_ticks=True):
+    def __init__(self, ax=None, xy0=(0.,0.), **kwargs):
 
-        if ax is not None:
-            self.ax = ax
-            if set_ticks:
-                self.ax.set_xticks([])
-                self.ax.set_yticks([])
-        else:
-            fig = plt.figure(figsize=(6,6))
-            self.ax = fig.gca()
-            self.ax.set_xlim(0,1)
-            self.ax.set_ylim(0,1)
+        self._init_figure(ax=ax, **kwargs)
 
+        self._init_objects()
+
+        self.x0 = .2
+        self.y0 = .2
+        self.line_length =  .2
+        self.operator_size =  1.5
+
+    def _init_objects(self):
+        """Init lists of objects."""
         self.verticles = list()
         self.lines = list()
         self.operators = list()
+
+
+    def set_size_inches(self, w=8, h=6):
+        """Set the figure size, and set xlim, ylim, x0 and y0 accordingly."""
+        # Geometry
+        w, h = 8, 6
+        aspectratio = float(h) / float(w)
+        self.fig.set_size_inches(w, h)
+
+        self.ax.set_xlim(.0, w)
+
+        #self.ax.set_xlim(.0, 10.)
+        self.ax.set_ylim(np.array(self.ax.get_xlim()) * aspectratio)
+        self.y0 = sum(self.ax.get_ylim()) / 2.
+        self.x0 = sum(self.ax.get_xlim()) * .05
+
 
     def verticle(self, xy=(0,0), **kwargs):
         """
@@ -139,15 +164,9 @@ class Diagram(object):
 
     def plot(self):
         """Draw the diagram."""
-
-        for v in self.verticles:
-            v.draw(self.ax)
-
-        for l in self.lines:
-            l.draw(self.ax)
-
-        for O in self.operators:
-            O.draw(self.ax)
+        for v in self.verticles: v.draw(self.ax)
+        for l in self.lines: l.draw(self.ax)
+        for O in self.operators: O.draw(self.ax)
 
     def text(self, *args, **kwargs):
         """Add text using matplotlib.axes.Axes.text."""
@@ -156,14 +175,17 @@ class Diagram(object):
         kwargs.setdefault('fontsize', 30)
         self.ax.text(*args, **kwargs)
 
-    def show(self):
-        """Show the figure with matplotlib.pyplot.show."""
-        plt.show()
+    # ======================================================================= #
 
-    def gcf(self):
-        """Get the figure."""
-        return self.fig
+    # Geometry ============================================================== #
 
-    def gca(self):
-        """Get the axe."""
-        return self.ax
+
+    # FIXME
+    def get_object_group_limits():
+        """
+        Return the x0, y0, w, h
+        of the leftmost, bottommost, rightmost and topmost objects.
+        """
+        raise NotImplementedError()
+
+    # ======================================================================= #

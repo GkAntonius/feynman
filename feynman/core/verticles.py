@@ -25,15 +25,28 @@ class Verticle(object):
     xy :
         Coordinates.
 
+    dxy :
+        Coordinates, so that the position is given by xy + dxy.
+
+    dx :
+        Coordinate, so that the position is given by xy + [dx, 0].
+
+    dy :
+        Coordinate, so that the position is given by xy + [0, dy].
+
     **kwargs :
         Any matplotlib line style argument. 
 """
 
     _xy = np.zeros(2)
 
-    def __init__(self, xy, **kwargs):
+    def __init__(self, xy=(0,0), **kwargs):
 
-        self.xy = xy
+        dx = np.array(kwargs.pop('dx', 0.))
+        dy = np.array(kwargs.pop('dy', 0.))
+        dxy = np.array(kwargs.pop('dxy', (0.,0.)))
+
+        self.xy = xy + dxy + np.array([dx, dy])
 
         self.style = dict(
             marker='o',

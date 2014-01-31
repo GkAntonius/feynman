@@ -5,7 +5,6 @@ examples/fock.py
 feynman/__init__.py
 feynman/colors.py
 feynman/constants.py
-feynman/diagrams.py
 feynman/utils.py
 feynman/vectors.py
 feynman.egg-info/PKG-INFO
@@ -17,6 +16,9 @@ feynman/core/__init__.py
 feynman/core/lines.py
 feynman/core/operators.py
 feynman/core/verticles.py
+feynman/diagrams/__init__.py
+feynman/diagrams/diagrams.py
+feynman/diagrams/plotter.py
 feynman/tests/__init__.py
 feynman/tests/test-v0_1_simple.py
 feynman/tests/test-v0_2_wiggly.py

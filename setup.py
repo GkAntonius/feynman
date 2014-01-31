@@ -7,7 +7,7 @@ install_requires = [
 
 setup_args = dict(
       name             = 'feynman',
-      version          = '1.0.0',
+      version          = '1.1.0',
       description      = "Feynman diagrams with python-matplotlib.",
       author           = "Gabriel Antonius",
       author_email     = "gabriel.antonius@gmail.com",

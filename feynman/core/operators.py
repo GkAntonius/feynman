@@ -56,6 +56,7 @@ class Operator(object):
     shape :
         default     -   'oval' if N == 2
                     -   'polygon' if N > 2.
+        #default: 'circle'
 
     verticles :
 
@@ -80,6 +81,7 @@ class Operator(object):
             self.shape = 'ellipse'
         else:
             self.shape = 'polygon'
+            #self.shape = kwargs.setdefault('shape', 'circle')
 
         self.ellipse_excentricity = kwargs.pop('c')
 
@@ -100,6 +102,18 @@ class Operator(object):
     def set_verticles(self, *verticles):
         """Return the verticles."""
         self.verticles = verticles
+
+    def set_angles(self, *angles):
+        """Set the angles between verticles."""
+        raise NotImplementedError()
+
+    def set_center(self, xy):
+        """Set the center of the polygon """
+        raise NotImplementedError()
+
+    @classmethod
+    def _check_verticle_distances(verticles, tolerance=1e-8):
+        """Assert that all verticles are equally distant from the center."""
 
     def get_xy(self):
         """Return the xy coordinates of the verticles, clockwise."""
@@ -147,11 +161,17 @@ class Operator(object):
 
         s : Text string.
 
+        Positional Arguments
+        -----------------
+
         x : (0.)
             x position, relative to the center of the operator.
 
         y : (0.)
             y position, relative to the center of the operator.
+
+        Keyword Arguments
+        -----------------
 
         fontsize : (30)
             The font size.
