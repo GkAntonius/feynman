@@ -31,6 +31,9 @@ class Plotter(object):
 
         self.transparent_background = kwargs.get('transparent', False)
 
+        self.x0 = 0.
+        self.y0 = 0.
+
     #def set_background_visible(self, transparent=True):
     #    """Set the background visibility."""
     #    self.transparent = transparent

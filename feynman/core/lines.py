@@ -288,7 +288,7 @@ class FancyLine(object):
 
         for key in kwargs.keys():
             if key in matplotlib_Line2D_valid_keyword_arguments:
-                self.line_kwargs.update(kwargs.pop(key))
+                self.line_kwargs.update({key : kwargs.pop(key)})
 
     def warn_unkwnown_kwargs(self, kwargs):
         """Collect unknown keyword arguments."""
