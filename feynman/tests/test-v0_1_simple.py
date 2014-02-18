@@ -32,8 +32,8 @@ class TestLines(TestDiagram):
 
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
-        l1 = dia.line(v1, v2, pathtype='elliptic', ellipse_excentricity=1.5)
-        l2 = dia.line(v2, v1, pathtype='elliptic', ellipse_excentricity=1.5)
+        l1 = dia.line(v1, v2, shape='elliptic', ellipse_excentricity=1.5)
+        l2 = dia.line(v2, v1, shape='elliptic', ellipse_excentricity=1.5)
 
         dia.plot()
 

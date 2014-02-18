@@ -1,5 +1,4 @@
 
-
 from copy import copy, deepcopy
 
 import numpy as np
@@ -16,13 +15,15 @@ import mycolors as mc
 from .. import vectors
 from .. import colors
 from ..constants import tau, pi
+from .util import matplotlib_Line2D_valid_keyword_arguments
 
-class Line(object):
+
+class FancyLine(object):
     """
     A particle line joigning two verticles.
 
     Arguments
-    ---------
+    =========
 
     vstart :
         Starting vericle.
@@ -30,32 +31,40 @@ class Line(object):
     vend :
         End vericle.
 
-    pathtype : ( linear)
-        The shape of the line path.
 
-            linear    -  A straight line between two points.
-            elliptic  -  An ellipse arc.
-            circular  -  A circle starting and ending at the same verticle.
+    style : "shape flavour stroke"
+    ---------------------------------- 
 
-    linetype : ( simple )
+    shape : ( linear)
+        The shape determines the line path.
+
+        |   linear    -  A straight line between two points.
+        |   elliptic  -  An ellipse arc.
+        |   circular  -  A circle starting and ending at the same verticle.
+
+    flavour : ( simple )
         The type of line.
 
-            simple  -  A straight line.
-            wiggly  -  A wavy line.
-            loopy   -  A spring.
+        |   simple  -  A straight line that follows the line path.
+        |   wiggly  -  A wavy line around the line path..
+        |   loopy   -  A spring.
 
-    linestyle : ( single )
+    stroke : ( single )
         The style for the line.
 
-            single  -  A simple line.
-            double  -  A double line.
+        |   single  -  A simple line.
+        |   double  -  A double line.
+
+
+    ellipse_param  : "spread excentricity position"
+    -----------------------------------------------
 
     ellipse_spread : (0.5)
         The angle (in units of tau) spread by the ellipse arc.
         The limit cases are
-            0.0 --> the curve will tend to a straight ligne,
-            0.5 --> the curve will be half an ellipse,
-            1.0 --> the curve will tend to a closed ellipse. 
+        |   0.0 --> the curve will tend to a straight ligne,
+        |   0.5 --> the curve will be half an ellipse,
+        |   1.0 --> the curve will tend to a closed ellipse. 
 
     ellipse_excentricity : (1.2)
         The excentricity of the ellipse, that is, the ratio of the long axe
@@ -66,16 +75,21 @@ class Line(object):
     ellipse_position :  ['up' | 1] or ['down', -1]
         In case ellipse_excentricity is not defined:
 
+
+    circle_param  : dict( radius=.1, angle=.25) 
+    -----------------------------------------------
+
     circle_radius : float (.1)
         The radius of the circle.
 
     circle_angle : float (0.25)
         The angle of the anchor verticle to the circle center, in units of tau.
 
+
     arrow : bool ( True )
         Include an arrow in the line.
 
-    arrowparam : dict
+    arrow_param : dict
         In case arrow==True, gives a mapping of all parameters for add_arrow.
 
     nwiggles : float
@@ -91,9 +105,12 @@ class Line(object):
     npoints : int
         Number of points that makes up the line.
 
+    **line_kwargs : 
+        Keyword arguments for matplotlib.Lines.line2D .
+
 
     Properties
-    ----------
+    ==========
 
     npoints : int
         Number of points that makes up the line.
@@ -102,7 +119,7 @@ class Line(object):
         The xy coordinates of the line.
 
     linepath : np.ndarray, shape (npoints, 2)
-        The director line arount which the xy points are placed (with style).
+        The director line arount which the xy points are placed (with line_kwargs).
 
     tangent : np.ndarray, shape (npoints, 2)
         The unitary vectors tangent to the linepath.
@@ -112,13 +129,19 @@ class Line(object):
 
 """
 
-    _pathtype_linear_aliases = ('linear','line',  'lin', 'l',)
-    _pathtype_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
-    _pathtype_circular_aliases = ('circular', 'circle', 'cir', 'c')
+    _shape_linear_aliases = ('straight', 'linear','line','l',)
+    _shape_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
+    _shape_circular_aliases = ('circular', 'circle', 'cir', 'c')
+    _shape_possible_values = sum([],_shape_linear_aliases + _shape_elliptic_aliases + _shape_circular_aliases)
 
-    _linetype_simple_aliases = ('simple', 's', 'straight')
-    _linetype_wiggly_aliases = ('wiggly', 'w', 'wiggle')
-    _linetype_loopy_aliases = ('loopy', 'l', 'loop')
+    _flavour_simple_aliases = ('simple',) #, 'straight'
+    _flavour_wiggly_aliases = ('wiggly', 'w', 'wiggle', 'wiggles')
+    _flavour_loopy_aliases = ('loopy', 'l', 'loop', 'loops')
+    _flavour_possible_values = sum([],_flavour_simple_aliases + _flavour_wiggly_aliases + _flavour_loopy_aliases)
+
+    _stroke_single_aliases = ('single', 's')
+    _stroke_double_aliases = ('double', 'd')
+    _stroke_possible_values = sum([], _stroke_single_aliases + _stroke_double_aliases)
 
     _xy = np.zeros((2, 2))
     _linepath = np.zeros((2, 2))
@@ -130,23 +153,79 @@ class Line(object):
 
     def __init__(self, vstart, vend, **kwargs):
 
+        # Tips of the line
         self.vstart = vstart
         self.vend = vend
 
-        self.xstart, self.ystart = self.vstart.xy
-        self.xend, self.yend = self.vend.xy
+        # Set default values
+        self.set_default()
+        self.set_shape_dependent_defaults(kwargs)
+        self.set_kwargs_defaults(kwargs)
 
-        # Default values
+        self.set_attributes(kwargs)
+        self.set_style(kwargs)
+
+        #  Compute various vectors
+        self.set_t_param(kwargs)  # Set the main parameter
+        self._set_linepath()  # Compute the linepath
+        self._set_tangent()  # Compute the tangent
+        self._set_normal()  # Compute the normal
+        self._set_xy()  # Compute the line points
+
+        # Initialize objects
+        self.lines = list()
+        self.patches = list()
+        self.texts = list()
+        self.arrows = list()
+
+        # If requested
+        self.add_initial_arrow(kwargs)
+
+        # All other kwargs are 'matplotlib' line line_kwargs arguments
+        self.set_line_kwargs_defaults(kwargs)
+
+    def draw(self, ax):
+        """Plot the line."""
+        for line in self.get_lines(): ax.add_line(line)      # Lines
+        for arrow in self.get_arrows(): ax.add_patch(arrow)  # Arrows
+        for text in self.get_texts(): ax.add_artist(text)    # Texts
+        return
+
+    def set_style(self, kwargs):
+        """Set at once the shape, flavour and stroke of the line."""
+
+        def popdefault(key): return kwargs.pop(key, self.default[key])
+        shape = popdefault('shape')
+        flavour = popdefault('flavour')
+        stroke = popdefault('stroke')
+        style = popdefault('style')
+
+        # Attempt to know shape
+        for token in style.split():
+            if token in self._shape_possible_values:
+                shape = token
+            elif token in self._flavour_possible_values:
+                flavour = token
+            elif token in self._stroke_possible_values:
+                stroke = token
+
+        self.set_shape(shape)
+        self.set_flavour(flavour)
+        self.set_stroke(stroke)
+                
+    def set_default(self, **overwrite):
+        """Set the default values."""
         default = dict(
-            linestyle='single',
-            linetype='simple',
-            pathtype='linear',
+            stroke='single',
+            flavour='simple',
+            shape='linear',
+            style='',
             arrow=True,
             npoints=400,
             ellipse_spread=.5,
             ellipse_excentricity=1.2,
             ellipse_position='up',
-            # Conditional default : depends on: pathtype, linetype
+            # Conditional default : depends on: shape, flavour
             circle_radius=.15,
             circle_angle=0.25,
             amplitude=.025,
@@ -155,35 +234,54 @@ class Line(object):
             nwiggles=5,
             nloops=14,
             phase=0,
+            double_center_color='w',
             )
 
-        # Adjust some default values according to pathtype and linetype
-        if kwargs.get('linetype') in self._linetype_simple_aliases:
-            default.update(arrow=True)
-        elif (kwargs.get('linetype') in self._linetype_wiggly_aliases
-           or kwargs.get('linetype') in self._linetype_loopy_aliases):
-            default.update(arrow=False)
+        default.update(**overwrite)
+        self.default = default
 
-        if kwargs.get('pathtype') in self._pathtype_circular_aliases:
-            if kwargs.get('linetype') == 'simple':
-                default.update(circle_radius=.1)
-            elif kwargs.get('linetype') == 'wiggly':
-                default.update(nwiggles=7.25)
-                default.update(phase=.75)
-                default.update(circle_radius=.15)
+    def set_shape_dependent_defaults(self, kwargs):
+        """Adjust some default values according to shape and flavour."""
+        if kwargs.get('flavour') in self._flavour_simple_aliases:
+            self.default.update(arrow=True)
+        elif (kwargs.get('flavour') in self._flavour_wiggly_aliases
+           or kwargs.get('flavour') in self._flavour_loopy_aliases):
+            self.default.update(arrow=False)
 
-        elif kwargs.get('pathtype') in self._pathtype_elliptic_aliases:
+        if kwargs.get('shape') in self._shape_circular_aliases:
+            if kwargs.get('flavour') == 'simple':
+                self.default.update(circle_radius=.1)
+            elif kwargs.get('flavour') == 'wiggly':
+                self.default.update(nwiggles=7.25)
+                self.default.update(phase=.75)
+                self.default.update(circle_radius=.15)
+
+        elif kwargs.get('shape') in self._shape_elliptic_aliases:
             if ('ellipse_position' in kwargs and
                 kwargs['ellipse_position'] in ('down', -1)
                 ):
                 if 'ellipse_excentricity' not in kwargs:
-                    default['ellipse_excentricity'] *= -1
+                    self.default['ellipse_excentricity'] *= -1
 
-        # Set default values
-        for key, val in default.items():
+    def set_line_kwargs_defaults(self, kwargs):
+        """Set default matplotlib.lines.Line2D keyword arguments."""
+        self.line_kwargs = dict(
+            marker='',
+            color='k',
+            linestyle='-',
+            linewidth=3,
+            zorder=10,
+            solid_capstyle="butt",
+            )
+        self.line_kwargs.update(kwargs)
+
+    def set_kwargs_defaults(self, kwargs):
+        """Set default values into kwargs."""
+        for key, val in self.default.items():
             kwargs.setdefault(key, val)
 
-        # Set attributes values
+    def set_attributes(self, kwargs):
+        """Set attributes values from keyword arguments."""
         for key in (
 
             # Options
@@ -206,72 +304,37 @@ class Line(object):
             'nloops',
             'phase',
 
+            'double_center_color',
+
             ):
             self.__dict__[key] = kwargs.pop(key)
 
-        # Set the line type
-        self.set_pathtype(kwargs.pop('pathtype'))
-        self.set_linetype(kwargs.pop('linetype'))
-        self.set_linestyle(kwargs.pop('linestyle'))
-
-        arrowparam = kwargs.pop('arrowparam', dict())
-
-        # Arrows parameters
-        self.arrows_param = list()
-
-        self.lines = list()
-        self.patches = list()
-        self.texts = list()
-        self.arrows = list()
-
-        # Set the main paramter
-        self._set_t(kwargs.pop('npoints'))
-
-        # Compute the linepath
-        self._set_linepath()
-
-        # Compute the tangent
-        self._set_tangent()
-
-        # Compute the normal
-        self._set_normal()
-
-        # Compute the line points
-        self._set_xy()
-
-        # Add the arrow
+    def add_initial_arrow(self, kwargs):
+        """Add the arrow, if requested at initiation."""
+        arrow_param = kwargs.pop('arrow_param', dict())
         if self.arrow:
-            #_arrow_kwargs = """
-            #    arrow_t
-            #    arrow_size
-            #    arrow_length
-            #    arrow_fancyness
-            #    """.split()
+            self.add_arrow(**arrow_param)
 
-            #arrow_kwargs = {}
-            #for key in _arrow_kwargs:
-            #    skey = key.split('arrow_')[-1]
-            #    if skey in kwargs:
-            #        arrow_kwargs[skey] = kwargs.pop(key)
-            ##self.add_arrow(**arrow_kwargs)
-            self.add_arrow(**arrowparam)
 
-        # all other kwargs are 'matplotlib' line style arguments
-        self.style = dict(
-            marker='',
-            color='k',
-            linestyle='-',
-            linewidth=3,
-            zorder=10,
-            solid_capstyle="butt",
-            )
-        self.style.update(kwargs)
-        self.double_center_color = 'w'
+    @property
+    def xstart(self): return self.vstart.xy[0]
+    @property
+    def ystart(self): return self.vstart.xy[1]
+    @property
+    def xend(self): return self.vend.xy[0]
+    @property
+    def yend(self): return self.vend.xy[1]
+
 
     def t_index(self, t):
+        """Querry the index of a given value of t."""
         return int(t * self.npoints)
 
-    def _set_t(self, npoints):
+    def set_t_param(self, kwargs, **overwrite):
+        kwargs.update(**overwrite)
+        self._set_t(npoints=kwargs.pop('npoints', 2))
+
+    def _set_t(self, npoints=2):
         """Set the main parameter for the curve."""
         self.t = np.linspace(0, 1, npoints)
 
@@ -344,22 +407,22 @@ class Line(object):
         R = vectors.rotation_matrix(.25)
         self._normal = vectors.sqdot(R, self.tangent)
 
-    def set_pathtype(self, pathtype):
+    def set_shape(self, shape):
         """
         Set the path type.
 
             linear    -  A straight line between two points.
             elliptic  -  An ellipse arc.
             circular  -  A circle starting and ending at the same verticle.
-"""
-        if pathtype in      self._pathtype_linear_aliases:
+        """
+        if shape in self._shape_linear_aliases:
             self._set_linepath = self._set_linear_linepath
-        elif pathtype in    self._pathtype_elliptic_aliases:
+        elif shape in self._shape_elliptic_aliases:
             self._set_linepath = self._set_elliptic_linepath
-        elif pathtype in    self._pathtype_circular_aliases:
+        elif shape in self._shape_circular_aliases:
             self._set_linepath = self._set_circular_linepath
         else:
-            raise ValueError('Wrong value for pathtype')
+            raise ValueError('Wrong value for shape')
 
     # User
     def get_xy(self):
@@ -372,6 +435,28 @@ class Line(object):
         self.xy = xy
 
 
+    def set_flavour(self, flavour):
+        """
+        Set the line style.
+
+            simple  -  A straight line.
+            wiggly  -  A wavy line.
+            loopy   -  A spring.
+        """
+        if flavour in self._flavour_simple_aliases:
+            self._set_xy = self._set_xy_simple
+            return
+        elif flavour in self._flavour_wiggly_aliases:
+            self._set_xy = self._set_xy_wiggly
+            return
+        elif flavour in self._flavour_loopy_aliases:
+            self._set_xy = self._set_xy_loopy
+            return
+        else:
+            raise ValueError('Wrong value for flavour')
+
+    #   -------------------------------------------------------------------   #
+    #   ------------------ Arrows routines --------------------------------   #
     #   -------------------------------------------------------------------   #
 
     def add_arrow(self, #t=0.5, direction=1, theta=.083, size=.025,
@@ -382,7 +467,7 @@ class Line(object):
         Arguments
         ---------
 
-        arrowstyle : ['normal', 'fancy', 'line']
+        style : ['normal', 'fancy', 'line']
 
         t : float
             The position of the arrow along the line.
@@ -402,20 +487,20 @@ class Line(object):
         width :
 
         length :
-"""
+        """
 
-        _arrow_style = 'normal', 'fancy', 'line'
+        _style = 'normal', 'fancy', 'line'
 
-        arrowstyle = kwargs.pop('arrowstyle', 'fancy')
+        style = kwargs.pop('style', 'fancy')
 
-        if arrowstyle == 'normal':
+        if style == 'normal':
             return self._add_normal_arrow(*args, **kwargs)
-        elif arrowstyle == 'fancy':
+        elif style == 'fancy':
             return self._add_fancy_arrow(*args, **kwargs)
-        elif arrowstyle == 'line':
+        elif style == 'line':
             return self._add_line_arrow(*args, **kwargs)
         else:
-            raise ValueError("Wrong value for arrowstyle. Allowed values : " + self._arrow_style)
+            raise ValueError("Wrong value for style.\n Allowed values : " + self._style)
 
     def _add_normal_arrow(self, t=.5, width=.03, length=.09, **kwargs):
         """
@@ -425,7 +510,7 @@ class Line(object):
         width :
         length :
         **kwargs :
-"""
+        """
 
         for key, val in dict(
             color='k',
@@ -454,7 +539,7 @@ class Line(object):
         width :
         length :
         fancyness :
-"""
+        """
 
         for key, val in dict(
             color='k',
@@ -505,10 +590,8 @@ class Line(object):
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
-"""
-        default = dict(fontsize=14)
-        for key, val in default.items():
-            kwargs.setdefault(key, val)
+        """
+        kwargs.setdefault('fontsize', 14)
         self.texts.append((s, t, y, kwargs))
 
     def get_texts(self):
@@ -522,60 +605,23 @@ class Line(object):
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
 
-    #def get_arrow_lines(self):
-    #    """Get the arrow lines."""
-    #    linepath = self.get_linepath()
-
-    #    lines = list()
-    #    for param in self.arrows_param:
-    #        (t, d, theta, size, style) = param
-
-    #        th = tau * theta
-
-    #        it = self.t_index(t)
-
-    #        # Find the position and tangent vector at point t
-    #        rtip = linepath[it]
-    #        tan = self.tangent[it]
-    #        norm = self.normal[it]
-
-    #        # Starting point
-    #        drstart = - d * cos(th) * tan + sin(th) * norm
-    #        rstart = rtip + size * drstart
-
-    #        # End point
-    #        drend = - d * cos(th) * tan - sin(th) * norm
-    #        rend = rtip + size * drend
-
-    #        # Set default style
-    #        for key in ('linewidth', 'color', 'linestyle', 'marker'):
-    #            style.setdefault(key, self.style[key])
-    #        style.setdefault('zorder', self.style.get('zorder') + 2)
-
-    #        xy = np.array([rstart, rtip, rend]).transpose()
-    #        arrow_line = mpl.lines.Line2D(*xy, **style)
-
-    #        lines.append(arrow_line)
-
-    #    return lines
-
     @property
     def main_lines(self):
         return self._main_lines
 
-    def set_linestyle(self, linestyle):
+    def set_stroke(self, stroke):
         """
-        Set the linestyle.
+        Set the stroke.
 
             single  -  A simple line.
             double  -  A double line.
 """
-        if linestyle in ('simple', 's', 'single'):
+        if stroke in ('simple', 's', 'single'):
             self.get_main_lines = self.get_single_main_lines
-        elif linestyle in ('double', 'd'):
+        elif stroke in ('double', 'd'):
             self.get_main_lines = self.get_double_main_lines
         else:
-            raise ValueError('Wrong value for linestyle')
+            raise ValueError('Wrong value for stroke')
 
     # Morphable
     def _set_main_lines(self):
@@ -590,28 +636,36 @@ class Line(object):
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
         lines = list()
-        style = deepcopy(self.style)
+        style = dict()
         x, y = self.xy.transpose()
 
+        for key, val in self.line_kwargs.items():
+            if key in matplotlib_Line2D_valid_keyword_arguments:
+                style[key] = val
+
         # Make contour lines
-        style['zorder'] = self.style.get('zorder', 0) -1
-        style['linewidth'] = 1.8 * self.style.get('linewidth', 2)
-        #i0 = int(self.npoints / 25)  # TODO use the line width for the offset
-        #lines.append(mpl.lines.Line2D(x[i0:-i0], y[i0:-i0], **style))
+        style['zorder'] = self.line_kwargs.get('zorder', 0) -1
+        style['linewidth'] = 1.8 * self.line_kwargs.get('linewidth', 2)
         lines.append(mpl.lines.Line2D(x, y, **style))
 
         # Make center lines
-        style['zorder'] = self.style.get('zorder', 0)
+        style['zorder'] = self.line_kwargs.get('zorder', 0)
         style['color'] = self.double_center_color
-        style['linewidth'] = .5 * self.style.get('linewidth', 2)
+        style['linewidth'] = .5 * self.line_kwargs.get('linewidth', 2)
         lines.append(mpl.lines.Line2D(x, y, **style))
         return lines
-    def _set_double_main_lines(self): self.main_lines = get_double_main_lines()
+
+    def _set_double_main_lines(self):
+        self.main_lines = get_double_main_lines()
 
     def get_single_main_lines(self):
         """Get the main lines."""
-        line = mpl.lines.Line2D(*self.xy.transpose(), **self.style)
-        #self.main_lines = [line]
+        style = dict()
+        for key, val in self.line_kwargs.items():
+            if key in matplotlib_Line2D_valid_keyword_arguments:
+                style[key] = val
+
+        line = mpl.lines.Line2D(*self.xy.transpose(), **self.line_kwargs)
         return [line]
     def _set_single_main_lines(self): self.main_lines = get_single_main_lines()
         
@@ -664,7 +718,7 @@ class Line(object):
         -------
         xy: np.ndarray of shape (N, 2)
 
-"""
+        """
         return self.linepath
 
     def get_path_point(self, t):
@@ -683,6 +737,9 @@ class Line(object):
 
     def path_point(self, t): return self.get_path_point(t)
     
+    #   -------------------------------------------------------------------   #
+    #   ------------------ linepath routines ------------------------------   #
+    #   -------------------------------------------------------------------   #
         
     def _set_linear_linepath(self):
         """Compute the xy eectors for a linear line path."""
@@ -744,7 +801,11 @@ class Line(object):
 
         return
 
-    # User
+
+    #   -------------------------------------------------------------------   #
+    #   ------------------ User routines ----------------------------------   #
+    #   -------------------------------------------------------------------   #
+        
     def get_tangent(self):
         """
         Get xy vectors for the tangent path.
@@ -758,7 +819,7 @@ class Line(object):
         Returns
         -------
             np.ndarray of shape (N, 2)
-"""
+        """
         return self.tangent
 
     def get_tangent_point(self, t):
@@ -768,7 +829,7 @@ class Line(object):
         t: Distance parameter along the path. 0. <= t <= 1.
 
         Returns: np.ndarray of shape (2)
-"""
+        """
         i_v = min(int(t * self.npoints), self.npoints)
         return self.tangent[i_v].reshape(2)
 
@@ -788,7 +849,7 @@ class Line(object):
         Returns
         -------
             np.ndarray of shape (N, 2)
-"""
+        """
         return self.normal
 
     def get_normal_point(self, t):
@@ -798,37 +859,22 @@ class Line(object):
         t: Distance parameter along the path. 0. <= t <= 1.
 
         Returns: np.ndarray of shape (2)
-"""
+        """
         i_v = min(int(t * self.npoints), self.npoints)
         v = self.normal[i_v]
         return v.reshape(2)
 
     def normal_point(self, t): return self.get_normal_point(t)
 
+
+    #   -------------------------------------------------------------------   #
+    #   -------------------- core routines ----------------------------------   #
+    #   -------------------------------------------------------------------   #
+        
     # Morphable
     def _set_xy(self):
         """Compute the xy coordinates of the line."""
         return self._set_xy_simple()
-
-    def set_linetype(self, linetype):
-        """
-        Set the line style.
-
-            simple  -  A straight line.
-            wiggly  -  A wavy line.
-            loopy   -  A spring.
-"""
-        if linetype in self._linetype_simple_aliases:
-            self._set_xy = self._set_xy_simple
-            return
-        elif linetype in self._linetype_wiggly_aliases:
-            self._set_xy = self._set_xy_wiggly
-            return
-        elif linetype in self._linetype_loopy_aliases:
-            self._set_xy = self._set_xy_loopy
-            return
-        else:
-            raise ValueError('Wrong value for linetype')
 
     def _set_xy_simple(self):
         """Compute the xy simple path.""" 
@@ -876,21 +922,4 @@ class Line(object):
     def get_arrows(self):
         """Get the patches, such as arrows."""
         return self.arrows
-
-    def draw(self, ax):
-        """Plot the line."""
-
-        # Lines
-        for line in self.get_lines():
-            ax.add_line(line)
-
-        # Arrows
-        for arrow in self.get_arrows():
-            ax.add_patch(arrow)
-
-        # Text
-        for text in self.get_texts():
-            ax.add_artist(text)
-
-        return
 

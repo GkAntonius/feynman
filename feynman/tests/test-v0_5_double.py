@@ -28,21 +28,17 @@ class TestLines(TestDiagram):
 
         v1 = dia.verticle(xy=(.2,.5))
         v2 = dia.verticle(xy=(0.8,.5))
-        l1 = dia.line(v1, v2, pathtype='linear', linestyle='double',
-                      arrow=True, arrowparam={'linewidth':2, 'width':.035})
+        l1 = dia.line(v1, v2, style="double linear", arrow=True, arrowparam={'linewidth':2, 'width':.035})
 
         v3 = dia.verticle(xy=(.2,.3))
         v4 = dia.verticle(xy=(0.8,.3))
-        l2 = dia.line(v3, v4,
-                    pathtype='linear', linestyle='double', linetype='wiggly',)
+        l2 = dia.line(v3, v4, style="linear double wiggly")
 
         v5 = dia.verticle(xy=(.2,.1))
         v6 = dia.verticle(xy=(0.8,.1))
-        l3 = dia.line(v5, v6,
-                    pathtype='linear', linestyle='double', linetype='loopy',)
+        l3 = dia.line(v5, v6, style="linear double loopy")
 
-        l4 = dia.line(v1, v2,
-                    pathtype='elliptic', linestyle='double', linetype='wiggly',)
+        l4 = dia.line(v1, v2, style = "elliptic double wiggly")
 
         
         dia.plot()

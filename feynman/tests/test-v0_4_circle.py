@@ -31,9 +31,9 @@ class TestLines(TestDiagram):
         v3 = dia.verticle(xy=(0.8,.2), marker='')
         v4 = dia.verticle(xy=(0.5,.6))
         l1 = dia.line(v1, v2, arrow=True)
-        l3 = dia.line(v2, v4, linetype='wiggly', nwiggles=3)
+        l3 = dia.line(v2, v4, flavour='wiggly', nwiggles=3)
         l3 = dia.line(v2, v3, arrow=True)
-        l2 = dia.line(v4, v4, pathtype='circular', linetype='simple')
+        l2 = dia.line(v4, v4, shape='circular', flavour='simple')
         
         dia.plot()
 
@@ -55,7 +55,7 @@ class TestLines(TestDiagram):
         v2 = dia.verticle(xy=(0.5,.2))
         v3 = dia.verticle(xy=(0.8,.2), marker='')
         l1 = dia.line(v1, v2, arrow=True)
-        l2 = dia.line(v2, v2, pathtype='circular', linetype='wiggly',)
+        l2 = dia.line(v2, v2, shape='circular', flavour='wiggly',)
         l3 = dia.line(v2, v3, arrow=True)
         
         dia.plot()
@@ -76,8 +76,8 @@ class TestLines(TestDiagram):
         
         v1 = dia.verticle((.2,.2))
         v2 = dia.verticle((0.5,.7))
-        l1 = dia.line(v1, v2, linetype='wiggly')
-        dia.line(v2, v2, pathtype='circular', arrow=True, circle_angle=l1.angle)
+        l1 = dia.line(v1, v2, flavour='wiggly')
+        dia.line(v2, v2, shape='circular', arrow=True, circle_angle=l1.angle)
         
         dia.plot()
 

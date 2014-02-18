@@ -6,7 +6,7 @@
 #       - get_lines
 #       - get_operators
 #
-#   o Line, Operator
+#   o FancyLine, Operator
 #       - get_verticles
 #
 #   o Diagram
@@ -34,7 +34,7 @@ from .. import colors as mc
 from .. import vectors
 from .. import colors
 from .. import core
-from ..core import Verticle, Line, Operator
+from ..core import Verticle, FancyLine, Operator
 
 from .plotter import Plotter
 
@@ -124,7 +124,7 @@ class Diagram(Plotter):
 
     def line(self, *args, **kwargs):
         """Create a feynman.core.line instance."""
-        l = Line(*args, **kwargs)
+        l = FancyLine(*args, **kwargs)
         self.lines.append(l)
         return l
 

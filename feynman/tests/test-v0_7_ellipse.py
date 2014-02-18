@@ -38,7 +38,7 @@ class TestOperator(TestDiagram):
         D1.line(v1, v2, arrow=True)
         O = D1.operator([v2,v3])
         O.text("$\Sigma$")
-        D1.line(v3, v4, linestyle='double', arrow=True)
+        D1.line(v3, v4, stroke='double', arrow=True)
 
         D1.plot()
 
@@ -52,7 +52,7 @@ class TestOperator(TestDiagram):
 
         D2.line(v1, v2, arrow=True)
         D2.operator([v2,v3], c=1.5)
-        D2.line(v3, v4, linetype='wiggly', nwiggles=2)
+        D2.line(v3, v4, flavour='wiggly', nwiggles=2)
 
         D2.plot()
 
