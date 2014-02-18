@@ -38,8 +38,6 @@ from ..core import Verticle, FancyLine, Operator
 
 from .plotter import Plotter
 
-# Personnal modules
-
 class Diagram(Plotter):
     """
     The main object for a feynman diagram.
@@ -88,7 +86,7 @@ class Diagram(Plotter):
         Returns
         -------
         feynman.core.Verticle instance.
-"""
+        """
         v = Verticle(xy, **kwargs)
         self.verticles.append(v)
         return v
@@ -110,7 +108,7 @@ class Diagram(Plotter):
         -------
 
         list of feynman.core.Verticle instance.
-"""
+        """
         xys = np.array(xys)
         if xys.ndim != 2:
              raise ValueError("xy must be a list of xy coordinates.")

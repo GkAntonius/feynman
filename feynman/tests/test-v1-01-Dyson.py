@@ -24,48 +24,56 @@ class TestText(TestDiagram):
     def test_diagram(self):
 
         # Set the ax
-        fig = plt.figure(figsize=(10,4))
+        fig = plt.figure(figsize=(10,1.2))
         ax = fig.add_subplot(111)
         
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        
         ax.set_xlim(0, 2.5)
-        ax.set_ylim(0, 1.)
-
+        ax.set_ylim(0, .3)
+        
+        y0 = sum(ax.get_ylim()) / 2
+        l = 0.4
+        
+        x0 = .05
+        
+        G_style = dict(arrow=True, arrow_param={'width':0.05}, stroke = 'double')
+        G0_style = dict(arrow=True, arrow_param={'width':0.05})
+        
         # First diagram
         D1 = Diagram(ax)
-
-        v01 = D1.verticle(xy=(.2,.5), marker='')
-        v02 = D1.verticle(xy=(.6,.5), marker='')
-        l01 = D1.line(v01, v02, arrow=True, linestyle = 'double')
-
-        v01.text('1')
-        v02.text('2')
-
-        D1.text(.75, .5, "=", fontsize=30)
-
-        x0 = .7
-        v21 = D1.verticle(xy=(x0+.2,.5), marker='')
-        v22 = D1.verticle(xy=(x0+.6,.5), marker='')
-        l21 = D1.line(v21, v22, arrow=True, linestyle = 'simple')
-
-        v21.text('1')
-        v22.text('2')
-
-        D1.text(1.45, .5, "+", fontsize=30)
-
-        x0 = 1.4
-        v11 = D1.verticle(xy=(x0+.2,.5), marker='')
-        v12 = D1.verticle(xy=(x0+.4,.5))
-        v13 = D1.verticle(xy=(x0+.6,.5))
-        v14 = D1.verticle(xy=(x0+.8,.5), marker='')
-
-        v11.text('1')
-        v12.text('3', x=-.04, y=.025)
-        v13.text('4', x= .01, y=.025)
-        v14.text('2')
-
-
-        D1.line(v11, v12, arrow=True)
-        D1.line(v13, v14, linestyle='double', arrow=True)
+        
+        arrow_param = dict(width=0.05)
+        
+        x = x0
+        v01 = D1.verticle(xy=(x,y0))
+        v02 = D1.verticle(v01.xy, dx=l)
+        G = D1.line(v01, v02, **G_style)
+        
+        text_prop = dict(y=0.05, fontsize=20)
+        G.text("$G$", **text_prop)
+        
+        x = x0 + .55
+        D1.text(x, y0, "=", fontsize=30)
+        
+        x = x0 + .7
+        v21 = D1.verticle(xy=(x,y0))
+        v22 = D1.verticle(v21.xy, dx=l)
+        G0 = D1.line(v21, v22, **G0_style)
+        G0.text("$G_0$", **text_prop)
+        
+        x = x0 + 1.25
+        D1.text(x, y0, "+", fontsize=30)
+        
+        x = x0 + 1.4
+        v11 = D1.verticle(xy=(x0 + 1.4,y0))
+        v12 = D1.verticle(xy=v11.xy, dx = l)
+        v13 = D1.verticle(xy=v12.xy, dx = .2)
+        v14 = D1.verticle(xy=v13.xy, dx = l)
+        
+        D1.line(v11, v12, arrow=True, arrow_param=arrow_param)
+        D1.line(v13, v14, stroke='double', arrow=True, arrow_param=arrow_param)
         O = D1.operator([v12,v13])
         O.text("$\Sigma$")
 

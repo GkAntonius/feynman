@@ -129,16 +129,19 @@ class FancyLine(object):
 
 """
 
+    _shape = 'linear'
     _shape_linear_aliases = ('straight', 'linear','line','l',)
     _shape_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
     _shape_circular_aliases = ('circular', 'circle', 'cir', 'c')
     _shape_possible_values = sum([],_shape_linear_aliases + _shape_elliptic_aliases + _shape_circular_aliases)
 
+    _flavour = 'simple'
     _flavour_simple_aliases = ('simple',) #, 'straight'
     _flavour_wiggly_aliases = ('wiggly', 'w', 'wiggle', 'wiggles')
     _flavour_loopy_aliases = ('loopy', 'l', 'loop', 'loops')
     _flavour_possible_values = sum([],_flavour_simple_aliases + _flavour_wiggly_aliases + _flavour_loopy_aliases)
 
+    _stroke = 'single'
     _stroke_single_aliases = ('single', 's')
     _stroke_double_aliases = ('double', 'd')
     _stroke_possible_values = sum([], _stroke_single_aliases + _stroke_double_aliases)
@@ -159,11 +162,11 @@ class FancyLine(object):
 
         # Set default values
         self.set_default()
+        self.set_style(kwargs)
         self.set_shape_dependent_defaults(kwargs)
         self.set_kwargs_defaults(kwargs)
 
         self.set_attributes(kwargs)
-        self.set_style(kwargs)
 
         #  Compute various vectors
         self.set_t_param(kwargs)  # Set the main parameter
@@ -242,21 +245,24 @@ class FancyLine(object):
 
     def set_shape_dependent_defaults(self, kwargs):
         """Adjust some default values according to shape and flavour."""
-        if kwargs.get('flavour') in self._flavour_simple_aliases:
+
+        if self.flavour == 'simple':
             self.default.update(arrow=True)
-        elif (kwargs.get('flavour') in self._flavour_wiggly_aliases
-           or kwargs.get('flavour') in self._flavour_loopy_aliases):
+
+        elif self.flavour in ('wiggly', 'loopy'):
             self.default.update(arrow=False)
 
-        if kwargs.get('shape') in self._shape_circular_aliases:
-            if kwargs.get('flavour') == 'simple':
+        if self.shape == 'circular':
+            if self.flavour == 'simple':
                 self.default.update(circle_radius=.1)
-            elif kwargs.get('flavour') == 'wiggly':
+            elif self.flavour == 'wiggly':
                 self.default.update(nwiggles=7.25)
                 self.default.update(phase=.75)
                 self.default.update(circle_radius=.15)
+            elif self.flavour == 'loopy':
+                pass
 
-        elif kwargs.get('shape') in self._shape_elliptic_aliases:
+        elif self.shape == 'elliptic':
             if ('ellipse_position' in kwargs and
                 kwargs['ellipse_position'] in ('down', -1)
                 ):
@@ -407,6 +413,10 @@ class FancyLine(object):
         R = vectors.rotation_matrix(.25)
         self._normal = vectors.sqdot(R, self.tangent)
 
+    @property
+    def shape(self):
+        return self._shape
+
     def set_shape(self, shape):
         """
         Set the path type.
@@ -417,9 +427,12 @@ class FancyLine(object):
         """
         if shape in self._shape_linear_aliases:
             self._set_linepath = self._set_linear_linepath
+            self._shape = 'linear'
         elif shape in self._shape_elliptic_aliases:
             self._set_linepath = self._set_elliptic_linepath
+            self._shape = 'elliptic'
         elif shape in self._shape_circular_aliases:
+            self._shape = 'circular'
             self._set_linepath = self._set_circular_linepath
         else:
             raise ValueError('Wrong value for shape')
@@ -435,6 +448,10 @@ class FancyLine(object):
         self.xy = xy
 
 
+    @property
+    def flavour(self):
+        return self._flavour
+
     def set_flavour(self, flavour):
         """
         Set the line style.
@@ -445,12 +462,15 @@ class FancyLine(object):
         """
         if flavour in self._flavour_simple_aliases:
             self._set_xy = self._set_xy_simple
+            self._flavour = 'simple'
             return
         elif flavour in self._flavour_wiggly_aliases:
             self._set_xy = self._set_xy_wiggly
+            self._flavour = 'wiggly'
             return
         elif flavour in self._flavour_loopy_aliases:
             self._set_xy = self._set_xy_loopy
+            self._flavour = 'loopy'
             return
         else:
             raise ValueError('Wrong value for flavour')
@@ -528,14 +548,16 @@ class FancyLine(object):
 
         self.arrows.append(arrow)
 
-    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09, **kwargs):
+    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09,
+                         t_shift_dir=0.025, **kwargs):
         """
         Add a fancy arrow.
 
         Arguments
         ---------
 
-        t :
+        t : Where to place the arrow along the line. [0, 1]
+        t_shift_dir : 
         width :
         length :
         fancyness :
@@ -548,7 +570,7 @@ class FancyLine(object):
             kwargs.setdefault(key, val)
 
         center = self.path_point(t)
-        tangent = self.tangent_point(min(1, t+.025))
+        tangent = self.tangent_point(min(1, t+t_shift_dir))
         normal = self.normal_point(t)
 
         tip = center + .5 * length * tangent
@@ -609,19 +631,25 @@ class FancyLine(object):
     def main_lines(self):
         return self._main_lines
 
+    @property
+    def stroke(self):
+        return self._stroke
+
     def set_stroke(self, stroke):
         """
         Set the stroke.
 
-            single  -  A simple line.
+            single  -  A single line.
             double  -  A double line.
 """
-        if stroke in ('simple', 's', 'single'):
+        if stroke in self._stroke_single_aliases:
             self.get_main_lines = self.get_single_main_lines
-        elif stroke in ('double', 'd'):
+            self._stroke = 'single'
+        elif stroke in self._stroke_double_aliases:
             self.get_main_lines = self.get_double_main_lines
+            self._stroke = 'double'
         else:
-            raise ValueError('Wrong value for stroke')
+            raise ValueError('Wrong value for stroke: ' + str(stroke))
 
     # Morphable
     def _set_main_lines(self):
@@ -665,7 +693,7 @@ class FancyLine(object):
             if key in matplotlib_Line2D_valid_keyword_arguments:
                 style[key] = val
 
-        line = mpl.lines.Line2D(*self.xy.transpose(), **self.line_kwargs)
+        line = mpl.lines.Line2D(*self.xy.transpose(), **style)
         return [line]
     def _set_single_main_lines(self): self.main_lines = get_single_main_lines()
         
