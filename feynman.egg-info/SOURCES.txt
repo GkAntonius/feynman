@@ -15,6 +15,7 @@ feynman.egg-info/top_level.txt
 feynman/core/__init__.py
 feynman/core/lines.py
 feynman/core/operators.py
+feynman/core/util.py
 feynman/core/verticles.py
 feynman/diagrams/__init__.py
 feynman/diagrams/diagrams.py
@@ -29,4 +30,4 @@ feynman/tests/test-v0_6_polygon.py
 feynman/tests/test-v0_7_ellipse.py
 feynman/tests/test-v0_8_text.py
 feynman/tests/test-v1-01-Dyson.py
-feynman/tests/test-v1-02-Hedin.py
+feynman/tests/test-v1-02-SigmaHedin.py

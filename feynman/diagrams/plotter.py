@@ -1,6 +1,8 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from numpy import array
+
 class Plotter(object):
     """
     A wrapper for matplotlib.figure.Figure object.
@@ -83,7 +85,7 @@ class Plotter(object):
         self.ax.set_xlim(.0, w)
 
         #self.ax.set_xlim(.0, 10.)
-        self.ax.set_ylim(np.array(self.ax.get_xlim()) * aspectratio)
+        self.ax.set_ylim(array(self.ax.get_xlim()) * aspectratio)
         self.y0 = sum(self.ax.get_ylim()) / 2.
         self.x0 = sum(self.ax.get_xlim()) * .05
 

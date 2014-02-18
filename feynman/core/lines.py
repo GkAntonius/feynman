@@ -1,5 +1,6 @@
 
 from copy import copy, deepcopy
+import warnings
 
 import numpy as np
 from numpy import sin, cos, sqrt
@@ -187,6 +188,9 @@ class FancyLine(object):
         # All other kwargs are 'matplotlib' line line_kwargs arguments
         self.set_line_kwargs_defaults(kwargs)
 
+        # Collect unknown keyword arguments
+        self.warn_unkwnown_kwargs(kwargs)
+
     def draw(self, ax):
         """Plot the line."""
         for line in self.get_lines(): ax.add_line(line)      # Lines
@@ -197,11 +201,13 @@ class FancyLine(object):
     def set_style(self, kwargs):
         """Set at once the shape, flavour and stroke of the line."""
 
-        def popdefault(key): return kwargs.pop(key, self.default[key])
-        shape = popdefault('shape')
-        flavour = popdefault('flavour')
-        stroke = popdefault('stroke')
-        style = popdefault('style')
+        def popdefault(D, key):
+            default = self.default.pop(key)
+            return D.pop(key, default)
+        shape = popdefault(kwargs, 'shape')
+        flavour = popdefault(kwargs, 'flavour')
+        stroke = popdefault(kwargs, 'stroke')
+        style = popdefault(kwargs, 'style')
 
         # Attempt to know shape
         for token in style.split():
@@ -279,7 +285,15 @@ class FancyLine(object):
             zorder=10,
             solid_capstyle="butt",
             )
-        self.line_kwargs.update(kwargs)
+
+        for key in kwargs.keys():
+            if key in matplotlib_Line2D_valid_keyword_arguments:
+                self.line_kwargs.update(kwargs.pop(key))
+
+    def warn_unkwnown_kwargs(self, kwargs):
+        """Collect unknown keyword arguments."""
+        for key in kwargs.keys():
+            warnings.warn("Unknown keyword argument will be ignored: " + str(key))
 
     def set_kwargs_defaults(self, kwargs):
         """Set default values into kwargs."""
@@ -664,12 +678,8 @@ class FancyLine(object):
     def get_double_main_lines(self):
         """Get a set of lines forming a double line."""
         lines = list()
-        style = dict()
+        style = deepcopy(self.line_kwargs)
         x, y = self.xy.transpose()
-
-        for key, val in self.line_kwargs.items():
-            if key in matplotlib_Line2D_valid_keyword_arguments:
-                style[key] = val
 
         # Make contour lines
         style['zorder'] = self.line_kwargs.get('zorder', 0) -1
