@@ -86,6 +86,11 @@ class FancyLine(object):
     circle_angle : float (0.25)
         The angle of the anchor verticle to the circle center, in units of tau.
 
+    circle_excentricity : float (.1)
+        The excentricity of the circle.
+        | > 1. --> squeezed in the tangent direction at the anchor point.
+        | < 1. --> stretched in the tangent direction at the anchor point.
+
 
     arrow : bool ( True )
         Include an arrow in the line.
@@ -237,6 +242,7 @@ class FancyLine(object):
             # Conditional default : depends on: shape, flavour
             circle_radius=.15,
             circle_angle=0.25,
+            circle_excentricity=1.,
             amplitude=.025,
             xamp=.025,
             yamp=.05,
@@ -312,6 +318,7 @@ class FancyLine(object):
             'ellipse_excentricity',
             'ellipse_position',
             'circle_radius',
+            'circle_excentricity',
             'circle_angle',
 
             # Amplitude of the wave and such...
@@ -823,16 +830,20 @@ class FancyLine(object):
         """Get xy vectors for the path."""
 
         r = self.circle_radius
+        c = self.circle_excentricity
         alpha = self.circle_angle
 
         # Circle center
         ro = self.rend + vectors.rotate([r,0], alpha)
 
         # Angular progression along the circle.
-        theta = tau * (self.t + alpha)
+        #theta = tau * (self.t + alpha)
+        theta = tau * self.t
 
         # xy relative to the circle center
-        circle = r * np.array([- cos(theta), - sin(theta)]).transpose()
+        circle = r * np.array([- cos(theta), - sin(theta) / c])#.transpose()
+        circle = vectors.rotate(circle, alpha)
+        circle = circle.transpose()
 
         # shift vector
         self.linepath = vectors.add(circle,  ro)
