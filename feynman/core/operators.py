@@ -7,9 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
-# Personnal modules
-import mycolors as mc
-
 from .. import vectors
 from .. import colors
 from ..constants import tau
