@@ -19,7 +19,9 @@ class Plotter(object):
         else:
             self.fig = plt.figure()
             self.ax = self.fig.add_axes([0., 0., 1.,1.])
-            self.set_size_inches(*kwargs.get('figsize', (8, 6)))
+            self.set_size_inches(*kwargs.get('figsize', (6, 6)))
+            self.ax.set_xlim(0,1)
+            self.ax.set_ylim(0,1)
             for spine in self.ax.spines.values():
                 spine.set_visible(False)
         

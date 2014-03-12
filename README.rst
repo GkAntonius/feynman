@@ -39,7 +39,7 @@ Using feynman
     v4 = diagram.verticle(xy=(.9,.5), marker='')
     
     l12 = diagram.line(v1, v2, arrow=True)
-    w23 = diagram.line(v2, v3, pathtype='elliptic', linestyle='wiggly')
+    w23 = diagram.line(v2, v3, shape='elliptic', flavour='wiggly')
     l23 = diagram.line(v2, v3, arrow=True)
     l34 = diagram.line(v3, v4, arrow=True)
     
