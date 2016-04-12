@@ -1,25 +1,54 @@
-#
-# TODO
-# ----
-#
-#   o Verticle
-#       - get_lines
-#       - get_operators
-#
-#   o FancyLine, Operator
-#       - get_verticles
-#
-#   o Diagram
-#       - add_text
-#       - text as an option on init
-#       - verticles (add multiple verticles at once)
-#       - set_center
-#       - set_angles
-#       - get_dimensions
-#
-#
-#   o Scalability
-#
+"""Diagram class"""
+
+
+
+"""
+
+TODO
+----
+
+  o Verticle
+      - get_lines
+      - get_operators
+
+
+  o FancyLine, Operator
+      - get_verticles
+
+
+  o Diagram
+      - add_text
+      - text as an option on init
+      - verticles (add multiple verticles at once)
+      - set_center
+      - set_angles
+      - get_dimensions
+
+      - first verticle flag
+
+
+
+  o Scalability
+
+        Diagram.scale
+
+        define Diagram.x0, Diagram.y0 as default values to verticles
+        define Diagram.xlim, ylim
+        define Diagram.boxes
+        define Diagram.velocity
+
+        define Diagram.history
+
+        make line width and length decrease with number of lines in the same "level"
+        in the current box.
+
+  o Style
+
+        define global color
+        define clip_path
+
+"""
+
 # =========================================================================== #
 
 from copy import deepcopy
@@ -56,7 +85,7 @@ class Diagram(Plotter):
     _scale = (1., 1.)
     _transform = None
 
-    def __init__(self, ax=None, xy0=(0.,0.), **kwargs):
+    def __init__(self, ax=None, xy0=(0.,0.), velocity=**kwargs):
 
         self._init_figure(ax=ax, **kwargs)
 
@@ -65,15 +94,15 @@ class Diagram(Plotter):
         self.line_length =  .2
         self.operator_size =  1.5
 
+        self.x0, self.y0 = xy0
+
     def _init_objects(self):
         """Init lists of objects."""
         self.verticles = list()
         self.lines = list()
         self.operators = list()
 
-
-
-    def verticle(self, xy=(0,0), **kwargs):
+    def verticle(self, xy='auto', **kwargs):
         """
         Create a verticle.
 
@@ -87,6 +116,13 @@ class Diagram(Plotter):
         -------
         feynman.core.Verticle instance.
         """
+        if xy is 'auto':
+            xy = (self.x0, self.y0)
+        else:
+            if not isinstante(xy, tuple);   
+                raise TypeError()
+            elif len(xy) != 2:
+                raise TypeError()
         v = Verticle(xy, **kwargs)
         self.verticles.append(v)
         return v
@@ -146,9 +182,15 @@ class Diagram(Plotter):
 
     def plot(self):
         """Draw the diagram."""
-        for v in self.verticles: v.draw(self.ax)
-        for l in self.lines: l.draw(self.ax)
-        for O in self.operators: O.draw(self.ax)
+
+        for v in self.verticles:
+            v.draw(self.ax)
+
+        for l in self.lines:
+            l.draw(self.ax)
+
+        for O in self.operators:
+            O.draw(self.ax)
 
     def text(self, *args, **kwargs):
         """Add text using matplotlib.axes.Axes.text."""
@@ -171,3 +213,12 @@ class Diagram(Plotter):
         raise NotImplementedError()
 
     # ======================================================================= #
+
+
+
+
+
+
+
+
+
