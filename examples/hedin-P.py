@@ -1,4 +1,5 @@
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 from feynman import Diagram
@@ -25,26 +26,37 @@ G_style = dict(style='double elliptic',
                 ellipse_excentricity=-1.2, ellipse_spread=.3,
                 arrow=True, arrow_param={'width':0.05})
 
-# First diagram
-D1 = Diagram(ax)
-
-arrowparam = dict(width=0.05)
+D = Diagram(ax)
 
 xy = [0.2, y0]
-v01 = D1.verticle(xy)
-v02 = D1.verticle(v01.xy, dx=opwidth)
-P = D1.operator([v01,v02], c=1.3)
+v01 = D.verticle(xy)
+v02 = D.verticle(v01.xy, dx=opwidth)
+P = D.operator([v01,v02], c=1.3)
 P.text("$P$")
 
-D1.text(.70, y0, "=", fontsize=30)
+D.text(.70, y0, "=", fontsize=30)
 
 xy[0] = 0.9
-v21 = D1.verticle(xy)
-v22 = D1.verticle(xy, dx=linlen)
+v21 = D.verticle(xy)
 
-l21 = D1.line(v22, v21, **G_style)
-l21 = D1.line(v21, v22, **G_style)
+xy[0] += linlen
+xy[1] += Gamma_width / 2
+v22 = D.verticle(xy)
 
-D1.plot()
-fig.savefig('P-RPA.pdf')
+xy[1] += - Gamma_width
+v23 = D.verticle(xy)
+
+xy[1] +=  Gamma_width / 2
+xy[0] +=  Gamma_width * np.sqrt(3) / 2 
+v24 = D.verticle(xy)
+
+l21 = D.line(v22, v21, **G_style)
+l21 = D.line(v21, v23, **G_style)
+
+Gamma = D.operator([v22,v23, v24])
+Gamma.text("$\Gamma$")
+
+D.plot()
+
+fig.savefig('pdf/hedin-P.pdf')
 
