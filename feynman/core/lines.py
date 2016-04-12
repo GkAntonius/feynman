@@ -130,7 +130,7 @@ class FancyLine(object):
     normal : np.ndarray, shape (npoints, 2)
         The unitary vectors normal to the linepath.
 
-"""
+    """
 
     _shape = 'linear'
     _shape_linear_aliases = ('straight', 'linear','line','l',)
@@ -606,7 +606,7 @@ class FancyLine(object):
     def _add_line_arrow(self, **kwargs):
         """
         Add an arrow made with lines.
-"""
+        """
         raise NotImplementedError()
 
 
@@ -659,7 +659,7 @@ class FancyLine(object):
 
             single  -  A single line.
             double  -  A double line.
-"""
+        """
         if stroke in self._stroke_single_aliases:
             self.get_main_lines = self.get_single_main_lines
             self._stroke = 'single'
@@ -770,7 +770,7 @@ class FancyLine(object):
         t: Distance parameter along the path. 0. <= t <= 1.
 
         Returns: np.ndarray of shape (2)
-"""
+        """
         # This function is not optimized at all.
         linepath = self.get_linepath()
         i_xy = min(int(t * self.npoints), self.npoints)

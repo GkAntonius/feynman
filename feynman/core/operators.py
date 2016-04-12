@@ -59,7 +59,7 @@ class Operator(object):
 
     N :
 
-"""
+    """
     def __init__(self, verticles, **kwargs):
 
         # Default values
@@ -175,7 +175,7 @@ class Operator(object):
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
-"""
+        """
         default = dict(fontsize=30)
         for key, val in default.items():
             kwargs.setdefault(key, val)

@@ -80,7 +80,7 @@ class Diagram(Plotter):
     transparent : True to set the background as transparent. 
 
 
-"""
+    """
 
     _scale = (1., 1.)
     _transform = None

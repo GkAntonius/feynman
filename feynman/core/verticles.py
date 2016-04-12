@@ -33,7 +33,7 @@ class Verticle(object):
 
     **kwargs :
         Any matplotlib line style argument. 
-"""
+    """
 
     _xy = np.zeros(2)
 
@@ -109,7 +109,7 @@ class Verticle(object):
 
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
-"""
+        """
         default = dict(fontsize=14)
         for key, val in default.items():
             kwargs.setdefault(key, val)
