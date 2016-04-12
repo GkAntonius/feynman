@@ -4,3 +4,4 @@ dist
 work
 *.swp
 Makefile
+.DS_Store
