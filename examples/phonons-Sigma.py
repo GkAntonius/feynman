@@ -51,5 +51,4 @@ DW = D.line(v1, v1, **DW_style)
 
 D.plot()
 
-fname = '{}.pdf'.format(diagram_name)
 fig.savefig('pdf/phonons-Sigma.pdf')
