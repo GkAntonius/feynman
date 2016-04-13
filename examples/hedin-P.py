@@ -6,10 +6,7 @@ from feynman import Diagram
 
 # Set the ax
 fig = plt.figure(figsize=(8,6))
-ax = fig.add_subplot(111)
-
-for spine in ax.spines.values():
-    spine.set_visible(False)
+ax = fig.add_subplot(111, frameon=False)
 
 ax.set_xlim(0, 2)
 ax.set_ylim(0, 1.5)

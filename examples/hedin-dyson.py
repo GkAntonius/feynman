@@ -9,10 +9,7 @@ from myfunctions import openfile
 
 # Set the ax
 fig = plt.figure(figsize=(10,1.2))
-ax = fig.add_subplot(111)
-
-for spine in ax.spines.values():
-    spine.set_visible(False)
+ax = fig.add_subplot(111, frameon=False)
 
 ax.set_xlim(0, 2.5)
 ax.set_ylim(0, .3)

@@ -6,10 +6,7 @@ from feynman import Diagram
 
 # Set the ax
 fig = plt.figure(figsize=(12,3))
-ax = fig.add_subplot(111)
-
-for spine in ax.spines.values():
-    spine.set_visible(False)
+ax = fig.add_subplot(111, frameon=False)
 
 ax.set_xlim(0, 3)
 ax.set_ylim(0, .75)
@@ -64,5 +61,5 @@ D.line(v330, v33, **chunkstyle)
 
 D.plot()
 
-fig.savefig('pdf/gw-gamma.pdf')
+fig.savefig('pdf/gw-Gamma.pdf')
 
