@@ -82,4 +82,3 @@ class TestText(TestDiagram):
         self.show_pdf(basename)
 
 
-

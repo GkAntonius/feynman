@@ -118,11 +118,11 @@ class Diagram(Plotter):
         """
         if xy is 'auto':
             xy = (self.x0, self.y0)
-        else:
-            if not isinstance(xy, tuple):
-                raise TypeError()
-            elif len(xy) != 2:
-                raise TypeError()
+        #else:
+        #    if not isinstance(xy, tuple):
+        #        raise TypeError()
+        #    elif len(xy) != 2:
+        #        raise TypeError()
         v = Verticle(xy, **kwargs)
         self.verticles.append(v)
         return v
