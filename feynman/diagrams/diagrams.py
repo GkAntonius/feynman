@@ -85,7 +85,7 @@ class Diagram(Plotter):
     _scale = (1., 1.)
     _transform = None
 
-    def __init__(self, ax=None, xy0=(0.,0.), velocity=**kwargs):
+    def __init__(self, ax=None, xy0=(0.,0.), **kwargs):
 
         self._init_figure(ax=ax, **kwargs)
 
@@ -119,7 +119,7 @@ class Diagram(Plotter):
         if xy is 'auto':
             xy = (self.x0, self.y0)
         else:
-            if not isinstante(xy, tuple);   
+            if not isinstance(xy, tuple):
                 raise TypeError()
             elif len(xy) != 2:
                 raise TypeError()

@@ -22,5 +22,6 @@ l23.text("p-q")
 l34.text("p")
 
 diagram.plot()
+plt.savefig('pdf/fock.pdf')
 diagram.show()
 

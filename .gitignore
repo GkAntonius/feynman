@@ -1,7 +1,18 @@
+# Developement files
 TODO
-build
-dist
 work
 *.swp
-Makefile
 .DS_Store
+tags
+Makefile
+
+
+# Files produced by the setup script
+*.pyc
+*.egg-info
+build
+build/*
+dist
+dist/*/
+dist/*.egg
+
