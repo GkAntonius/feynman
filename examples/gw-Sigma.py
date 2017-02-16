@@ -8,34 +8,24 @@ ax = fig.add_subplot(111, frameon=False)
 ax.set_xlim(0, 2)
 ax.set_ylim(0, .5)
 
-y0 = 0.175
-
-opwidth = 0.3
-linlen = 0.8
-
 W_style = dict(style='double wiggly elliptic', nwiggles=5)
 G_style = dict(style='double', arrow=True, arrow_param={'width':0.05})
 
+# Sigma operator
 D = Diagram(ax)
 
-xy = [0.2, y0]
-v01 = D.verticle(xy)
+v01 = D.verticle([.2, .175])
+v02 = D.verticle(v01.xy, dx=.3)
 
-xy[0] += opwidth
-v02 = D.verticle(xy)
-
-Sigma = D.operator([v01,v02])
+Sigma = D.operator([v01, v02])
 Sigma.text("$\Sigma$")
 
-D.text(.70, y0, "=", fontsize=30)
+# Equal sign
+D.text(v02.x+.2, v02.y, "=", fontsize=30)
 
-xy[1] = y0 - 0.07
-
-xy[0] = 0.9
-v21 = D.verticle(xy)
-
-xy[0] += linlen
-v22 = D.verticle(xy)
+# GW convolution
+v21 = D.verticle(v02.xy, dxy=[0.4, -0.07])
+v22 = D.verticle(v21.xy, dx=0.8)
 
 l21 = D.line(v21, v22, **G_style)
 l22 = D.line(v21, v22, **W_style)
@@ -45,6 +35,7 @@ l22.text("W", y=-.1)
 
 D.plot()
 
+# Save
 fig.savefig('pdf/gw-Sigma.pdf')
 fig.savefig('pdf/gw-Sigma.png')
 

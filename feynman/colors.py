@@ -14,4 +14,5 @@ aqua = "#19818F"
 olive = "#5C6A26"
 black = "k"
 grey = "#999999"
+lightgrey = "#cccccc"
 

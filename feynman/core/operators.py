@@ -22,13 +22,10 @@ class Operator(object):
     Arguments
     ---------
 
-    verticles : feynman.Verticle (=2*[Verticle()])
+    verticles : a list of N verticles (feynman.Verticle)
         First and second verticle, counted clockwise
-        defining an edge (or the starting and ending pointaa)
+        defining an edge (or the starting and ending points)
         of a patch object. 
-
-    N : (2)
-        Number of verticles to the operator.
 
     rotate : (0.)
         Rotation angle to the operator, in units of tau.
@@ -58,6 +55,8 @@ class Operator(object):
     verticles :
 
     N :
+        Number of verticles to the operator.
+
 
     """
     def __init__(self, verticles, **kwargs):
@@ -84,7 +83,7 @@ class Operator(object):
 
         self.style = dict(
             edgecolor="k",
-            facecolor=colors.grey,
+            facecolor=colors.lightgrey,
             linewidth=3,
             )
 
