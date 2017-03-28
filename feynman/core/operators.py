@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
+from . import Drawable
+from . import Line
+
 from .. import vectors
 from .. import colors
 from ..constants import tau
 
 
-
-class Operator(object):
+class Operator(Drawable):
     """
     A N-point operator.
     Often represented as a polygon, or a circle.
@@ -35,6 +37,16 @@ class Operator(object):
         that is, the ratio of the long axe over the short axe.
         When c = 1, the shape will be a circle.
 
+    shape :
+        By default, the shape is 'ellipse' if N=2,
+        and 'polygon' if N>2.
+        When N=4 however, you can also specify 'bubble' as a shape
+        to have lines connecting (v1, v2) together and (v3, v4) together,
+        and a single elliptic patch on top of those two lines.
+
+    line_prop :
+        Line properties if shape='bubble'.
+
     **kwargs :
         Any other style specification for a matplotlib.patches.Patch instance.
 
@@ -46,11 +58,6 @@ class Operator(object):
 
     Properties
     ----------
-
-    shape :
-        default     -   'oval' if N == 2
-                    -   'polygon' if N > 2.
-        #default: 'circle'
 
     verticles :
 
@@ -73,13 +80,19 @@ class Operator(object):
         self.verticles = verticles
         self.N = len(verticles)
 
+        # TODO enforce possible values
+        shape = kwargs.pop('shape', 'polygon')
         if self.N == 2:
             self.shape = 'ellipse'
+        elif self.N == 4:
+            self.shape = shape
         else:
             self.shape = 'polygon'
             #self.shape = kwargs.setdefault('shape', 'circle')
 
         self.ellipse_excentricity = kwargs.pop('c')
+
+        self.line_prop = kwargs.pop('line_prop', dict())
 
         self.style = dict(
             edgecolor="k",
@@ -90,6 +103,7 @@ class Operator(object):
         self.style.update(kwargs)
 
         self.texts = list()
+        self.lines = list()
 
     def get_verticles(self):
         """Return the verticles."""
@@ -129,6 +143,8 @@ class Operator(object):
             return self.get_ellipse(*args, **kwargs)
         elif self.shape.lower() == "polygon":
             return self.get_polygon(*args, **kwargs)
+        elif self.shape.lower() == "bubble":
+            return self.get_bubble(*args, **kwargs)
         else:
             raise ValueError("Unrecognized shape: " + self.shape)
 
@@ -147,6 +163,38 @@ class Operator(object):
         angle = vectors.angle(dxy, 'deg')
         ellipse = mpa.Ellipse(center, width, height, angle=angle, **self.style)
         return ellipse
+
+    def get_bubble(self):
+        """Return the oval on top of the lines."""
+        xys = self.get_xy()
+        vwidth  = abs(xys[1][0] - xys[0][0])
+        vheight = abs(xys[0][1] - xys[-1][1])
+        width = 0.6 * vwidth
+        height = 1.1 * vheight
+        center = self.get_center()
+        angle = vectors.angle(xys[1] - xys[0], 'deg')
+        ellipse = mpa.Ellipse(center, width, height, angle=angle, zorder=2, **self.style)
+        return ellipse
+
+    def get_lines(self):
+        """Return the lines used for the bubble shape."""
+        if not self.shape.lower() == "bubble":
+            return list()
+
+        default_style = dict(
+            style = 'simple straight linear',
+            arrow = False,
+            zorder = 1,
+            )
+
+        for key, val in default_style.items():
+            self.line_prop.setdefault(key, val)
+
+        v1, v2, v3 ,v4 = self.verticles
+        line1 = Line(v1, v2, **self.line_prop)
+        line2 = Line(v3, v4, **self.line_prop)
+
+        return line1, line2
 
     def text(self, s, x=0., y=0., **kwargs):
         """
@@ -175,7 +223,7 @@ class Operator(object):
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
         """
-        default = dict(fontsize=30)
+        default = dict(fontsize=30, zorder=10)
         for key, val in default.items():
             kwargs.setdefault(key, val)
         self.texts.append((s, x, y, kwargs))
@@ -193,6 +241,8 @@ class Operator(object):
 
     def draw(self, ax):
         """Draw the diagram."""
+        for line in self.get_lines():
+            line.draw(ax)
         patch = self.get_patch()
         ax.add_patch(patch)
         for text in self.get_texts():

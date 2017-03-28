@@ -7,12 +7,14 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
+from . import Drawable
+
 from .. import vectors
 from .. import colors
 from ..constants import tau
 
 
-class Verticle(object):
+class Verticle(Drawable):
     """
     A verticle. Often represented as a point.
 
@@ -31,19 +33,35 @@ class Verticle(object):
     dy :
         Coordinate, so that the position is given by xy + [0, dy].
 
+    angle :
+        Angle from xy, so that the position is given by
+        xy + radius * [cos(angle), sin(angle)]
+        Angle is given in units of tau=2pi
+
+    radius :
+        Radius from xy, so that the position is given by
+        xy + radius * [cos(angle), sin(angle)]
+
     **kwargs :
         Any matplotlib line style argument. 
     """
 
     _xy = np.zeros(2)
 
+    _lines = list()
+
     def __init__(self, xy=(0,0), **kwargs):
 
         dx = np.array(kwargs.pop('dx', 0.))
         dy = np.array(kwargs.pop('dy', 0.))
         dxy = np.array(kwargs.pop('dxy', (0.,0.)))
+        angle = np.array(kwargs.pop('angle', 0.))
+        radius = np.array(kwargs.pop('radius', 0.))
 
-        self.xy = xy + dxy + np.array([dx, dy])
+        self.xy = ( xy 
+            + dxy + np.array([dx, dy])
+            + radius * np.array([np.cos(angle*tau), np.sin(angle*tau)])
+            )
 
         self.style = dict(
             marker='o',
@@ -56,7 +74,6 @@ class Verticle(object):
         self.style.update(kwargs)
 
         # TODO Should be able to get the lines connected to that verticle.
-        self.lines = list()
         self.texts = list()
 
     @property
@@ -89,6 +106,8 @@ class Verticle(object):
         """Returns a matplotlib.lines.Line2D instance."""
         return mpl.lines.Line2D([self.xy[0]],[self.xy[1]], **self.style)
 
+    # TODO
+    # Change x, y for dx, dy
     def text(self, s, x=-.025, y=+.025, **kwargs):
         """
         Add text near the verticle.
@@ -110,7 +129,11 @@ class Verticle(object):
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
         """
-        default = dict(fontsize=14)
+        default = dict(
+            verticalalignment='center',
+            horizontalalignment='center',
+            fontsize=14
+            )
         for key, val in default.items():
             kwargs.setdefault(key, val)
         self.texts.append((s, x, y, kwargs))
@@ -129,6 +152,18 @@ class Verticle(object):
         for text in self.get_texts():
             ax.add_artist(text)
         return
+
+    @property
+    def lines(self):
+        """The lines attached to it."""
+        return self._lines
+
+    @lines.setter
+    def lines(self, value):
+        self._lines = value
+
+    def chunk(self, *args, **kwargs):
+        self.diagram.add_chunk(self, *args, **kwargs)
 
     #@classmethod
     #def _add_relative(cls, other, radius, angle):

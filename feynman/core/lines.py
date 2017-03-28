@@ -10,13 +10,15 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
+from . import Drawable
+
 from .. import vectors
 from .. import colors
 from ..constants import tau, pi
 from .util import matplotlib_Line2D_valid_keyword_arguments
 
 
-class FancyLine(object):
+class Line(Drawable):
     """
     A particle line joigning two verticles.
 
@@ -156,6 +158,8 @@ class FancyLine(object):
     _main_lines = None
 
     t =  np.linspace(0, 1, 2)
+
+    _diagram = None
 
     def __init__(self, vstart, vend, **kwargs):
 
@@ -631,7 +635,11 @@ class FancyLine(object):
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
         """
-        kwargs.setdefault('fontsize', 14)
+        default = dict(
+            verticalalignment='center',
+            horizontalalignment='center',
+            fontsize=14
+            )
         self.texts.append((s, t, y, kwargs))
 
     def get_texts(self):

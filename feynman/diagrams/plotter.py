@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 
 from numpy import array
 
+#
+# TODO
+#   Have a FeynmanFigure object containing the many diagrams
+#       and handling equation symbols
+#
+#
 class Plotter(object):
     """
     A wrapper for matplotlib.figure.Figure object.
