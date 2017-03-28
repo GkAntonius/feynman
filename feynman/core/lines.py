@@ -138,18 +138,27 @@ class Line(Drawable):
     _shape_linear_aliases = ('straight', 'linear','line','l',)
     _shape_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
     _shape_circular_aliases = ('circular', 'circle', 'cir', 'c')
-    _shape_possible_values = sum([],_shape_linear_aliases + _shape_elliptic_aliases + _shape_circular_aliases)
+    _shape_possible_values = sum([], _shape_linear_aliases
+                                   + _shape_elliptic_aliases
+                                   + _shape_circular_aliases)
 
     _flavour = 'simple'
     _flavour_simple_aliases = ('simple',) #, 'straight'
     _flavour_wiggly_aliases = ('wiggly', 'w', 'wiggle', 'wiggles')
     _flavour_loopy_aliases = ('loopy', 'l', 'loop', 'loops')
-    _flavour_possible_values = sum([],_flavour_simple_aliases + _flavour_wiggly_aliases + _flavour_loopy_aliases)
+    _flavour_possible_values = sum([], _flavour_simple_aliases
+                                     + _flavour_wiggly_aliases
+                                     + _flavour_loopy_aliases)
 
     _stroke = 'single'
     _stroke_single_aliases = ('single', 's')
     _stroke_double_aliases = ('double', 'd')
-    _stroke_possible_values = sum([], _stroke_single_aliases + _stroke_double_aliases)
+    _stroke_dashed_aliases = ('dashed', '--')
+    _stroke_dotted_aliases = ('dotted', ':')
+    _stroke_possible_values = sum([], _stroke_single_aliases
+                                    + _stroke_double_aliases
+                                    + _stroke_dashed_aliases
+                                    + _stroke_dotted_aliases)
 
     _xy = np.zeros((2, 2))
     _linepath = np.zeros((2, 2))
@@ -674,6 +683,12 @@ class Line(Drawable):
         elif stroke in self._stroke_double_aliases:
             self.get_main_lines = self.get_double_main_lines
             self._stroke = 'double'
+        elif stroke in self._stroke_dashed_aliases:
+            self.get_main_lines = self.get_dashed_main_lines
+            self._stroke = 'dashed'
+        elif stroke in self._stroke_dotted_aliases:
+            self.get_main_lines = self.get_dotted_main_lines
+            self._stroke = 'dotted'
         else:
             raise ValueError('Wrong value for stroke: ' + str(stroke))
 
@@ -705,9 +720,6 @@ class Line(Drawable):
         lines.append(mpl.lines.Line2D(x, y, **style))
         return lines
 
-    def _set_double_main_lines(self):
-        self.main_lines = get_double_main_lines()
-
     def get_single_main_lines(self):
         """Get the main lines."""
         style = dict()
@@ -717,8 +729,25 @@ class Line(Drawable):
 
         line = mpl.lines.Line2D(*self.xy.transpose(), **style)
         return [line]
-    def _set_single_main_lines(self): self.main_lines = get_single_main_lines()
-        
+
+    def get_dashed_main_lines(self):
+        """Get the main lines."""
+        self.line_kwargs['linestyle'] = '--'
+        lines = self.get_single_main_lines()
+        for line in lines:
+            line.set_dashes([10,6])
+
+        return lines
+
+    def get_dotted_main_lines(self):
+        """Get the main lines."""
+        self.line_kwargs['linestyle'] = '--'
+        lines = self.get_single_main_lines()
+        for line in lines:
+            line.set_dashes([3,5])
+
+        return lines
+
     def distance(self):
         """The distance between the starting point and the end point."""
         return np.linalg.norm(self.dr)

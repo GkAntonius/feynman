@@ -5,6 +5,7 @@ work
 .DS_Store
 tags
 Makefile
+mytests
 
 
 # Files produced by the setup script
