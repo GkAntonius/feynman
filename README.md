@@ -1,6 +1,6 @@
 Plot beautiful Feynman diagrams with matplotlib.
 
-<a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/pdf/gw-Sigma.png" height="150" ></a><br clear="all" />
+<a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Solid_State_Physics/gw-Sigma.png" height="150" ></a><br clear="all" />
 
 
 Requirements
