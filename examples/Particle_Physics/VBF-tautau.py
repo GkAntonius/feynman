@@ -39,3 +39,4 @@ t2.text(r"$\tau^+$",fontsize=35)
 
 diagram.plot()
 fig.savefig('pdf/VBF-tautau.pdf',bbox_inches='tight')
+fig.savefig('pdf/VBF-tautau.png',bbox_inches='tight')
