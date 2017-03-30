@@ -2,7 +2,7 @@ Plot beautiful Feynman diagrams with matplotlib.
 
 <a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Solid_State_Physics/pdf/gw-Sigma.png" height="150" ></a><br clear="all" />
 
-<a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Particle_Physics/pdf/VBF-tautau.png" height="300" ></a><br clear="all" />
+<a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Particle_Physics/pdf/VBF-tautau.png" height="450" ></a><br clear="all" />
 
 Requirements
 ------------
