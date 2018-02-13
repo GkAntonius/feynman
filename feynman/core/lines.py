@@ -553,7 +553,7 @@ class Line(Drawable):
         else:
             raise ValueError("Wrong value for style.\n Allowed values : " + self._style)
 
-    def _add_normal_arrow(self, t=.5, width=.03, length=.09, **kwargs):
+    def _add_normal_arrow(self, t=.5, width=.03, length=.09, direction=1.0, **kwargs):
         """
         Add a normal, triangular arrow.
 
@@ -570,8 +570,12 @@ class Line(Drawable):
             kwargs.setdefault(key, val)
 
         center = self.path_point(t)
-        tip = center + .5 * length * self.tangent_point(t)
-        back = tip - .5 * length * self.tangent_point(t)
+        if direction > 0.0:
+          tip = center + .5 * length * self.tangent_point(t)
+          back = tip - .5 * length * self.tangent_point(t)
+        else:
+          tip = center - .5 * length * self.tangent_point(t)
+          back = tip + .5 * length * self.tangent_point(t)
         c1 = back + .5 * width * self.normal_point(t)
         c2 = back - .5 * width * self.normal_point(t)
 
@@ -579,7 +583,7 @@ class Line(Drawable):
 
         self.arrows.append(arrow)
 
-    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09,
+    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09, direction=1.0,
                          t_shift_dir=0.025, **kwargs):
         """
         Add a fancy arrow.
@@ -601,14 +605,23 @@ class Line(Drawable):
             kwargs.setdefault(key, val)
 
         center = self.path_point(t)
-        tangent = self.tangent_point(min(1, t+t_shift_dir))
         normal = self.normal_point(t)
 
-        tip = center + .5 * length * tangent
-        back = tip - .5 * length * tangent
-        c1 = back + .5 * width * normal
-        c2 = back - .5 * width * normal
-        antitip = back + fancyness * length * self.tangent_point(t)
+
+        if direction > 0.0 :
+            tangent = self.tangent_point(min(1, t+t_shift_dir))
+            tip = center + .5 * length * tangent
+            back = tip - .5 * length * tangent
+            c1 = back + .5 * width * normal
+            c2 = back - .5 * width * normal
+            antitip = back + fancyness * length * self.tangent_point(t)
+        else :
+            tangent = self.tangent_point(min(1, t-t_shift_dir))
+            tip = center - .5 * length * tangent
+            back = tip + .5 * length * tangent
+            c1 = back + .5 * width * normal
+            c2 = back - .5 * width * normal
+            antitip = back - fancyness * length * self.tangent_point(t)
 
         arrow = mpa.Polygon([tip, c1, antitip, c2], **kwargs)
 
