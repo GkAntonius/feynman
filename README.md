@@ -1,4 +1,4 @@
-Sharp-looking Feynman diagrams.
+Sharp-looking Feynman diagrams in python
 
 <a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Solid_State_Physics/pdf/gw-Sigma.png" height="150" ></a><br clear="all" />
 
