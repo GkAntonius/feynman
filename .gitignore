@@ -7,9 +7,11 @@ tags
 Makefile
 mytests
 
+# Files produced by the tests
+Tests/*.pdf
 
 # Files produced by the setup script
-*.pyc
+**.pyc
 *.egg-info
 build
 build/*

@@ -1,6 +1,8 @@
-Plot beautiful Feynman diagrams with matplotlib.
+Sharp-looking Feynman diagrams.
 
 <a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Solid_State_Physics/pdf/gw-Sigma.png" height="150" ></a><br clear="all" />
+
+<a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Solid_State_Physics/pdf/phonons-Sigma.png " height="150" ></a><br clear="all" />
 
 <a href="url"><img src="https://github.com/GkAntonius/feynman/blob/master/examples/Particle_Physics/pdf/VBF-tautau.png" height="450" ></a><br clear="all" />
 
@@ -14,8 +16,6 @@ Requirements
 
 Installing from source
 ----------------------
-
-Once you have satisfied the requirements, install the package with
 
   python setup.py install
 

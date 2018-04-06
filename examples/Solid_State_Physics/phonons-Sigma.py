@@ -30,7 +30,7 @@ G_style = dict(style='simple', arrow=True, arrow_param={'width':0.15, 'length': 
 # Item 1
 v1 = D.verticle([D.x0, D.y0])
 v2 = D.verticle(v1.xy, dx=opwidth)
-Sigma = D.operator([v1,v2])
+Sigma = D.operator([v1,v2], facecolor='#8AA2BB')
 Sigma.text("$\Sigma^{ep}$")
 
 # Item 2
@@ -52,3 +52,4 @@ DW = D.line(v1, v1, **DW_style)
 D.plot()
 
 fig.savefig('pdf/phonons-Sigma.pdf')
+fig.savefig('pdf/phonons-Sigma.png')
