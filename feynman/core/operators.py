@@ -8,12 +8,13 @@ import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
 from . import Drawable
-from . import Line
+from . import Line, Verticle
 
 from .. import vectors
 from .. import colors
 from ..constants import tau
 
+__all__ = ['Operator', 'RegularOperator', 'RegularBubbleOperator']
 
 class Operator(Drawable):
     """
@@ -50,20 +51,14 @@ class Operator(Drawable):
     **kwargs :
         Any other style specification for a matplotlib.patches.Patch instance.
 
-    Returns
-    -------
-
-    Vs : list of N verticle.
-
-
     Properties
     ----------
 
     verticles :
+        list of N feynman.Verticle
 
     N :
         Number of verticles to the operator.
-
 
     """
     def __init__(self, verticles, **kwargs):
@@ -129,6 +124,7 @@ class Operator(Drawable):
         """Return the xy coordinates of the verticles, clockwise."""
         return np.array([v.xy for v in self.verticles])
 
+    # TODO make it a property
     def get_center(self):
         """Return the xy coordinates of the center."""
         center = np.array([0., 0.])
@@ -154,7 +150,7 @@ class Operator(Drawable):
         return polygon
 
     def get_ellipse(self):
-        """Return the oval."""
+        """Return an oval between two vertices."""
         start, end = self.get_xy()
         dxy = end - start
         width = np.linalg.norm(dxy)
@@ -165,7 +161,7 @@ class Operator(Drawable):
         return ellipse
 
     def get_bubble(self):
-        """Return the oval on top of the lines."""
+        """Return an oval on top of the lines between [v1."""
         xys = self.get_xy()
         vwidth  = abs(xys[1][0] - xys[0][0])
         vheight = abs(xys[0][1] - xys[-1][1])
@@ -250,3 +246,81 @@ class Operator(Drawable):
         return
 
 
+class RegularOperator(Operator):
+    """
+    A N-point operator.
+    Often represented as a polygon, or a circle.
+
+
+    Arguments
+    ---------
+
+    N: Number of verticles
+
+    angle:
+        Verticles, are counted clockwise. angle=0=1 means
+        that there is a verticle in the [1,0] direction from the center.
+
+    rotate : (0.)
+        Rotation angle to the operator, in units of tau.
+
+    c : (1.)
+        If the shape is elliptic, c is the excentricity of the ellipse,
+        that is, the ratio of the long axe over the short axe.
+        When c = 1, the shape will be a circle.
+
+    **kwargs :
+        Any other style specification for a matplotlib.patches.Patch instance.
+
+    Returns
+    -------
+
+    Vs : list of N verticle.
+
+
+    Properties
+    ----------
+
+    verticles :
+        list of N feynman.Verticle
+
+    N :
+        Number of verticles to the operator.
+
+    """
+    def __init__(self, N, center, size=0.3, angle=None, **kwargs):
+
+        # TODO: add keyword variable side to specify the distance between vertices rather than size.
+
+        if angle is None:
+            if N > 2:
+                angle = tau / (2 * N)
+            else:
+                angle = 0.
+
+        vertices = list()
+        for i in range(N):
+            v = Verticle(xy=center, radius=size, angle=angle + float(i)/N)
+            vertices.append(v)
+
+        kwargs.update(shape='polygon')
+
+        super(RegularOperator, self).__init__(vertices, **kwargs)
+
+    def get_patch(self, *args, **kwargs):
+            return self.get_polygon(*args, **kwargs)
+
+
+class RegularBubbleOperator(RegularOperator):
+    """
+    This operator is represented by a circle with N vertices.
+    """
+    def __init__(self, N, center, size=0.3, angle=None, **kwargs):
+        self.radius = size
+        super(RegularBubbleOperator, self).__init__(N, center, size, angle, **kwargs)
+
+    def get_circle(self, *args, **kwargs):
+        return mpa.Circle(self.get_center(), self.radius, **self.style)
+
+    def get_patch(self, *args, **kwargs):
+            return self.get_circle(*args, **kwargs)

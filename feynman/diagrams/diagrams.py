@@ -8,6 +8,7 @@ TODO
 ----
 
   o Verticle
+      - rename Vertex
       - get_lines
       - get_operators
       - get_diagram
@@ -185,6 +186,9 @@ class Diagram(Plotter):
         """Add an feynman.core.operator instance."""
         operator.diagram = self
         self.operators.append(operator)
+        for v in operator.verticles:
+            #if v in self.verticles: continue  # Should avoid this check
+            self.add_verticle(v)
 
     def draw(self):
         """Draw the diagram."""

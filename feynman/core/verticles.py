@@ -58,10 +58,13 @@ class Verticle(Drawable):
         angle = np.array(kwargs.pop('angle', 0.))
         radius = np.array(kwargs.pop('radius', 0.))
 
-        self.xy = ( xy 
-            + dxy + np.array([dx, dy])
-            + radius * np.array([np.cos(angle*tau), np.sin(angle*tau)])
-            )
+        cxy = (np.complex(*xy) + np.complex(*dxy) + np.complex(dx, dy)
+               + radius * np.e ** (1j * tau * angle))
+        self.xy = np.array([cxy.real, cxy.imag])
+        #self.xy = ( xy 
+        #    + dxy + np.array([dx, dy])
+        #    + radius * np.array([np.cos(angle*tau), np.sin(angle*tau)])
+        #    )
 
         self.style = dict(
             marker='o',
@@ -91,6 +94,27 @@ class Verticle(Drawable):
     @property
     def xy(self):
         return self._xy
+
+    @property
+    def ccenter(self):
+        return np.complex()
+
+    @property
+    def xcc(self):
+        return self.real(self.ccenter)
+
+    @property
+    def ycc(self):
+        return self.imag(self.ccenter)
+
+    @property
+    def cxy(self):
+        return np.complex(self.x-self.xcc, self.y-self.ycc)
+
+    @cxy.setter
+    def cxy(self, c):
+        self.x  = np.real(c-self.xcc) + self.xcc
+        self.y  = np.imag(c-self.ycc) + self.ycc
 
     @xy.setter
     def xy(self, xy):
