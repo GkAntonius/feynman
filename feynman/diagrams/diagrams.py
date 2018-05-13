@@ -1,57 +1,5 @@
 """Diagram class"""
 
-
-
-"""
-
-TODO
-----
-
-  o Vertex
-      - get_lines
-      - get_operators
-      - get_diagram
-
-
-  o Line, Operator
-      - get_vertices
-
-
-  o Diagram
-      - add_text
-      - text as an option on init
-      - vertices (add multiple vertices at once)
-      - set_center
-      - set_angles
-      - get_dimensions
-
-      - first vertex flag
-
-
-
-  o Scalability
-
-        Diagram.scale
-
-        define Diagram.x0, Diagram.y0 as default values to vertices
-        define Diagram.xlim, ylim
-        define Diagram.boxes
-        define Diagram.velocity
-
-        define Diagram.history
-
-        make line width and length decrease with number of lines in the same "level"
-        in the current box.
-
-  o Style
-
-        define global color
-        define clip_path
-
-"""
-
-# =========================================================================== #
-
 from copy import deepcopy
 import warnings
 
@@ -91,17 +39,11 @@ class Diagram(Plotter):
 
         self._init_figure(ax=ax, **kwargs)
 
-        self._init_objects()
-
         self.line_length =  .2
         self.operator_size =  1.5
 
         self.x0, self.y0 = xy0
 
-        self.lines = list()
-
-    def _init_objects(self):
-        """Init lists of objects."""
         self.vertices = list()
         self.lines = list()
         self.operators = list()
@@ -238,12 +180,19 @@ class Diagram(Plotter):
         kwargs.setdefault('fontsize', 30)
         self.ax.text(*args, **kwargs)
 
+    def scale(self, x):
+        """Apply a scaling factor."""
 
-    # TODO decorator method to set the diagram property of the argument
-    #def tag_object(self, f):
+        for v in self.vertices:
+            v.scale(x)
+
+        for l in self.lines:
+            l.scale(x)
+
+        for o in self.operators:
+            o.scale(x)
 
 
-    # FIXME
     def get_object_group_limits():
         """
         Return the x0, y0, w, h

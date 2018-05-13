@@ -190,11 +190,9 @@ class Vertex(Drawable):
     def chunk(self, *args, **kwargs):
         self.diagram.add_chunk(self, *args, **kwargs)
 
-    #@classmethod
-    #def _add_relative(cls, other, radius, angle):
-    #    """
-    #    Return a new instance relative to some other existing vertex.
-    #    """
+    def scale(self, x):
+        """Apply a scaling factor to the size of the marker."""
+        self.style['markersize'] *= x
 
 
 # =========================================================================== #

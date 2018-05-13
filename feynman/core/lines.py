@@ -138,27 +138,29 @@ class Line(Drawable):
     _shape_linear_aliases = ('straight', 'linear','line','l',)
     _shape_elliptic_aliases = ('elliptic', 'ellipse', 'ell', 'e')
     _shape_circular_aliases = ('circular', 'circle', 'cir', 'c')
-    _shape_possible_values = sum([], _shape_linear_aliases
-                                   + _shape_elliptic_aliases
-                                   + _shape_circular_aliases)
+    _shape_allowed_values = sum([], _shape_linear_aliases
+                                  + _shape_elliptic_aliases
+                                  + _shape_circular_aliases)
 
     _flavour = 'simple'
     _flavour_simple_aliases = ('simple',) #, 'straight'
     _flavour_wiggly_aliases = ('wiggly', 'w', 'wiggle', 'wiggles')
     _flavour_loopy_aliases = ('loopy', 'l', 'loop', 'loops')
-    _flavour_possible_values = sum([], _flavour_simple_aliases
-                                     + _flavour_wiggly_aliases
-                                     + _flavour_loopy_aliases)
+    _flavour_allowed_values = sum([], _flavour_simple_aliases
+                                    + _flavour_wiggly_aliases
+                                    + _flavour_loopy_aliases)
 
     _stroke = 'single'
     _stroke_single_aliases = ('single', 's')
     _stroke_double_aliases = ('double', 'd')
     _stroke_dashed_aliases = ('dashed', '--')
     _stroke_dotted_aliases = ('dotted', ':')
-    _stroke_possible_values = sum([], _stroke_single_aliases
-                                    + _stroke_double_aliases
-                                    + _stroke_dashed_aliases
-                                    + _stroke_dotted_aliases)
+    _stroke_allowed_values = sum([], _stroke_single_aliases
+                                   + _stroke_double_aliases
+                                   + _stroke_dashed_aliases
+                                   + _stroke_dotted_aliases)
+
+    _arrow_style_allowed_values = ('normal', 'fancy', 'line')
 
     _xy = np.zeros((2, 2))
     _linepath = np.zeros((2, 2))
@@ -167,8 +169,6 @@ class Line(Drawable):
     _main_lines = None
 
     t =  np.linspace(0, 1, 2)
-
-    _diagram = None
 
     def __init__(self, vstart, vend, **kwargs):
 
@@ -208,9 +208,15 @@ class Line(Drawable):
 
     def draw(self, ax):
         """Plot the line."""
-        for line in self.get_lines(): ax.add_line(line)      # Lines
-        for arrow in self.get_arrows(): ax.add_patch(arrow)  # Arrows
-        for text in self.get_texts(): ax.add_artist(text)    # Texts
+        # Lines
+        for line in self.get_lines():
+            ax.add_line(line)
+        # Arrows
+        for arrow in self.get_arrows():
+            ax.add_patch(arrow)
+        # Texts
+        for text in self.get_texts():
+            ax.add_artist(text)
         return
 
     def set_style(self, kwargs):
@@ -226,11 +232,11 @@ class Line(Drawable):
 
         # Attempt to know shape
         for token in style.split():
-            if token in self._shape_possible_values:
+            if token in self._shape_allowed_values:
                 shape = token
-            elif token in self._flavour_possible_values:
+            elif token in self._flavour_allowed_values:
                 flavour = token
-            elif token in self._stroke_possible_values:
+            elif token in self._stroke_allowed_values:
                 stroke = token
 
         self.set_shape(shape)
@@ -352,16 +358,21 @@ class Line(Drawable):
         if self.arrow:
             self.add_arrow(**arrow_param)
 
+    @property
+    def xstart(self):
+        return self.vstart.xy[0]
 
     @property
-    def xstart(self): return self.vstart.xy[0]
-    @property
-    def ystart(self): return self.vstart.xy[1]
-    @property
-    def xend(self): return self.vend.xy[0]
-    @property
-    def yend(self): return self.vend.xy[1]
+    def ystart(self):
+        return self.vstart.xy[1]
 
+    @property
+    def xend(self):
+        return self.vend.xy[0]
+
+    @property
+    def yend(self):
+        return self.vend.xy[1]
 
     def t_index(self, t):
         """Querry the index of a given value of t."""
@@ -510,8 +521,7 @@ class Line(Drawable):
     #   ------------------ Arrows routines --------------------------------   #
     #   -------------------------------------------------------------------   #
 
-    def add_arrow(self, #t=0.5, direction=1, theta=.083, size=.025,
-                  *args, **kwargs):
+    def add_arrow(self, *args, **kwargs):
         """
         Add an arrow on the line.
 
@@ -519,6 +529,9 @@ class Line(Drawable):
         ---------
 
         style : ['normal', 'fancy', 'line']
+            'normal' is a triagular arrow.
+            'fancy' is a triangular arrow with a bent back.
+            'line' is a two-stroke line.
 
         t : float
             The position of the arrow along the line.
@@ -528,34 +541,40 @@ class Line(Drawable):
             The direction of the arrow. A positive number gives
             a forward arrow while a negative number gives a backward arrow.
 
-        theta :
-            The angle the arrow branches make with the path
-            in units of tau
-
-        size :
-            The length of the arrow branches.
-
         width :
+            The width of the arrow.
 
         length :
+            The length of the arrow.
+
+        t_shift_dir :
+            When the shape of the line is not linear,
+            the direction of the arrow will be given by
+            the tangent of the line at position t + t_shift_dir.
         """
 
-        _style = 'normal', 'fancy', 'line'
+        arrow_kwargs = deepcopy(kwargs)
+        style = arrow_kwargs.setdefault('style', 'fancy')
 
-        style = kwargs.pop('style', 'fancy')
+        arrow_kwargs.setdefault('t', .5)
+        arrow_kwargs.setdefault('width', .03)
+        arrow_kwargs.setdefault('length', .09)
+        arrow_kwargs.setdefault('direction', 1.0)
 
         if style == 'normal':
-            return self._add_normal_arrow(*args, **kwargs)
+            self.arrows.append(arrow_kwargs)
         elif style == 'fancy':
-            return self._add_fancy_arrow(*args, **kwargs)
+            arrow_kwargs.setdefault('t_shift_dir', 0.025)
+            self.arrows.append(arrow_kwargs)
         elif style == 'line':
-            return self._add_line_arrow(*args, **kwargs)
+            self.arrows.append(arrow_kwargs)
         else:
-            raise ValueError("Wrong value for style.\n Allowed values : " + self._style)
+            raise ValueError("Wrong value for style.\n Allowed values : "
+                             + str(self._arrow_style_allowed_values))
 
-    def _add_normal_arrow(self, t=.5, width=.03, length=.09, direction=1.0, **kwargs):
+    def _get_normal_arrow(self, t=.5, width=.03, length=.09, direction=1.0, **kwargs):
         """
-        Add a normal, triangular arrow.
+        Get a triangular arrow.
 
         t :
         width :
@@ -581,12 +600,13 @@ class Line(Drawable):
 
         arrow = mpa.Polygon([tip, c1, c2], **kwargs)
 
-        self.arrows.append(arrow)
+        return arrow
+        #self.arrows.append(arrow)
 
-    def _add_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09, direction=1.0,
-                         t_shift_dir=0.025, **kwargs):
+    def _get_fancy_arrow(self, t=.5, width=.03, length=.09, fancyness=.09,
+                         direction=1.0, t_shift_dir=0.025, **kwargs):
         """
-        Add a fancy arrow.
+        Get a fancy arrow.
 
         Arguments
         ---------
@@ -625,13 +645,13 @@ class Line(Drawable):
 
         arrow = mpa.Polygon([tip, c1, antitip, c2], **kwargs)
 
-        self.arrows.append(arrow)
+        return arrow
+        #self.arrows.append(arrow)
 
 
-
-    def _add_line_arrow(self, **kwargs):
+    def _get_line_arrow(self, **kwargs):
         """
-        Add an arrow made with lines.
+        Get an arrow made with lines.
         """
         raise NotImplementedError()
 
@@ -658,11 +678,13 @@ class Line(Drawable):
             Any other style specification for a matplotlib.text.Text instance.
         """
         default = dict(
-            verticalalignment='center',
-            horizontalalignment='center',
+            #va='top', #ha='left',
             fontsize=14
             )
-        self.texts.append((s, t, y, kwargs))
+        text_kwargs = deepcopy(kwargs)
+        for key, val in default.items():
+            text_kwargs.setdefault(key, val)
+        self.texts.append([s, t, y, text_kwargs])
 
     def get_texts(self):
         """Return a list of matplotlib.text.Text instances."""
@@ -827,7 +849,8 @@ class Line(Drawable):
         xy = linepath[i_xy]
         return xy.reshape(2)
 
-    def path_point(self, t): return self.get_path_point(t)
+    def path_point(self, t):
+        return self.get_path_point(t)
     
     #   -------------------------------------------------------------------   #
     #   ------------------ linepath routines ------------------------------   #
@@ -929,7 +952,8 @@ class Line(Drawable):
         i_v = min(int(t * self.npoints), self.npoints)
         return self.tangent[i_v].reshape(2)
 
-    def tangent_point(self, t): return self.get_tangent_point(t)
+    def tangent_point(self, t):
+        return self.get_tangent_point(t)
 
     # User
     def get_normal(self, tangent=None, **kwargs):
@@ -1017,5 +1041,47 @@ class Line(Drawable):
 
     def get_arrows(self):
         """Get the patches, such as arrows."""
-        return self.arrows
+        arrows = list()
+        for arrow_kwargs in self.arrows:
+            style = arrow_kwargs.pop('style', 'fancy')
+            if style == 'normal':
+                arrow = self._get_normal_arrow(**arrow_kwargs)
+            elif style == 'fancy':
+                arrow = self._get_fancy_arrow(**arrow_kwargs)
+            elif style == 'line':
+                arrow = self._get_line_arrow(**arrow_kwargs)
+            else:
+                raise ValueError("Wrong value for style.\n Allowed values : "
+                                 + str(self._arrow_style_allowed_values))
+            arrows.append(arrow)
+        return arrows
+
+    def scale_width(self, x):
+        """Apply a scaling factor to the line width."""
+        self.line_kwargs['linewidth'] *= x
+
+    def scale_amplitudes(self, x):
+        """Apply a scaling factor to the wiggle or loop amplitudes."""
+        self.amplitude *= x
+        self.xamp *= x
+        self.yamp *= x
+
+    def scale_arrows(self, x):
+        """Apply a scaling factor to the arrows size."""
+        for arrow_kwargs in self.arrows:
+            arrow_kwargs['width'] *= x
+            arrow_kwargs['length'] *= x
+
+    def scale_text(self, x):
+        """Apply a scaling factor to the text size and relative position."""
+        for textparams in self.texts:
+            textparams[2] *= x
+            textparams[3]['fontsize'] *= x
+
+    def scale(self, x):
+        """Apply a scaling factor."""
+        self.scale_width(x)
+        self.scale_amplitudes(x)
+        self.scale_arrows(x)
+        self.scale_text(x)
 

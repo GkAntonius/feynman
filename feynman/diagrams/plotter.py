@@ -3,12 +3,6 @@ import matplotlib.pyplot as plt
 
 from numpy import array
 
-#
-# TODO
-#   Have a FeynmanFigure object containing the many diagrams
-#       and handling equation symbols
-#
-#
 class Plotter(object):
     """
     A wrapper for matplotlib.figure.Figure object.
@@ -72,6 +66,9 @@ class Plotter(object):
         if not exists(dirnm):
             from subprocess import call
             call(['mkdir', '-p', dirnm])
+
+    def savefig(self, fname, **kwargs):
+        return self.fig.savefig(fname, **kwargs)
     
     def singlesave(self, dname, ftype='pdf', show=False):
         """Save a single figure"""

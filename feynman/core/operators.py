@@ -87,8 +87,6 @@ class Operator(Drawable):
 
         self.ellipse_excentricity = kwargs.pop('c')
 
-        self.line_prop = kwargs.pop('line_prop', dict())
-
         self.style = dict(
             edgecolor="k",
             facecolor=colors.lightgrey,
@@ -96,6 +94,18 @@ class Operator(Drawable):
             )
 
         self.style.update(kwargs)
+
+        self.line_prop = kwargs.pop('line_prop', dict())
+
+        default_line_prop = dict(
+            style = 'simple straight linear',
+            arrow = False,
+            zorder = 1,
+            linewidth=3,
+            )
+
+        for key, val in default_line_prop.items():
+            self.line_prop.setdefault(key, val)
 
         self.texts = list()
         self.lines = list()
@@ -177,15 +187,6 @@ class Operator(Drawable):
         if not self.shape.lower() == "bubble":
             return list()
 
-        default_style = dict(
-            style = 'simple straight linear',
-            arrow = False,
-            zorder = 1,
-            )
-
-        for key, val in default_style.items():
-            self.line_prop.setdefault(key, val)
-
         v1, v2, v3 ,v4 = self.vertices
         line1 = Line(v1, v2, **self.line_prop)
         line2 = Line(v3, v4, **self.line_prop)
@@ -219,17 +220,16 @@ class Operator(Drawable):
         **kwargs :
             Any other style specification for a matplotlib.text.Text instance.
         """
-        default = dict(fontsize=30, zorder=10)
+        default = dict(fontsize=30, zorder=10, ha='center', va='center')
+        text_kwargs = deepcopy(kwargs)
         for key, val in default.items():
-            kwargs.setdefault(key, val)
-        self.texts.append((s, x, y, kwargs))
+            text_kwargs.setdefault(key, val)
+        self.texts.append([s, x, y, text_kwargs])
 
     def get_texts(self):
         """Return a list of matplotlib.text.Text instances."""
         texts = list()
         for (s, x, y, kwargs) in self.texts:
-            kwargs.setdefault('ha', 'center')
-            kwargs.setdefault('va', 'center')
             center = self.get_center()
             xtext, ytext = center + np.array([x,y])
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
@@ -244,6 +244,23 @@ class Operator(Drawable):
         for text in self.get_texts():
             ax.add_artist(text)
         return
+
+    def scale_width(self, x):
+        """Apply a scaling factor to the line width."""
+        self.style['linewidth'] *= x
+        self.line_prop['linewidth'] *= x
+
+    def scale_text(self, x):
+        """Apply a scaling factor to the text size and relative position."""
+        for textparams in self.texts:
+            textparams[1] *= x
+            textparams[2] *= x
+            textparams[3]['fontsize'] *= x
+
+    def scale(self, x):
+        """Apply a scaling factor."""
+        self.scale_width(x)
+        self.scale_text(x)
 
 
 class RegularOperator(Operator):
