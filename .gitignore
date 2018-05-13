@@ -1,14 +1,10 @@
 # Developement files
-TODO
-work
 *.swp
 .DS_Store
 tags
-Makefile
-mytests
 
 # Files produced by the tests
-Tests/*.pdf
+result_images
 
 # Files produced by the setup script
 **.pyc

@@ -24,13 +24,11 @@ setup_args = dict(
       description      = "Feynman diagrams with python-matplotlib.",
       author           = "Gabriel Antonius",
       author_email     = "gabriel.antonius@gmail.com",
-     #url              = url,
-     #license          = license,
-     #platforms        = platforms,
-     #keywords         = keywords,
+      license          = 'GPL',
+      keywords         = "Feynman diagram diagrams",
       install_requires = install_requires,
       packages         = find_packages(),
-      package_data    = my_package_data,
+      package_data     = my_package_data,
       )
 
 
