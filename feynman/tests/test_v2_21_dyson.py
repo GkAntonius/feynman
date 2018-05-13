@@ -31,8 +31,8 @@ def test_diagram():
     arrow_param = dict(width=0.05)
     
     x = x0
-    v01 = D1.verticle(xy=(x,y0))
-    v02 = D1.verticle(v01.xy, dx=l)
+    v01 = D1.vertex(xy=(x,y0))
+    v02 = D1.vertex(v01.xy, dx=l)
     G = D1.line(v01, v02, **G_style)
     
     text_prop = dict(y=0.05, fontsize=20)
@@ -42,8 +42,8 @@ def test_diagram():
     D1.text(x, y0, "=", fontsize=30)
     
     x = x0 + .7
-    v21 = D1.verticle(xy=(x,y0))
-    v22 = D1.verticle(v21.xy, dx=l)
+    v21 = D1.vertex(xy=(x,y0))
+    v22 = D1.vertex(v21.xy, dx=l)
     G0 = D1.line(v21, v22, **G0_style)
     G0.text("G0", **text_prop)
     
@@ -51,10 +51,10 @@ def test_diagram():
     D1.text(x, y0, "+", fontsize=30)
     
     x = x0 + 1.4
-    v11 = D1.verticle(xy=(x0 + 1.4,y0))
-    v12 = D1.verticle(xy=v11.xy, dx = l)
-    v13 = D1.verticle(xy=v12.xy, dx = .2)
-    v14 = D1.verticle(xy=v13.xy, dx = l)
+    v11 = D1.vertex(xy=(x0 + 1.4,y0))
+    v12 = D1.vertex(xy=v11.xy, dx = l)
+    v13 = D1.vertex(xy=v12.xy, dx = .2)
+    v14 = D1.vertex(xy=v13.xy, dx = l)
     
     D1.line(v11, v12, arrow=True, arrow_param=arrow_param)
     D1.line(v13, v14, stroke='double', arrow=True, arrow_param=arrow_param)

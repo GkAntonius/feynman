@@ -13,10 +13,11 @@ from .. import vectors
 from .. import colors
 from ..constants import tau
 
+__all__ = ['Vertex', 'Verticle']
 
-class Verticle(Drawable):
+class Vertex(Drawable):
     """
-    A verticle. Often represented as a point.
+    A vertex. Often represented as a point.
 
     Arguments
     ---------
@@ -76,7 +77,7 @@ class Verticle(Drawable):
 
         self.style.update(kwargs)
 
-        # TODO Should be able to get the lines connected to that verticle.
+        # TODO Should be able to get the lines connected to that vertex.
         self.texts = list()
 
     @property
@@ -134,7 +135,7 @@ class Verticle(Drawable):
     # Change x, y for dx, dy
     def text(self, s, x=-.025, y=+.025, **kwargs):
         """
-        Add text near the verticle.
+        Add text near the vertex.
 
         Arguments
         ---------
@@ -142,10 +143,10 @@ class Verticle(Drawable):
         s : Text string.
 
         x : (-0.025)
-            x position, relative to the verticle.
+            x position, relative to the vertex.
 
         y : (-0.025)
-            y position, relative to the verticle.
+            y position, relative to the vertex.
 
         fontsize : (14)
             The font size.
@@ -192,9 +193,12 @@ class Verticle(Drawable):
     #@classmethod
     #def _add_relative(cls, other, radius, angle):
     #    """
-    #    Return a new instance relative to some other existing verticle.
+    #    Return a new instance relative to some other existing vertex.
     #    """
 
 
 # =========================================================================== #
+
+# This is just an alias to maintain backward compatibility
+Verticle = Vertex
 

@@ -25,16 +25,16 @@ G_style = dict(style='double elliptic',
 D = Diagram(ax)
 
 xy = [0.2, y0]
-v01 = D.verticle(xy)
-v02 = D.verticle(v01.xy, dx=opwidth)
+v01 = D.vertex(xy)
+v02 = D.vertex(v01.xy, dx=opwidth)
 P = D.operator([v01,v02], c=1.3)
 P.text("$P$")
 
 D.text(.70, y0, "=", fontsize=30)
 
 xy[0] = 0.9
-v21 = D.verticle(xy)
-v22 = D.verticle(xy, dx=linlen)
+v21 = D.vertex(xy)
+v22 = D.vertex(xy, dx=linlen)
 
 l21 = D.line(v22, v21, **G_style)
 l21 = D.line(v21, v22, **G_style)

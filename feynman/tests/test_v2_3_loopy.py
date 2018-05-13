@@ -17,12 +17,12 @@ def test_loopy():
     
     D = Diagram(ax)
     
-    v1 = D.verticle(xy=(.2,.5))
-    v2 = D.verticle(xy=(0.8,.5))
+    v1 = D.vertex(xy=(.2,.5))
+    v2 = D.vertex(xy=(0.8,.5))
     l1 = D.line(v1, v2, arrow=True)
     l2 = D.line(v1, v2, shape='elliptic', flavour='loopy', nloops=22)
-    v3 = D.verticle(xy=(.2,.2))
-    v4 = D.verticle(xy=(0.8,.2))
+    v3 = D.vertex(xy=(.2,.2))
+    v4 = D.vertex(xy=(0.8,.2))
     l3 = D.line(v3, v4, shape='linear', flavour='loopy')
 
     D.plot()

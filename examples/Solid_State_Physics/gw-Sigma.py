@@ -14,8 +14,8 @@ G_style = dict(style='double', arrow=True, arrow_param={'width':0.05})
 # Sigma operator
 D = Diagram(ax)
 
-v01 = D.verticle([.2, .175])
-v02 = D.verticle(v01.xy, dx=.3)
+v01 = D.vertex([.2, .175])
+v02 = D.vertex(v01.xy, dx=.3)
 
 Sigma = D.operator([v01, v02])
 Sigma.text("$\Sigma$")
@@ -24,8 +24,8 @@ Sigma.text("$\Sigma$")
 D.text(v02.x+.2, v02.y, "=", fontsize=30)
 
 # GW convolution
-v21 = D.verticle(v02.xy, dxy=[0.4, -0.07])
-v22 = D.verticle(v21.xy, dx=0.8)
+v21 = D.vertex(v02.xy, dxy=[0.4, -0.07])
+v22 = D.vertex(v21.xy, dx=0.8)
 
 l21 = D.line(v21, v22, **G_style)
 l22 = D.line(v21, v22, **W_style)

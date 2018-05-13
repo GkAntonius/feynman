@@ -22,10 +22,10 @@ v_style = dict(style='simple wiggly', nwiggles=2)
 D1 = Diagram(ax)
 
 xy = [0.2, y0]
-v01 = D1.verticle(xy)
+v01 = D1.vertex(xy)
 
 xy[0] += linlen
-v02 = D1.verticle(v01.xy, dx=linlen)
+v02 = D1.vertex(v01.xy, dx=linlen)
 
 W = D1.line(v01, v02, **W_style)
 
@@ -36,9 +36,9 @@ W.text("$W$", **text_prop)
 D1.text(.75, y0, "=", fontsize=30)
 
 xy = [0.9, y0]
-v11 = D1.verticle(xy)
-v13 = D1.verticle(v11.xy, dx=opwidth)
-v14 = D1.verticle(v13.xy, dx=linlen)
+v11 = D1.vertex(xy)
+v13 = D1.vertex(v11.xy, dx=opwidth)
+v14 = D1.vertex(v13.xy, dx=linlen)
 
 O = D1.operator([v11,v13], c=1.1)
 O.text("${\\varepsilon^{-1}}$", x=.0, y=.01, fontsize=35)

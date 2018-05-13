@@ -7,26 +7,25 @@
 TODO
 ----
 
-  o Verticle
-      - rename Vertex
+  o Vertex
       - get_lines
       - get_operators
       - get_diagram
 
 
   o Line, Operator
-      - get_verticles
+      - get_vertices
 
 
   o Diagram
       - add_text
       - text as an option on init
-      - verticles (add multiple verticles at once)
+      - vertices (add multiple vertices at once)
       - set_center
       - set_angles
       - get_dimensions
 
-      - first verticle flag
+      - first vertex flag
 
 
 
@@ -34,7 +33,7 @@ TODO
 
         Diagram.scale
 
-        define Diagram.x0, Diagram.y0 as default values to verticles
+        define Diagram.x0, Diagram.y0 as default values to vertices
         define Diagram.xlim, ylim
         define Diagram.boxes
         define Diagram.velocity
@@ -54,6 +53,7 @@ TODO
 # =========================================================================== #
 
 from copy import deepcopy
+import warnings
 
 import numpy as np
 import matplotlib as mpl
@@ -65,7 +65,7 @@ from .. import colors as mc
 from .. import vectors
 from .. import colors
 from .. import core
-from ..core import Verticle, Line, Operator
+from ..core import Vertex, Line, Operator
 
 from .plotter import Plotter
 
@@ -102,13 +102,13 @@ class Diagram(Plotter):
 
     def _init_objects(self):
         """Init lists of objects."""
-        self.verticles = list()
+        self.vertices = list()
         self.lines = list()
         self.operators = list()
 
-    def verticle(self, xy='auto', **kwargs):
+    def vertex(self, xy='auto', **kwargs):
         """
-        Create a verticle.
+        Create a vertex.
 
         Arguments
         ---------
@@ -118,7 +118,7 @@ class Diagram(Plotter):
 
         Returns
         -------
-        feynman.core.Verticle instance.
+        feynman.core.Vertex instance.
         """
         if xy is 'auto':
             xy = (self.x0, self.y0)
@@ -127,13 +127,13 @@ class Diagram(Plotter):
         #        raise TypeError()
         #    elif len(xy) != 2:
         #        raise TypeError()
-        v = Verticle(xy, **kwargs)
-        self.add_verticle(v)
+        v = Vertex(xy, **kwargs)
+        self.add_vertex(v)
         return v
 
-    def verticles(self, xys, **kwargs):
+    def vertices(self, xys, **kwargs):
         """
-        Create multiple verticles.
+        Create multiple vertices.
 
         Arguments
         ---------
@@ -147,7 +147,7 @@ class Diagram(Plotter):
         Returns
         -------
 
-        list of feynman.core.Verticle instance.
+        list of feynman.core.Vertex instance.
         """
         xys = np.array(xys)
         if xys.ndim != 2:
@@ -155,10 +155,20 @@ class Diagram(Plotter):
  
         vs = list()
         for xy in xys:
-            v = Verticle(xy, **kwargs)
-            self.add_verticle(v)
+            v = Vertex(xy, **kwargs)
+            self.add_vertex(v)
             vs.append(v)
         return vs
+
+    def verticle(self, *args, **kwargs):
+        warning.warn('Diagram.verticle is deprecated. ' +
+                     'Use Diagram.vertex instead.')
+        self.vertex(*args, **kwargs)
+
+    def verticles(self, *args, **kwargs):
+        warning.warn('Diagram.verticles is deprecated. ' +
+                     'Use Diagram.vertices instead.')
+        self.vertices(*args, **kwargs)
 
     def line(self, *args, **kwargs):
         """Create a feynman.core.line instance."""
@@ -172,10 +182,10 @@ class Diagram(Plotter):
         self.operators.append(O)
         return O
 
-    def add_verticle(self, verticle):
-        """Add a feynman.core.verticle instance."""
-        verticle.diagram = self
-        self.verticles.append(verticle)
+    def add_vertex(self, vertex):
+        """Add a feynman.core.Vertex instance."""
+        vertex.diagram = self
+        self.vertices.append(vertex)
 
     def add_line(self, line):
         """Add a feynman.core.line instance."""
@@ -186,14 +196,14 @@ class Diagram(Plotter):
         """Add an feynman.core.operator instance."""
         operator.diagram = self
         self.operators.append(operator)
-        for v in operator.verticles:
-            #if v in self.verticles: continue  # Should avoid this check
-            self.add_verticle(v)
+        for v in operator.vertices:
+            #if v in self.vertices: continue  # Should avoid this check
+            self.add_vertex(v)
 
     def draw(self):
         """Draw the diagram."""
 
-        for v in self.verticles:
+        for v in self.vertices:
             v.draw(self.ax)
 
         for l in self.lines:
@@ -205,20 +215,20 @@ class Diagram(Plotter):
     def plot(self, *args, **kwargs):
         return self.draw(*args, **kwargs)
 
-    def add_chunk(self, verticle, dx=0, dy=0, angle=0, radius=0, **line_prop):
+    def add_chunk(self, vertex, dx=0, dy=0, angle=0, radius=0, **line_prop):
         """
-        Create a chunk going to the verticle by initializing a verticle
-        and a line.  The new verticle will be invisible by default.  All other
+        Create a chunk going to the vertex by initializing a vertex
+        and a line.  The new vertex will be invisible by default.  All other
         keyword arguments are passed to the line.
 
-        Return: new_verticle, new_line
+        Return: new_vertex, new_line
         """
         v_prop = dict(dx=dx, dy=dy, angle=angle, radius=radius)
         v_prop.setdefault('marker', '')
         line_prop.setdefault('style', 'simple single linear')
         line_prop.setdefault('arrow', False)
-        v = self.verticle(verticle.xy, **v_prop)
-        l = self.line(v, verticle, **line_prop)
+        v = self.vertex(vertex.xy, **v_prop)
+        l = self.line(v, vertex, **line_prop)
         return v, l
 
     def text(self, *args, **kwargs):

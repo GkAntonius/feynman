@@ -18,20 +18,20 @@ def test_triangle():
     
     dia = Diagram(ax)
 
-    v1 = dia.verticle(xy=(.2,.6), marker='')
-    v2 = dia.verticle(xy=(.2,.4), marker='')
+    v1 = dia.vertex(xy=(.2,.6), marker='')
+    v2 = dia.vertex(xy=(.2,.4), marker='')
 
-    v3 = dia.verticle(xy=(.3,.6))
-    v4 = dia.verticle(xy=(.3,.4))
+    v3 = dia.vertex(xy=(.3,.6))
+    v4 = dia.vertex(xy=(.3,.4))
 
     l1 = dia.line(v1, v3)
     l2 = dia.line(v2, v4)
 
-    v5 = dia.verticle(xy=(.3 + .2 * np.sqrt(3) / 2, .5))
+    v5 = dia.vertex(xy=(.3 + .2 * np.sqrt(3) / 2, .5))
 
     triangle = dia.operator([v3, v4, v5])
 
-    v6 = dia.verticle(xy=(.8, .5), marker='')
+    v6 = dia.vertex(xy=(.8, .5), marker='')
     l3 = dia.line(v5, v6, flavour='wiggly', nwiggles=4)
     
     dia.plot()

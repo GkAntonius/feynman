@@ -20,16 +20,16 @@ from .util import matplotlib_Line2D_valid_keyword_arguments
 
 class Line(Drawable):
     """
-    A particle line joigning two verticles.
+    A particle line joigning two vertices.
 
     Arguments
     =========
 
     vstart :
-        Starting vericle.
+        Starting vertex.
 
     vend :
-        End vericle.
+        End vertex.
 
 
     style : "shape flavour stroke"
@@ -40,7 +40,7 @@ class Line(Drawable):
 
         |   linear    -  A straight line between two points.
         |   elliptic  -  An ellipse arc.
-        |   circular  -  A circle starting and ending at the same verticle.
+        |   circular  -  A circle starting and ending at the same vertex.
 
     flavour : ( simple )
         The type of line.
@@ -83,7 +83,7 @@ class Line(Drawable):
         The radius of the circle.
 
     circle_angle : float (0.25)
-        The angle of the anchor verticle to the circle center, in units of tau.
+        The angle of the anchor vertex to the circle center, in units of tau.
 
     circle_excentricity : float (.1)
         The excentricity of the circle.
@@ -454,7 +454,7 @@ class Line(Drawable):
 
             linear    -  A straight line between two points.
             elliptic  -  An ellipse arc.
-            circular  -  A circle starting and ending at the same verticle.
+            circular  -  A circle starting and ending at the same vertex.
         """
         if shape in self._shape_linear_aliases:
             self._set_linepath = self._set_linear_linepath

@@ -29,8 +29,8 @@ def test_diagram():
     # First diagram
     D1 = Diagram(ax)
     
-    v1 = D1.verticle([x0, y0])
-    v2 = D1.verticle(v1.xy, dx=opwidth)
+    v1 = D1.vertex([x0, y0])
+    v2 = D1.vertex(v1.xy, dx=opwidth)
     Sigma = D1.operator([v1,v2])
     Sigma.text("S")
     
@@ -40,10 +40,10 @@ def test_diagram():
     x0 += .2
     y0 -= .1
     
-    v1 = D1.verticle((x0, y0))
-    v2 = D1.verticle(v1.xy, dx= (linlen - Gamma_width / 2))
-    v4 = D1.verticle(v2.xy, dx=Gamma_width)
-    v3 = D1.verticle(v4.xy, dxy=(- Gamma_width / 2, Gamma_width * np.sqrt(3) / 2))
+    v1 = D1.vertex((x0, y0))
+    v2 = D1.vertex(v1.xy, dx= (linlen - Gamma_width / 2))
+    v4 = D1.vertex(v2.xy, dx=Gamma_width)
+    v3 = D1.vertex(v4.xy, dxy=(- Gamma_width / 2, Gamma_width * np.sqrt(3) / 2))
     l1 = D1.line(v1, v2, **G_style)
     l2 = D1.line(v1, v3, **W_style)
     

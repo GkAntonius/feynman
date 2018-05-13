@@ -17,10 +17,10 @@ def test_simple():
     
     D = Diagram(ax)
     
-    v1 = D.verticle(xy=(.2,.2), marker='')
-    v2 = D.verticle(xy=(0.5,.2))
-    v3 = D.verticle(xy=(0.8,.2), marker='')
-    v4 = D.verticle(xy=(0.5,.6))
+    v1 = D.vertex(xy=(.2,.2), marker='')
+    v2 = D.vertex(xy=(0.5,.2))
+    v3 = D.vertex(xy=(0.8,.2), marker='')
+    v4 = D.vertex(xy=(0.5,.6))
     l1 = D.line(v1, v2, arrow=True)
     l3 = D.line(v2, v4, flavour='wiggly', nwiggles=3)
     l3 = D.line(v2, v3, arrow=True)
@@ -42,9 +42,9 @@ def test_wiggly():
     
     D = Diagram(ax)
     
-    v1 = D.verticle(xy=(.2,.2), marker='')
-    v2 = D.verticle(xy=(0.5,.2))
-    v3 = D.verticle(xy=(0.8,.2), marker='')
+    v1 = D.vertex(xy=(.2,.2), marker='')
+    v2 = D.vertex(xy=(0.5,.2))
+    v3 = D.vertex(xy=(0.8,.2), marker='')
     l1 = D.line(v1, v2, arrow=True)
     l2 = D.line(v2, v2, shape='circular', flavour='wiggly',)
     l3 = D.line(v2, v3, arrow=True)
@@ -65,8 +65,8 @@ def test_angle():
     
     D = Diagram(ax)
     
-    v1 = D.verticle((.2,.2))
-    v2 = D.verticle((0.5,.7))
+    v1 = D.vertex((.2,.2))
+    v2 = D.vertex((0.5,.7))
     l1 = D.line(v1, v2, flavour='wiggly')
     D.line(v2, v2, shape='circular', arrow=True, circle_angle=l1.angle)
     

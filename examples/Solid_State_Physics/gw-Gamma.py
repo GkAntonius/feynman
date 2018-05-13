@@ -26,15 +26,15 @@ arrow_param = dict(width=0.05)
 
 xy = [0.2, y0]
 
-v01 = D.verticle(xy, dy= side/2)
-v02 = D.verticle(xy, dy=-side/2)
-v03 = D.verticle(xy, dx=gammalen)
+v01 = D.vertex(xy, dy= side/2)
+v02 = D.vertex(xy, dy=-side/2)
+v03 = D.vertex(xy, dx=gammalen)
 gamma0 = D.operator([v01,v02,v03])
 gamma0.text("$\Gamma$")
 
 D.text(.75, y0, "=", fontsize=30)
 
-v30 = D.verticle([1.05, y0])
+v30 = D.vertex([1.05, y0])
 
 
 n1 = np.array([-np.sqrt(3)/6, .5])
@@ -42,14 +42,14 @@ n2 = np.array([-np.sqrt(3)/6,-.5])
 n3 = np.array([ np.sqrt(3)/3, .0])
 
 chunkdist = .05
-v310 = D.verticle(v30.xy, dxy=n1*chunkdist, marker='')
-v320 = D.verticle(v30.xy, dxy=n2*chunkdist, marker='')
-v330 = D.verticle(v30.xy, dxy=n3*chunkdist, marker='')
+v310 = D.vertex(v30.xy, dxy=n1*chunkdist, marker='')
+v320 = D.vertex(v30.xy, dxy=n2*chunkdist, marker='')
+v330 = D.vertex(v30.xy, dxy=n3*chunkdist, marker='')
 
 chunklen = .05
-v31 = D.verticle(v310.xy, dxy=n1*chunklen, marker='')
-v32 = D.verticle(v320.xy, dxy=n2*chunklen, marker='')
-v33 = D.verticle(v330.xy, dxy=n3*chunklen, marker='')
+v31 = D.vertex(v310.xy, dxy=n1*chunklen, marker='')
+v32 = D.vertex(v320.xy, dxy=n2*chunklen, marker='')
+v33 = D.vertex(v330.xy, dxy=n3*chunklen, marker='')
 
 chunkstyle=dict(arrow=False, linewidth=6.)
 D.line(v310, v31, **chunkstyle)

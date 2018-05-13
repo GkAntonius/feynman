@@ -18,10 +18,10 @@ def test_text():
     # First diagram
     D1 = Diagram(ax)
 
-    v1 = D1.verticle(xy=(.2,.2), marker='')
-    v2 = D1.verticle(xy=(.4,.2))
-    v3 = D1.verticle(xy=(.6,.2))
-    v4 = D1.verticle(xy=(.8,.2), marker='')
+    v1 = D1.vertex(xy=(.2,.2), marker='')
+    v2 = D1.vertex(xy=(.4,.2))
+    v3 = D1.vertex(xy=(.6,.2))
+    v4 = D1.vertex(xy=(.8,.2), marker='')
 
     v1.text('1', x=-.03, y=.02)
     v2.text('2', x=-.03, y=.02)
@@ -38,10 +38,10 @@ def test_text():
     # Second diagram
     D2 = Diagram(ax)
 
-    v1 = D2.verticle(xy=(.1,.5), marker='')
-    v2 = D2.verticle(xy=(.3,.5))
-    v3 = D2.verticle(xy=(.7,.5))
-    v4 = D2.verticle(xy=(.9,.5), marker='')
+    v1 = D2.vertex(xy=(.1,.5), marker='')
+    v2 = D2.vertex(xy=(.3,.5))
+    v3 = D2.vertex(xy=(.7,.5))
+    v4 = D2.vertex(xy=(.9,.5), marker='')
 
     l12 = D2.line(v1, v2, arrow=True)
     w23 = D2.line(v2, v3, shape='elliptic', flavour='loopy', nloops=18)

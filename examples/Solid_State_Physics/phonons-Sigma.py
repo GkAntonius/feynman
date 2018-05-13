@@ -28,8 +28,8 @@ DW_style = dict(style='circular loopy', circle_radius=.7, xamp=.10, yamp=.15, nl
 G_style = dict(style='simple', arrow=True, arrow_param={'width':0.15, 'length': .3})
 
 # Item 1
-v1 = D.verticle([D.x0, D.y0])
-v2 = D.verticle(v1.xy, dx=opwidth)
+v1 = D.vertex([D.x0, D.y0])
+v2 = D.vertex(v1.xy, dx=opwidth)
 Sigma = D.operator([v1,v2], facecolor='#8AA2BB')
 Sigma.text("$\Sigma^{ep}$")
 
@@ -37,8 +37,8 @@ Sigma.text("$\Sigma^{ep}$")
 D.text(v2.x + objspace, D.y0, "=", fontsize=30)
 
 # Item 3
-v1 = D.verticle([v2.x + 2 * objspace,  D.y0 - 0.3])
-v2 = D.verticle(v1.xy, dx=linlen)
+v1 = D.vertex([v2.x + 2 * objspace,  D.y0 - 0.3])
+v2 = D.vertex(v1.xy, dx=linlen)
 G = D.line(v1, v2, **G_style)
 Ph = D.line(v1, v2, **Ph_style)
 
@@ -46,7 +46,7 @@ Ph = D.line(v1, v2, **Ph_style)
 D.text(v2.x + objspace, D.y0, "+", fontsize=30)
 
 # Item 3
-v1 = D.verticle([v2.x + 3 * objspace,  D.y0 - 0.3])
+v1 = D.vertex([v2.x + 3 * objspace,  D.y0 - 0.3])
 DW = D.line(v1, v1, **DW_style)
 
 D.plot()

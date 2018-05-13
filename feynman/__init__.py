@@ -5,9 +5,7 @@ feynman
 
 G.K.Antonius
 
-
 Montreal 2013
-
 """
 
 from .constants import *

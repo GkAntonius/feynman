@@ -16,3 +16,4 @@ black = "k"
 grey = "#999999"
 lightgrey = "#cccccc"
 
+lightblue = "#8AA2BB"

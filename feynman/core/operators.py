@@ -8,7 +8,7 @@ import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
 from . import Drawable
-from . import Line, Verticle
+from . import Line, Vertex
 
 from .. import vectors
 from .. import colors
@@ -25,8 +25,8 @@ class Operator(Drawable):
     Arguments
     ---------
 
-    verticles : a list of N verticles (feynman.Verticle)
-        First and second verticle, counted clockwise
+    vertices : a list of N vertices (feynman.Vertex)
+        First and second vertex, counted clockwise
         defining an edge (or the starting and ending points)
         of a patch object. 
 
@@ -54,14 +54,14 @@ class Operator(Drawable):
     Properties
     ----------
 
-    verticles :
-        list of N feynman.Verticle
+    vertices :
+        list of N feynman.Vertex
 
     N :
-        Number of verticles to the operator.
+        Number of vertices to the operator.
 
     """
-    def __init__(self, verticles, **kwargs):
+    def __init__(self, vertices, **kwargs):
 
         # Default values
         default = dict(
@@ -72,8 +72,8 @@ class Operator(Drawable):
         for key, val in default.items():
             kwargs.setdefault(key, val)
 
-        self.verticles = verticles
-        self.N = len(verticles)
+        self.vertices = vertices
+        self.N = len(vertices)
 
         # TODO enforce possible values
         shape = kwargs.pop('shape', 'polygon')
@@ -100,16 +100,16 @@ class Operator(Drawable):
         self.texts = list()
         self.lines = list()
 
-    def get_verticles(self):
-        """Return the verticles."""
-        return self.verticles
+    def get_vertices(self):
+        """Return the vertices."""
+        return self.vertices
 
-    def set_verticles(self, *verticles):
-        """Return the verticles."""
-        self.verticles = verticles
+    def set_vertices(self, *vertices):
+        """Return the vertices."""
+        self.vertices = vertices
 
     def set_angles(self, *angles):
-        """Set the angles between verticles."""
+        """Set the angles between vertices."""
         raise NotImplementedError()
 
     def set_center(self, xy):
@@ -117,12 +117,12 @@ class Operator(Drawable):
         raise NotImplementedError()
 
     @classmethod
-    def _check_verticle_distances(verticles, tolerance=1e-8):
-        """Assert that all verticles are equally distant from the center."""
+    def _check_vertices_distances(vertices, tolerance=1e-8):
+        """Assert that all vertices are equally distant from the center."""
 
     def get_xy(self):
-        """Return the xy coordinates of the verticles, clockwise."""
-        return np.array([v.xy for v in self.verticles])
+        """Return the xy coordinates of the vertices, clockwise."""
+        return np.array([v.xy for v in self.vertices])
 
     # TODO make it a property
     def get_center(self):
@@ -186,7 +186,7 @@ class Operator(Drawable):
         for key, val in default_style.items():
             self.line_prop.setdefault(key, val)
 
-        v1, v2, v3 ,v4 = self.verticles
+        v1, v2, v3 ,v4 = self.vertices
         line1 = Line(v1, v2, **self.line_prop)
         line2 = Line(v3, v4, **self.line_prop)
 
@@ -255,11 +255,11 @@ class RegularOperator(Operator):
     Arguments
     ---------
 
-    N: Number of verticles
+    N: Number of vertices
 
     angle:
-        Verticles, are counted clockwise. angle=0=1 means
-        that there is a verticle in the [1,0] direction from the center.
+        vertices are counted clockwise. angle=0=1 means
+        that there is a vertex in the [1,0] direction from the center.
 
     rotate : (0.)
         Rotation angle to the operator, in units of tau.
@@ -275,17 +275,17 @@ class RegularOperator(Operator):
     Returns
     -------
 
-    Vs : list of N verticle.
+    Vs : list of N vertices.
 
 
     Properties
     ----------
 
-    verticles :
-        list of N feynman.Verticle
+    vertices :
+        list of N feynman.Vertex
 
     N :
-        Number of verticles to the operator.
+        Number of vertices to the operator.
 
     """
     def __init__(self, N, center, size=0.3, angle=None, **kwargs):
@@ -300,7 +300,7 @@ class RegularOperator(Operator):
 
         vertices = list()
         for i in range(N):
-            v = Verticle(xy=center, radius=size, angle=angle + float(i)/N)
+            v = Vertex(xy=center, radius=size, angle=angle + float(i)/N)
             vertices.append(v)
 
         kwargs.update(shape='polygon')
