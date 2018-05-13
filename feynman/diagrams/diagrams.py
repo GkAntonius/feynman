@@ -161,14 +161,14 @@ class Diagram(Plotter):
         return vs
 
     def verticle(self, *args, **kwargs):
-        warning.warn('Diagram.verticle is deprecated. ' +
+        warnings.warn('Diagram.verticle is deprecated. ' +
                      'Use Diagram.vertex instead.')
-        self.vertex(*args, **kwargs)
+        return self.vertex(*args, **kwargs)
 
     def verticles(self, *args, **kwargs):
         warning.warn('Diagram.verticles is deprecated. ' +
                      'Use Diagram.vertices instead.')
-        self.vertices(*args, **kwargs)
+        return self.vertices(*args, **kwargs)
 
     def line(self, *args, **kwargs):
         """Create a feynman.core.line instance."""
