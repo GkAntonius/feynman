@@ -22,116 +22,87 @@ class Line(Drawable):
     """
     A particle line joigning two vertices.
 
-    Arguments
-    =========
+    Parameters
+    ----------
 
-    vstart :
+    vstart:
         Starting vertex.
 
-    vend :
+    vend:
         End vertex.
 
+    style: 'shape flavour stroke'
+        A single string that specifies the shape, flavour, and stroke,
+        in any order.
 
-    style : "shape flavour stroke"
-    ---------------------------------- 
-
-    shape : ( linear)
+    shape: 'linear'
         The shape determines the line path.
 
         |   linear    -  A straight line between two points.
         |   elliptic  -  An ellipse arc.
         |   circular  -  A circle starting and ending at the same vertex.
 
-    flavour : ( simple )
+    flavour: 'simple'
         The type of line.
 
         |   simple  -  A straight line that follows the line path.
         |   wiggly  -  A wavy line around the line path..
         |   loopy   -  A spring.
 
-    stroke : ( single )
+    stroke: 'single'
         The style for the line.
 
         |   single  -  A simple line.
         |   double  -  A double line.
 
-
-    ellipse_param  : "spread excentricity position"
-    -----------------------------------------------
-
-    ellipse_spread : (0.5)
+    ellipse_spread: 0.5
         The angle (in units of tau) spread by the ellipse arc.
         The limit cases are
         |   0.0 --> the curve will tend to a straight ligne,
         |   0.5 --> the curve will be half an ellipse,
         |   1.0 --> the curve will tend to a closed ellipse. 
 
-    ellipse_excentricity : (1.2)
+    ellipse_excentricity: 1.2
         The excentricity of the ellipse, that is, the ratio of the long axe
         over the short axe. At 1.0, the curve will be a circle arc.
         Also Controls wether the curve is 'up' or 'down'.
         A positive value makes it 'up', while a negative value makes it 'down'.
 
-    ellipse_position :  ['up' | 1] or ['down', -1]
+    ellipse_position:  ['up', 1] or ['down', -1]
         In case ellipse_excentricity is not defined:
 
-
-    circle_param  : dict( radius=.1, angle=.25) 
-    -----------------------------------------------
-
-    circle_radius : float (.1)
+    circle_radius: .1
         The radius of the circle.
 
-    circle_angle : float (0.25)
+    circle_angle: 0.25
         The angle of the anchor vertex to the circle center, in units of tau.
 
-    circle_excentricity : float (.1)
+    circle_excentricity: .1
         The excentricity of the circle.
         | > 1. --> squeezed in the tangent direction at the anchor point.
         | < 1. --> stretched in the tangent direction at the anchor point.
 
-
-    arrow : bool ( True )
+    arrow: True
         Include an arrow in the line.
 
-    arrow_param : dict
+    arrow_param: dict
         In case arrow==True, gives a mapping of all parameters for add_arrow.
 
-    nwiggles : float
+    nwiggles: float
         The number of wiggles in a wiggly line.
         Can be integer or half-integer (if the phase is 0 or .5).
 
-    nloops : float
+    nloops: float
         The number of loops in a loopy line.
 
-    phase : float
+    phase: float
         Phase in the wiggly or loopy pattern, in units of tau.
 
-    npoints : int
+    npoints: int
         Number of points that makes up the line.
 
-    **line_kwargs : 
+    **line_kwargs: 
         Keyword arguments for matplotlib.Lines.line2D .
-
-
-    Properties
-    ==========
-
-    npoints : int
-        Number of points that makes up the line.
-
-    xy : np.ndarray, shape (npoints, 2)
-        The xy coordinates of the line.
-
-    linepath : np.ndarray, shape (npoints, 2)
-        The director line arount which the xy points are placed (with line_kwargs).
-
-    tangent : np.ndarray, shape (npoints, 2)
-        The unitary vectors tangent to the linepath.
-
-    normal : np.ndarray, shape (npoints, 2)
-        The unitary vectors normal to the linepath.
-
     """
 
     _shape = 'linear'
@@ -167,6 +138,9 @@ class Line(Drawable):
     _tangent = np.zeros((2,2))
     _normal = np.zeros((2,2))
     _main_lines = None
+    _diagram = None
+
+    _line_kwargs = dict()
 
     t =  np.linspace(0, 1, 2)
 
@@ -205,6 +179,18 @@ class Line(Drawable):
 
         # Collect unknown keyword arguments
         self.warn_unkwnown_kwargs(kwargs)
+
+    @property
+    def line_kwargs(self):
+        """
+        Style specifications for :class:`matplotlib.lines.Line2D`
+        such as color, linewidth, etc.
+        """
+        return self._line_kwargs
+
+    @line_kwargs.setter
+    def line_kwargs(self, dictionary):
+        self._line_kwargs = dictionary
 
     def draw(self, ax):
         """Plot the line."""
@@ -407,6 +393,7 @@ class Line(Drawable):
 
     @property
     def xy(self):
+        """The xy coordinates of the line."""
         return self._xy
 
     @xy.setter
@@ -417,6 +404,7 @@ class Line(Drawable):
 
     @property
     def npoints(self):
+        """Number of points that makes up the line."""
         return self.t.size
 
     @npoints.setter
@@ -429,6 +417,7 @@ class Line(Drawable):
 
     @property
     def tangent(self):
+        """The unitary vectors tangent to the linepath."""
         return self._tangent
 
     @tangent.setter
@@ -445,6 +434,7 @@ class Line(Drawable):
 
     @property
     def normal(self):
+        """The unitary vectors normal to the linepath."""
         return self._normal
 
     def _set_normal(self):
@@ -495,9 +485,9 @@ class Line(Drawable):
         """
         Set the line style.
 
-            simple  -  A straight line.
-            wiggly  -  A wavy line.
-            loopy   -  A spring.
+            | simple  -  A straight line.
+            | wiggly  -  A wavy line.
+            | loopy   -  A spring.
         """
         if flavour in self._flavour_simple_aliases:
             self._set_xy = self._set_xy_simple
@@ -809,6 +799,7 @@ class Line(Drawable):
 
     @property
     def linepath(self):
+        """The director line arount which the xy points are placed."""
         return self._linepath
 
     @linepath.setter
@@ -1052,6 +1043,11 @@ class Line(Drawable):
                                  + str(self._arrow_style_allowed_values))
             arrows.append(arrow)
         return arrows
+
+    @property
+    def diagram(self):
+        """The diagram it belongs to."""
+        return self._diagram
 
     def scale_width(self, x):
         """Apply a scaling factor to the line width."""

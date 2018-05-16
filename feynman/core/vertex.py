@@ -17,39 +17,41 @@ __all__ = ['Vertex', 'Verticle']
 
 class Vertex(Drawable):
     """
-    A vertex. Often represented as a point.
+    A vertex. Usually represented as a disc.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
 
-    xy :
-        Coordinates.
+    xy: [x, y]
+        Coordinates of the vertex.
 
-    dxy :
-        Coordinates, so that the position is given by xy + dxy.
+    dxy:
+        Coordinates shift, so that the position is given by xy + dxy.
 
-    dx :
-        Coordinate, so that the position is given by xy + [dx, 0].
+    dx:
+        Coordinates shift in the x direction.
 
-    dy :
-        Coordinate, so that the position is given by xy + [0, dy].
+    dy:
+        Coordinates shift in the y direction.
 
-    angle :
+    angle:
         Angle from xy, so that the position is given by
-        xy + radius * [cos(angle), sin(angle)]
-        Angle is given in units of tau=2pi
+        xy + radius * [cos(angle), sin(angle)].
+        Angle is given in units of tau=2pi.
 
-    radius :
+    radius:
         Radius from xy, so that the position is given by
-        xy + radius * [cos(angle), sin(angle)]
+        xy + radius * [cos(angle), sin(angle)].
 
-    **kwargs :
+    **kwargs:
         Any matplotlib line style argument. 
     """
 
     _xy = np.zeros(2)
+    _style = dict()
 
     _lines = list()
+    _diagram = None
 
     def __init__(self, xy=(0,0), **kwargs):
 
@@ -79,6 +81,18 @@ class Vertex(Drawable):
 
         # TODO Should be able to get the lines connected to that vertex.
         self.texts = list()
+
+    @property
+    def style(self):
+        """
+        A dictionary of matplotlib line style,
+        such as marker, markersize, color, etc.
+        """
+        return self._style
+
+    @style.setter
+    def style(self, dictionary):
+        self._style = dictionary
 
     @property
     def x(self): return self._xy[0]
@@ -125,6 +139,7 @@ class Vertex(Drawable):
 
     # User
     def set_xy(self, xy):
+        """Set the position of the vertex."""
         self.xy = xy
 
     def get_marker(self):
@@ -137,21 +152,21 @@ class Vertex(Drawable):
         """
         Add text near the vertex.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
 
-        s : Text string.
+        s: Text string.
 
-        x : (-0.025)
+        x: (-0.025)
             x position, relative to the vertex.
 
-        y : (-0.025)
+        y: (-0.025)
             y position, relative to the vertex.
 
-        fontsize : (14)
+        fontsize: (14)
             The font size.
 
-        **kwargs :
+        **kwargs:
             Any other style specification for a matplotlib.text.Text instance.
         """
         default = dict(
@@ -186,6 +201,11 @@ class Vertex(Drawable):
     @lines.setter
     def lines(self, value):
         self._lines = value
+
+    @property
+    def diagram(self):
+        """The diagram it belongs to."""
+        return self._diagram
 
     def chunk(self, *args, **kwargs):
         self.diagram.add_chunk(self, *args, **kwargs)

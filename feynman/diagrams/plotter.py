@@ -36,10 +36,6 @@ class Plotter(object):
         self.x0 = 0.
         self.y0 = 0.
 
-    #def set_background_visible(self, transparent=True):
-    #    """Set the background visibility."""
-    #    self.transparent = transparent
-
     def show(self):
         """Show the figure with matplotlib.pyplot.show."""
         plt.show()

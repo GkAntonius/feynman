@@ -21,14 +21,18 @@ class Diagram(Plotter):
     """
     The main object for a feynman diagram.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
 
-    fig : A :class:`matplotlib.figure.Figure`  instante.
-    ax : A :class:`matplotlib.axes.AxesSubplot`  instance.
+    ax:
+        A :class:`matplotlib.axes.AxesSubplot`  instance.
+        If no ax is given, a new figure and a new axe are initialized.
 
-    transparent : True to set the background as transparent. 
+    xy0:
+        Default reference point for creation of vertices.
 
+    transparent: :vartype: `bool`
+        Set the background as transparent.
 
     """
 
@@ -52,23 +56,20 @@ class Diagram(Plotter):
         """
         Create a vertex.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
 
-        xy :        Coordinates.
-        **kwargs :  Any matplotlib line style argument. 
+        xy:
+            Coordinates of the vertex.
+        **kwargs:
+            Any argument passed to :class:`feynman.core.Vertex`
 
         Returns
         -------
-        feynman.core.Vertex instance.
+        :class:`feynman.core.Vertex`
         """
         if xy is 'auto':
             xy = (self.x0, self.y0)
-        #else:
-        #    if not isinstance(xy, tuple):
-        #        raise TypeError()
-        #    elif len(xy) != 2:
-        #        raise TypeError()
         v = Vertex(xy, **kwargs)
         self.add_vertex(v)
         return v
@@ -77,8 +78,8 @@ class Diagram(Plotter):
         """
         Create multiple vertices.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
 
         xys :
             List of xy coordinates.
@@ -88,7 +89,6 @@ class Diagram(Plotter):
 
         Returns
         -------
-
         list of feynman.core.Vertex instance.
         """
         xys = np.array(xys)
@@ -113,25 +113,25 @@ class Diagram(Plotter):
         return self.vertices(*args, **kwargs)
 
     def line(self, *args, **kwargs):
-        """Create a feynman.core.line instance."""
+        """Create a :class:`feynman.core.Line` instance."""
         l = Line(*args, **kwargs)
         self.lines.append(l)
         return l
 
     def operator(self, *args, **kwargs):
-        """Create an feynman.core.operator instance."""
-        O = Operator(*args, **kwargs)
-        self.operators.append(O)
-        return O
+        """Create an :class:`feynman.core.operator` instance."""
+        o = Operator(*args, **kwargs)
+        self.operators.append(o)
+        return o
 
     def add_vertex(self, vertex):
         """Add a feynman.core.Vertex instance."""
-        vertex.diagram = self
+        vertex._diagram = self
         self.vertices.append(vertex)
 
     def add_line(self, line):
         """Add a feynman.core.line instance."""
-        line.diagram = self
+        line._diagram = self
         self.lines.append(line)
 
     def add_operator(self, operator):
@@ -181,7 +181,15 @@ class Diagram(Plotter):
         self.ax.text(*args, **kwargs)
 
     def scale(self, x):
-        """Apply a scaling factor."""
+        """
+        Apply a scaling factor to the diagram.
+        Suppose your diagram looks good for a figure of size (6,6)
+        with a single subplot. If you create multiple subplots in your figure,
+        each with its own diagram (e.g. to represent an equation),
+        then the same diagram will generally look too thick in the smaller
+        subplots. It is then desirable to apply a scaling factor to thin down
+        the lines, the arrows, and the text for all objects of the diagram.
+        """
 
         for v in self.vertices:
             v.scale(x)
@@ -193,11 +201,11 @@ class Diagram(Plotter):
             o.scale(x)
 
 
-    def get_object_group_limits():
-        """
-        Return the x0, y0, w, h
-        of the leftmost, bottommost, rightmost and topmost objects.
-        """
-        raise NotImplementedError()
+    #def get_object_group_limits():
+    #    """
+    #    Return the x0, y0, w, h
+    #    of the leftmost, bottommost, rightmost and topmost objects.
+    #    """
+    #    raise NotImplementedError()
 
 

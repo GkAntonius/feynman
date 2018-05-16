@@ -22,45 +22,40 @@ class Operator(Drawable):
     Often represented as a polygon, or a circle.
 
 
-    Arguments
-    ---------
+    Parameters
+    ----------
 
-    vertices : a list of N vertices (feynman.Vertex)
+    vertices: a list of N vertices (feynman.Vertex)
         First and second vertex, counted clockwise
         defining an edge (or the starting and ending points)
         of a patch object. 
 
-    rotate : (0.)
+    rotate: (0.)
         Rotation angle to the operator, in units of tau.
 
-    c : (1.)
+    c: (1.)
         If the shape is elliptic, c is the excentricity of the ellipse,
         that is, the ratio of the long axe over the short axe.
         When c = 1, the shape will be a circle.
 
-    shape :
+    shape:
         By default, the shape is 'ellipse' if N=2,
         and 'polygon' if N>2.
         When N=4 however, you can also specify 'bubble' as a shape
         to have lines connecting (v1, v2) together and (v3, v4) together,
         and a single elliptic patch on top of those two lines.
 
-    line_prop :
+    line_prop:
         Line properties if shape='bubble'.
 
-    **kwargs :
+    **kwargs:
         Any other style specification for a matplotlib.patches.Patch instance.
 
-    Properties
-    ----------
-
-    vertices :
-        list of N feynman.Vertex
-
-    N :
-        Number of vertices to the operator.
-
     """
+
+    _vertices = list()
+    _style = dict()
+
     def __init__(self, vertices, **kwargs):
 
         # Default values
@@ -73,7 +68,6 @@ class Operator(Drawable):
             kwargs.setdefault(key, val)
 
         self.vertices = vertices
-        self.N = len(vertices)
 
         # TODO enforce possible values
         shape = kwargs.pop('shape', 'polygon')
@@ -110,13 +104,31 @@ class Operator(Drawable):
         self.texts = list()
         self.lines = list()
 
-    def get_vertices(self):
-        """Return the vertices."""
-        return self.vertices
+    @property
+    def N(self):
+        """Number of vertices to the operator."""
+        return len(self.vertices)
 
-    def set_vertices(self, *vertices):
-        """Return the vertices."""
-        self.vertices = vertices
+    @property
+    def vertices(self):
+        """The list of N vertices forming the operator."""
+        return self._vertices
+
+    @vertices.setter
+    def vertices(self, vlist):
+        self._vertices = vlist
+
+    @property
+    def style(self):
+        """
+        A dictionary of style elements for a :class:`matplotlib.patches.Patch`
+        instance, such as linewidth, edgecolor, facecolor, etc.
+        """
+        return self._style
+
+    @style.setter
+    def style(self, dictionary):
+        self._style = dictionary
 
     def set_angles(self, *angles):
         """Set the angles between vertices."""
@@ -125,10 +137,6 @@ class Operator(Drawable):
     def set_center(self, xy):
         """Set the center of the polygon """
         raise NotImplementedError()
-
-    @classmethod
-    def _check_vertices_distances(vertices, tolerance=1e-8):
-        """Assert that all vertices are equally distant from the center."""
 
     def get_xy(self):
         """Return the xy coordinates of the vertices, clockwise."""
@@ -197,24 +205,18 @@ class Operator(Drawable):
         """
         Add text in the operator.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
 
-        s : Text string.
+        s: Text string.
 
-        Positional Arguments
-        -----------------
-
-        x : (0.)
+        x: (0.)
             x position, relative to the center of the operator.
 
-        y : (0.)
+        y: (0.)
             y position, relative to the center of the operator.
 
-        Keyword Arguments
-        -----------------
-
-        fontsize : (30)
+        fontsize: (30)
             The font size.
 
         **kwargs :
@@ -265,45 +267,26 @@ class Operator(Drawable):
 
 class RegularOperator(Operator):
     """
-    A N-point operator.
-    Often represented as a polygon, or a circle.
+    A N-point operator represented as a polygon.
 
+    Parameters
+    ----------
 
-    Arguments
-    ---------
+    N:
+        Number of vertices.
 
-    N: Number of vertices
+    center:
+        Position of the center of the operator.
+
+    size:
+        Distance from the center to a corner.
 
     angle:
         vertices are counted clockwise. angle=0=1 means
         that there is a vertex in the [1,0] direction from the center.
 
-    rotate : (0.)
-        Rotation angle to the operator, in units of tau.
-
-    c : (1.)
-        If the shape is elliptic, c is the excentricity of the ellipse,
-        that is, the ratio of the long axe over the short axe.
-        When c = 1, the shape will be a circle.
-
     **kwargs :
         Any other style specification for a matplotlib.patches.Patch instance.
-
-    Returns
-    -------
-
-    Vs : list of N vertices.
-
-
-    Properties
-    ----------
-
-    vertices :
-        list of N feynman.Vertex
-
-    N :
-        Number of vertices to the operator.
-
     """
     def __init__(self, N, center, size=0.3, angle=None, **kwargs):
 
@@ -331,6 +314,25 @@ class RegularOperator(Operator):
 class RegularBubbleOperator(RegularOperator):
     """
     This operator is represented by a circle with N vertices.
+
+    Parameters
+    ----------
+
+    N:
+        Number of vertices.
+
+    center:
+        Position of the center of the operator.
+
+    size:
+        Radius of the circle.
+
+    angle:
+        vertices are counted clockwise. angle=0=1 means
+        that there is a vertex in the [1,0] direction from the center.
+
+    **kwargs :
+        Any other style specification for a matplotlib.patches.Patch instance.
     """
     def __init__(self, N, center, size=0.3, angle=None, **kwargs):
         self.radius = size
