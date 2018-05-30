@@ -6,13 +6,12 @@ from numpy import array
 class Plotter(object):
     """
     A wrapper for matplotlib.figure.Figure object.
-    as well as a styliser
     """
 
     def _init_figure(self, ax=None, **kwargs):
         """Init internal figure object."""
-        # Init diagram and ax
 
+        # Init diagram and ax
         if ax:
             self.ax = ax
             self.fig = ax.get_figure()

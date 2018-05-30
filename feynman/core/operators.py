@@ -83,7 +83,7 @@ class Operator(Drawable):
 
         self.style = dict(
             edgecolor="k",
-            facecolor=colors.lightgrey,
+            facecolor=colors.lightblue,
             linewidth=3,
             )
 

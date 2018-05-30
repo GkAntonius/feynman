@@ -64,10 +64,8 @@ class Vertex(Drawable):
         cxy = (np.complex(*xy) + np.complex(*dxy) + np.complex(dx, dy)
                + radius * np.e ** (1j * tau * angle))
         self.xy = np.array([cxy.real, cxy.imag])
-        #self.xy = ( xy 
-        #    + dxy + np.array([dx, dy])
-        #    + radius * np.array([np.cos(angle*tau), np.sin(angle*tau)])
-        #    )
+        #self.xy = ( xy  + dxy + np.array([dx, dy])
+        #    + radius * np.array([np.cos(angle*tau), np.sin(angle*tau)]))
 
         self.style = dict(
             marker='o',

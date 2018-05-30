@@ -54,7 +54,7 @@ class Diagram(Plotter):
 
     def vertex(self, xy='auto', **kwargs):
         """
-        Create a vertex.
+        Create a :class:`feynman.Vertex` vertex.
 
         Parameters
         ----------
@@ -62,11 +62,11 @@ class Diagram(Plotter):
         xy:
             Coordinates of the vertex.
         **kwargs:
-            Any argument passed to :class:`feynman.core.Vertex`
+            Any argument passed to :class:`feynman.Vertex`
 
         Returns
         -------
-        :class:`feynman.core.Vertex`
+        :class:`feynman.Vertex`
         """
         if xy is 'auto':
             xy = (self.x0, self.y0)
@@ -89,7 +89,7 @@ class Diagram(Plotter):
 
         Returns
         -------
-        list of feynman.core.Vertex instance.
+        list of feynman.Vertex instance.
         """
         xys = np.array(xys)
         if xys.ndim != 2:
@@ -113,29 +113,31 @@ class Diagram(Plotter):
         return self.vertices(*args, **kwargs)
 
     def line(self, *args, **kwargs):
-        """Create a :class:`feynman.core.Line` instance."""
+        """
+        Create a :class:`feynman.Line` instance.
+        """
         l = Line(*args, **kwargs)
         self.lines.append(l)
         return l
 
     def operator(self, *args, **kwargs):
-        """Create an :class:`feynman.core.operator` instance."""
+        """Create an :class:`feynman.Operator` instance."""
         o = Operator(*args, **kwargs)
         self.operators.append(o)
         return o
 
     def add_vertex(self, vertex):
-        """Add a feynman.core.Vertex instance."""
+        """Add a feynman.Vertex instance."""
         vertex._diagram = self
         self.vertices.append(vertex)
 
     def add_line(self, line):
-        """Add a feynman.core.line instance."""
+        """Add a feynman.Line instance."""
         line._diagram = self
         self.lines.append(line)
 
     def add_operator(self, operator):
-        """Add an feynman.core.operator instance."""
+        """Add an feynman.Operator instance."""
         operator.diagram = self
         self.operators.append(operator)
         for v in operator.vertices:
