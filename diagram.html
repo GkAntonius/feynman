@@ -1,0 +1,218 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Diagram &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Vertex" href="vertex.html" />
+    <link rel="prev" title="The feynman package" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="vertex.html" title="Vertex"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The feynman package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">The feynman package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="vertex.html"
+                        title="next chapter">Vertex</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/diagram.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="diagram">
+<h1>Diagram<a class="headerlink" href="#diagram" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="feynman.diagrams.diagrams.Diagram">
+<em class="property">class </em><code class="descclassname">feynman.diagrams.diagrams.</code><code class="descname">Diagram</code><span class="sig-paren">(</span><em>ax=None</em>, <em>xy0=(0.0</em>, <em>0.0)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main object for a feynman diagram.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ax</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.AxesSubplot</span></code>  instance.
+If no ax is given, a new figure and a new axe are initialized.</li>
+<li><strong>xy0</strong> – Default reference point for creation of vertices.</li>
+<li><strong>transparent</strong> – Set the background as transparent.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a feynman.Line instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.add_operator">
+<code class="descname">add_operator</code><span class="sig-paren">(</span><em>operator</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.add_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an feynman.Operator instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.add_vertex">
+<code class="descname">add_vertex</code><span class="sig-paren">(</span><em>vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.add_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a feynman.Vertex instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.line">
+<code class="descname">line</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a <a class="reference internal" href="line.html#feynman.Line" title="feynman.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">feynman.Line</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.operator">
+<code class="descname">operator</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an <a class="reference internal" href="operator.html#feynman.Operator" title="feynman.Operator"><code class="xref py py-class docutils literal notranslate"><span class="pre">feynman.Operator</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the diagram.
+Suppose your diagram looks good for a figure of size (6,6)
+with a single subplot. If you create multiple subplots in your figure,
+each with its own diagram (e.g. to represent an equation),
+then the same diagram will generally look too thick in the smaller
+subplots. It is then desirable to apply a scaling factor to thin down
+the lines, the arrows, and the text for all objects of the diagram.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.text">
+<code class="descname">text</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add text using matplotlib.axes.Axes.text.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.vertex">
+<code class="descname">vertex</code><span class="sig-paren">(</span><em>xy='auto'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a <a class="reference internal" href="vertex.html#feynman.Vertex" title="feynman.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">feynman.Vertex</span></code></a> vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xy</strong> – Coordinates of the vertex.</li>
+<li><strong>**kwargs</strong> – Any argument passed to <a class="reference internal" href="vertex.html#feynman.Vertex" title="feynman.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">feynman.Vertex</span></code></a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="vertex.html#feynman.Vertex" title="feynman.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">feynman.Vertex</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.diagrams.diagrams.Diagram.vertices">
+<code class="descname">vertices</code><span class="sig-paren">(</span><em>xys</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.diagrams.diagrams.Diagram.vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create multiple vertices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xys</strong> – List of xy coordinates.</li>
+<li><strong>**kwargs</strong> – Any matplotlib line style argument.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of feynman.Vertex instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="vertex.html" title="Vertex"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The feynman package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

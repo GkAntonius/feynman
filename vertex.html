@@ -1,0 +1,168 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Vertex &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Line" href="line.html" />
+    <link rel="prev" title="Diagram" href="diagram.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="line.html" title="Line"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="diagram.html" title="Diagram"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="diagram.html"
+                        title="previous chapter">Diagram</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="line.html"
+                        title="next chapter">Line</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/vertex.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="vertex">
+<h1>Vertex<a class="headerlink" href="#vertex" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="feynman.Vertex">
+<em class="property">class </em><code class="descclassname">feynman.</code><code class="descname">Vertex</code><span class="sig-paren">(</span><em>xy=(0</em>, <em>0)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>A vertex. Usually represented as a disc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xy</strong> (<em>[</em><em>x</em><em>, </em><em>y</em><em>]</em>) – Coordinates of the vertex.</li>
+<li><strong>dxy</strong> – Coordinates shift, so that the position is given by xy + dxy.</li>
+<li><strong>dx</strong> – Coordinates shift in the x direction.</li>
+<li><strong>dy</strong> – Coordinates shift in the y direction.</li>
+<li><strong>angle</strong> – Angle from xy, so that the position is given by
+xy + radius * [cos(angle), sin(angle)].
+Angle is given in units of tau=2pi.</li>
+<li><strong>radius</strong> – Radius from xy, so that the position is given by
+xy + radius * [cos(angle), sin(angle)].</li>
+<li><strong>**kwargs</strong> – Any matplotlib line style argument.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="feynman.Vertex.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Vertex.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the size of the marker.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Vertex.set_xy">
+<code class="descname">set_xy</code><span class="sig-paren">(</span><em>xy</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Vertex.set_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the position of the vertex.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="feynman.Vertex.style">
+<code class="descname">style</code><a class="headerlink" href="#feynman.Vertex.style" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of matplotlib line style,
+such as marker, markersize, color, etc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Vertex.text">
+<code class="descname">text</code><span class="sig-paren">(</span><em>s</em>, <em>x=-0.025</em>, <em>y=0.025</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Vertex.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add text near the vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>s</strong> (<em>Text string.</em>) – </li>
+<li><strong>x</strong> (<em>(</em><em>-0.025</em><em>)</em>) – x position, relative to the vertex.</li>
+<li><strong>y</strong> (<em>(</em><em>-0.025</em><em>)</em>) – y position, relative to the vertex.</li>
+<li><strong>fontsize</strong> – The font size.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.text.Text instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="line.html" title="Line"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="diagram.html" title="Diagram"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

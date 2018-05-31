@@ -1,0 +1,122 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Fock exchange &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_examples/Solid_State_Physics/plot_Fock.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fock-exchange">
+<span id="sphx-glr-auto-examples-solid-state-physics-plot-fock-py"></span><h1>Fock exchange<a class="headerlink" href="#fock-exchange" title="Permalink to this headline">¶</a></h1>
+<p>A simple diagram composed of vertices and lines.</p>
+<img alt="../../_images/sphx_glr_plot_Fock_001.png" class="align-center" src="../../_images/sphx_glr_plot_Fock_001.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">feynman</span> <span class="kn">import</span> <span class="n">Diagram</span>
+
+<span class="c1"># If no Axes is given, a new one is initialized.</span>
+<span class="n">diagram</span> <span class="o">=</span> <span class="n">Diagram</span><span class="p">()</span>
+
+<span class="c1"># Create four vertices.</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v3</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=.</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">v4</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v3</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create four lines.</span>
+<span class="c1"># By default, &#39;simple&#39; lines have arrows</span>
+<span class="c1"># and others flavours such as &#39;wiggly&#39; or &#39;loopy&#39; don&#39;t.</span>
+<span class="n">l12</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+<span class="n">l23</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v3</span><span class="p">)</span>
+<span class="n">l34</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v3</span><span class="p">,</span> <span class="n">v4</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">w23</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v3</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;wiggly elliptic&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add labels.</span>
+<span class="n">l12</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">)</span>
+<span class="n">w23</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)</span>
+<span class="n">l23</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;p - q&quot;</span><span class="p">)</span>
+<span class="n">l34</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">)</span>
+
+<span class="n">diagram</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.059 seconds)</p>
+<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_Fock.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_Fock.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_Fock.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_Fock.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

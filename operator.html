@@ -1,0 +1,225 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Operator &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Line" href="line.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="line.html" title="Line"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="line.html"
+                        title="previous chapter">Line</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/operator.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="operator">
+<h1>Operator<a class="headerlink" href="#operator" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="feynman.Operator">
+<em class="property">class </em><code class="descclassname">feynman.</code><code class="descname">Operator</code><span class="sig-paren">(</span><em>vertices</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A N-point operator.
+Often represented as a polygon, or a circle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertices</strong> (<em>a list of N vertices</em><em> (</em><a class="reference internal" href="vertex.html#feynman.Vertex" title="feynman.Vertex"><em>feynman.Vertex</em></a><em>)</em>) – First and second vertex, counted clockwise
+defining an edge (or the starting and ending points)
+of a patch object.</li>
+<li><strong>rotate</strong> (<em>(</em><em>0.</em><em>)</em>) – Rotation angle to the operator, in units of tau.</li>
+<li><strong>c</strong> (<em>(</em><em>1.</em><em>)</em>) – If the shape is elliptic, c is the excentricity of the ellipse,
+that is, the ratio of the long axe over the short axe.
+When c = 1, the shape will be a circle.</li>
+<li><strong>shape</strong> – By default, the shape is ‘ellipse’ if N=2,
+and ‘polygon’ if N&gt;2.
+When N=4 however, you can also specify ‘bubble’ as a shape
+to have lines connecting (v1, v2) together and (v3, v4) together,
+and a single elliptic patch on top of those two lines.</li>
+<li><strong>line_prop</strong> – Line properties if shape=’bubble’.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.patches.Patch instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="feynman.Operator.N">
+<code class="descname">N</code><a class="headerlink" href="#feynman.Operator.N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of vertices to the operator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Operator.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Operator.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Operator.scale_text">
+<code class="descname">scale_text</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Operator.scale_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the text size and relative position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Operator.scale_width">
+<code class="descname">scale_width</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Operator.scale_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the line width.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="feynman.Operator.style">
+<code class="descname">style</code><a class="headerlink" href="#feynman.Operator.style" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of style elements for a <code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.patches.Patch</span></code>
+instance, such as linewidth, edgecolor, facecolor, etc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Operator.text">
+<code class="descname">text</code><span class="sig-paren">(</span><em>s</em>, <em>x=0.0</em>, <em>y=0.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Operator.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add text in the operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>s</strong> (<em>Text string.</em>) – </li>
+<li><strong>x</strong> (<em>(</em><em>0.</em><em>)</em>) – x position, relative to the center of the operator.</li>
+<li><strong>y</strong> (<em>(</em><em>0.</em><em>)</em>) – y position, relative to the center of the operator.</li>
+<li><strong>fontsize</strong> – The font size.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.text.Text instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="feynman.Operator.vertices">
+<code class="descname">vertices</code><a class="headerlink" href="#feynman.Operator.vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of N vertices forming the operator.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="feynman.RegularOperator">
+<em class="property">class </em><code class="descclassname">feynman.</code><code class="descname">RegularOperator</code><span class="sig-paren">(</span><em>N</em>, <em>center</em>, <em>size=0.3</em>, <em>angle=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.RegularOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A N-point operator represented as a polygon.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>N</strong> – Number of vertices.</li>
+<li><strong>center</strong> – Position of the center of the operator.</li>
+<li><strong>size</strong> – Distance from the center to a corner.</li>
+<li><strong>angle</strong> – vertices are counted clockwise. angle=0=1 means
+that there is a vertex in the [1,0] direction from the center.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.patches.Patch instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="feynman.RegularBubbleOperator">
+<em class="property">class </em><code class="descclassname">feynman.</code><code class="descname">RegularBubbleOperator</code><span class="sig-paren">(</span><em>N</em>, <em>center</em>, <em>size=0.3</em>, <em>angle=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.RegularBubbleOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>This operator is represented by a circle with N vertices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>N</strong> – Number of vertices.</li>
+<li><strong>center</strong> – Position of the center of the operator.</li>
+<li><strong>size</strong> – Radius of the circle.</li>
+<li><strong>angle</strong> – vertices are counted clockwise. angle=0=1 means
+that there is a vertex in the [1,0] direction from the center.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.patches.Patch instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="line.html" title="Line"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>The Gamma function &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_examples/Solid_State_Physics/plot_Gamma.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-gamma-function">
+<span id="sphx-glr-auto-examples-solid-state-physics-plot-gamma-py"></span><h1>The Gamma function<a class="headerlink" href="#the-gamma-function" title="Permalink to this headline">¶</a></h1>
+<p>A diagram containing operators of various orders.</p>
+<img alt="../../_images/sphx_glr_plot_Gamma_001.png" class="align-center" src="../../_images/sphx_glr_plot_Gamma_001.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">feynman</span> <span class="kn">import</span> <span class="n">Diagram</span>
+
+<span class="c1"># Set up the figure and ax</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">y0</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">())</span><span class="o">/</span><span class="mf">2.</span>
+
+<span class="n">side</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">gammalen</span> <span class="o">=</span> <span class="n">side</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">linlen</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">txtpad</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">tail_marker</span> <span class="o">=</span> <span class="s1">&#39;o&#39;</span>
+
+<span class="n">W_style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;double wiggly&#39;</span><span class="p">,</span> <span class="n">nwiggles</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v_style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;simple wiggly&#39;</span><span class="p">,</span> <span class="n">nwiggles</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">G_style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;double&#39;</span><span class="p">,</span>  <span class="n">arrow</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">arrow_param</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">})</span>
+
+<span class="n">D</span> <span class="o">=</span> <span class="n">Diagram</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># Left hand size</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">y0</span><span class="p">]</span>
+<span class="n">v11</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span> <span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v12</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v13</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">gammalen</span><span class="p">)</span>
+<span class="n">gamma0</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">operator</span><span class="p">([</span><span class="n">v11</span><span class="p">,</span><span class="n">v12</span><span class="p">,</span><span class="n">v13</span><span class="p">])</span>
+<span class="n">gamma0</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;$\Gamma$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Symbol</span>
+<span class="n">D</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">v13</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">txtpad</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create a three-vertex dot.</span>
+<span class="n">chunkdist</span> <span class="o">=</span> <span class="o">.</span><span class="mo">03</span>
+<span class="n">chunklen</span> <span class="o">=</span> <span class="o">.</span><span class="mo">03</span>
+<span class="n">chunkstyle</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrow</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">6.</span><span class="p">)</span>
+<span class="n">v20</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">([</span><span class="n">v13</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">txtpad</span><span class="p">,</span> <span class="n">y0</span><span class="p">])</span>
+<span class="n">v210</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>   <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v220</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v230</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">2.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v21</span>  <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>   <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="o">+</span><span class="n">chunklen</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v22</span>  <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="o">+</span><span class="n">chunklen</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">v23</span>  <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">2.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">chunkdist</span><span class="o">+</span><span class="n">chunklen</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">D</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v210</span><span class="p">,</span> <span class="n">v21</span><span class="p">,</span> <span class="o">**</span><span class="n">chunkstyle</span><span class="p">)</span>
+<span class="n">D</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v220</span><span class="p">,</span> <span class="n">v22</span><span class="p">,</span> <span class="o">**</span><span class="n">chunkstyle</span><span class="p">)</span>
+<span class="n">D</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v230</span><span class="p">,</span> <span class="n">v23</span><span class="p">,</span> <span class="o">**</span><span class="n">chunkstyle</span><span class="p">)</span>
+
+<span class="c1"># Symbol</span>
+<span class="n">D</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">v20</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">txtpad</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">)</span>
+
+<span class="c1"># Second term</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="p">[</span><span class="n">v20</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">txtpad</span><span class="p">,</span> <span class="n">y0</span><span class="p">]</span>
+<span class="n">v31</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span> <span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v32</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v33</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span> <span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">side</span><span class="p">)</span>
+<span class="n">v34</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="n">side</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">side</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">operator</span><span class="p">([</span><span class="n">v31</span><span class="p">,</span><span class="n">v32</span><span class="p">,</span><span class="n">v34</span><span class="p">,</span><span class="n">v33</span><span class="p">])</span>
+<span class="n">K</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">frac{\delta \Sigma}{\delta G}$&quot;</span><span class="p">)</span>
+
+<span class="n">v41</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v33</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">linlen</span><span class="p">)</span>
+<span class="n">v42</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">v34</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">linlen</span><span class="p">)</span>
+<span class="n">v43</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">vertex</span><span class="p">((</span><span class="n">v41</span><span class="o">.</span><span class="n">xy</span><span class="o">+</span><span class="n">v42</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">gammalen</span><span class="p">)</span>
+
+<span class="n">G1</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v41</span><span class="p">,</span> <span class="n">v33</span><span class="p">,</span> <span class="o">**</span><span class="n">G_style</span><span class="p">)</span>
+<span class="n">G2</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">v34</span><span class="p">,</span> <span class="n">v42</span><span class="p">,</span> <span class="o">**</span><span class="n">G_style</span><span class="p">)</span>
+
+<span class="n">gamma1</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">operator</span><span class="p">([</span><span class="n">v41</span><span class="p">,</span><span class="n">v42</span><span class="p">,</span><span class="n">v43</span><span class="p">])</span>
+<span class="n">gamma1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;$\Gamma$&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Plot and show</span>
+<span class="n">D</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.078 seconds)</p>
+<div class="sphx-glr-footer docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_Gamma.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_Gamma.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_Gamma.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_Gamma.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

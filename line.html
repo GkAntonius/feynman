@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Line &#8212; feynman 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Operator" href="operator.html" />
+    <link rel="prev" title="Vertex" href="vertex.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="operator.html" title="Operator"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="vertex.html" title="Vertex"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="vertex.html"
+                        title="previous chapter">Vertex</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="operator.html"
+                        title="next chapter">Operator</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/line.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="line">
+<h1>Line<a class="headerlink" href="#line" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="feynman.Line">
+<em class="property">class </em><code class="descclassname">feynman.</code><code class="descname">Line</code><span class="sig-paren">(</span><em>vstart</em>, <em>vend</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line" title="Permalink to this definition">¶</a></dt>
+<dd><p>A particle line joigning two vertices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vstart</strong> – Starting vertex.</li>
+<li><strong>vend</strong> – End vertex.</li>
+<li><strong>style</strong> (<em>'shape flavour stroke'</em>) – A single string that specifies the shape, flavour, and stroke,
+in any order.</li>
+<li><strong>shape</strong> (<em>'linear'</em>) – <p>The shape determines the line path.</p>
+<div class="line-block">
+<div class="line">linear    -  A straight line between two points.</div>
+<div class="line">elliptic  -  An ellipse arc.</div>
+<div class="line">circular  -  A circle starting and ending at the same vertex.</div>
+</div>
+</li>
+<li><strong>flavour</strong> (<em>'simple'</em>) – <p>The type of line.</p>
+<div class="line-block">
+<div class="line">simple  -  A straight line that follows the line path.</div>
+<div class="line">wiggly  -  A wavy line around the line path..</div>
+<div class="line">loopy   -  A spring.</div>
+</div>
+</li>
+<li><strong>stroke</strong> (<em>'single'</em>) – <p>The style for the line.</p>
+<div class="line-block">
+<div class="line">single  -  A simple line.</div>
+<div class="line">double  -  A double line.</div>
+</div>
+</li>
+<li><strong>ellipse_spread</strong> (<em>0.5</em>) – The angle (in units of tau) spread by the ellipse arc.
+The limit cases are
+|   0.0 –&gt; the curve will tend to a straight ligne,
+|   0.5 –&gt; the curve will be half an ellipse,
+|   1.0 –&gt; the curve will tend to a closed ellipse.</li>
+<li><strong>ellipse_excentricity</strong> (<em>1.2</em>) – The excentricity of the ellipse, that is, the ratio of the long axe
+over the short axe. At 1.0, the curve will be a circle arc.
+Also Controls wether the curve is ‘up’ or ‘down’.
+A positive value makes it ‘up’, while a negative value makes it ‘down’.</li>
+<li><strong>ellipse_position</strong> (<em>[</em><em>'up'</em><em>, </em><em>1</em><em>] or </em><em>[</em><em>'down'</em><em>, </em><em>-1</em><em>]</em>) – In case ellipse_excentricity is not defined:</li>
+<li><strong>circle_radius</strong> (<em>1</em>) – The radius of the circle.</li>
+<li><strong>circle_angle</strong> (<em>0.25</em>) – The angle of the anchor vertex to the circle center, in units of tau.</li>
+<li><strong>circle_excentricity</strong> (<em>1</em>) – The excentricity of the circle.
+| &gt; 1. –&gt; squeezed in the tangent direction at the anchor point.
+| &lt; 1. –&gt; stretched in the tangent direction at the anchor point.</li>
+<li><strong>arrow</strong> (<em>True</em>) – Include an arrow in the line.</li>
+<li><strong>arrow_param</strong> (<em>dict</em>) – In case arrow==True, gives a mapping of all parameters for add_arrow.</li>
+<li><strong>nwiggles</strong> (<em>float</em>) – The number of wiggles in a wiggly line.
+Can be integer or half-integer (if the phase is 0 or .5).</li>
+<li><strong>nloops</strong> (<em>float</em>) – The number of loops in a loopy line.</li>
+<li><strong>phase</strong> (<em>float</em>) – Phase in the wiggly or loopy pattern, in units of tau.</li>
+<li><strong>npoints</strong> (<em>int</em>) – Number of points that makes up the line.</li>
+<li><strong>**line_kwargs</strong> – Keyword arguments for matplotlib.Lines.line2D .</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="feynman.Line.add_arrow">
+<code class="descname">add_arrow</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.add_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an arrow on the line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>style</strong> (<em>[</em><em>'normal'</em><em>, </em><em>'fancy'</em><em>, </em><em>'line'</em><em>]</em>) – ‘normal’ is a triagular arrow.
+‘fancy’ is a triangular arrow with a bent back.
+‘line’ is a two-stroke line.</li>
+<li><strong>t</strong> (<em>float</em>) – The position of the arrow along the line.
+Must be in the range [0,1].</li>
+<li><strong>direction</strong> – The direction of the arrow. A positive number gives
+a forward arrow while a negative number gives a backward arrow.</li>
+<li><strong>width</strong> – The width of the arrow.</li>
+<li><strong>length</strong> – The length of the arrow.</li>
+<li><strong>t_shift_dir</strong> – When the shape of the line is not linear,
+the direction of the arrow will be given by
+the tangent of the line at position t + t_shift_dir.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="feynman.Line.line_kwargs">
+<code class="descname">line_kwargs</code><a class="headerlink" href="#feynman.Line.line_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Style specifications for <code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.lines.Line2D</span></code>
+such as color, linewidth, etc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.scale_arrows">
+<code class="descname">scale_arrows</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.scale_arrows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the arrows size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.scale_text">
+<code class="descname">scale_text</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.scale_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the text size and relative position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.scale_width">
+<code class="descname">scale_width</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.scale_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a scaling factor to the line width.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.set_flavour">
+<code class="descname">set_flavour</code><span class="sig-paren">(</span><em>flavour</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.set_flavour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the line style.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">simple  -  A straight line.</div>
+<div class="line">wiggly  -  A wavy line.</div>
+<div class="line">loopy   -  A spring.</div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.set_shape">
+<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.set_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the path type.</p>
+<blockquote>
+<div>linear    -  A straight line between two points.
+elliptic  -  An ellipse arc.
+circular  -  A circle starting and ending at the same vertex.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.set_stroke">
+<code class="descname">set_stroke</code><span class="sig-paren">(</span><em>stroke</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.set_stroke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the stroke.</p>
+<blockquote>
+<div>single  -  A single line.
+double  -  A double line.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.set_style">
+<code class="descname">set_style</code><span class="sig-paren">(</span><em>kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.set_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set at once the shape, flavour and stroke of the line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="feynman.Line.text">
+<code class="descname">text</code><span class="sig-paren">(</span><em>s</em>, <em>t=0.5</em>, <em>y=-0.06</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#feynman.Line.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add text over the line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>s</strong> (<em>Text string.</em>) – </li>
+<li><strong>t</strong> (<em>(</em><em>5</em><em>)</em>) – Position along the line (0 &lt; t &lt; 1).</li>
+<li><strong>y</strong> (<em>(</em><em>-.06</em><em>)</em>) – y position, perpendicular to the path direction.</li>
+<li><strong>fontsize</strong> – The font size.</li>
+<li><strong>**kwargs</strong> – Any other style specification for a matplotlib.text.Text instance.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="operator.html" title="Operator"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="vertex.html" title="Vertex"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">feynman 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Gabriel Antonius.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

@@ -1,4 +1,0 @@
-recursive-include examples *.py
-exclude TODO
-exclude Makefile
-recursive-exclude Work
