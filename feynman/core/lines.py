@@ -294,9 +294,14 @@ class Line(Drawable):
             solid_capstyle="butt",
             )
 
+        valid_keys = list()
         for key in kwargs.keys():
             if key in matplotlib_Line2D_valid_keyword_arguments:
-                self.line_kwargs.update({key : kwargs.pop(key)})
+                self.line_kwargs[key] = kwargs[key]
+                valid_keys.append(key)
+
+        for key in valid_keys:
+            kwargs.pop(key)
 
     def warn_unkwnown_kwargs(self, kwargs):
         """Collect unknown keyword arguments."""
@@ -429,7 +434,7 @@ class Line(Drawable):
         v = np.zeros((self.npoints, 2))
         v[:-1] = self.xy[1:] - self.xy[:-1]
         v[-1] = self.xy[-1] - self.xy[-2]
-        norms = np.array(map(lambda n: max(np.linalg.norm(n), 1e-8), v))
+        norms = np.array(list(map(lambda n: max(np.linalg.norm(n), 1e-8), v)))
         self.tangent = vectors.dot(v, 1. / norms)
 
     @property
