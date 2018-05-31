@@ -6,6 +6,9 @@ tags
 # Files produced by the tests
 result_images
 
+# Files produced by the doc
+**.zip
+
 # Files produced by the setup script
 **.pyc
 *.egg-info
