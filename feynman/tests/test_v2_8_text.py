@@ -4,7 +4,7 @@ from matplotlib.testing.decorators import image_comparison
 from ..diagrams import Diagram
 
 @image_comparison(baseline_images=['text'],
-                  extensions=['pdf'])
+                  extensions=['png'])
 def test_text():
 
     fig = plt.figure(figsize=(6,6))

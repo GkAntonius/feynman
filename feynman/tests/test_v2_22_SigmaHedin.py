@@ -5,7 +5,7 @@ from matplotlib.testing.decorators import image_comparison
 from ..diagrams import Diagram
 
 @image_comparison(baseline_images=['sigma'],
-                  extensions=['pdf'])
+                  extensions=['png'])
 def test_diagram():
 
     # Set the ax

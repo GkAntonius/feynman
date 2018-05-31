@@ -1,4 +1,2 @@
-
-from diagrams import *
-
-
+from . import plotter
+from .diagrams import *
