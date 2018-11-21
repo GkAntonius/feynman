@@ -254,8 +254,21 @@ class Line(Drawable):
             double_center_color='w',
             )
 
+        overwrite_arrow_param = overwrite.pop('arrow_param', dict())
+
         default.update(**overwrite)
         self.default = default
+
+        default_arrow_param = dict(
+            style='fancy',
+            t=0.5,
+            width=0.03,
+            length=0.09,
+            direction=1,
+            t_shift_dir=0.025,
+            )
+        default_arrow_param.update(**overwrite_arrow_param)
+        self.default_arrow_param = default_arrow_param
 
     def set_shape_dependent_defaults(self, kwargs):
         """Adjust some default values according to shape and flavour."""
@@ -269,6 +282,7 @@ class Line(Drawable):
         if self.shape == 'circular':
             if self.flavour == 'simple':
                 self.default.update(circle_radius=.1)
+                self.default_arrow_param['direction'] = -1
             elif self.flavour == 'wiggly':
                 self.default.update(nwiggles=7.25)
                 self.default.update(phase=.75)
@@ -545,24 +559,19 @@ class Line(Drawable):
             the tangent of the line at position t + t_shift_dir.
         """
 
-        arrow_kwargs = deepcopy(kwargs)
-        style = arrow_kwargs.setdefault('style', 'fancy')
+        arrow_kwargs = deepcopy(self.default_arrow_param)
+        arrow_kwargs.update(**kwargs)
 
-        arrow_kwargs.setdefault('t', .5)
-        arrow_kwargs.setdefault('width', .03)
-        arrow_kwargs.setdefault('length', .09)
-        arrow_kwargs.setdefault('direction', 1.0)
+        style = arrow_kwargs['style']
 
-        if style == 'normal':
-            self.arrows.append(arrow_kwargs)
-        elif style == 'fancy':
-            arrow_kwargs.setdefault('t_shift_dir', 0.025)
-            self.arrows.append(arrow_kwargs)
-        elif style == 'line':
-            self.arrows.append(arrow_kwargs)
-        else:
+        if style not in self._arrow_style_allowed_values:
             raise ValueError("Wrong value for style.\n Allowed values : "
                              + str(self._arrow_style_allowed_values))
+
+        if style in ('normal', 'line'):
+            arrow_kwargs.setdefault('t_shift_dir', 0)  # keep previous default
+
+        self.arrows.append(arrow_kwargs)
 
     def _get_normal_arrow(self, t=.5, width=.03, length=.09, direction=1.0, **kwargs):
         """
