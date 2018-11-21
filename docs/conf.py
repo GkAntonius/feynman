@@ -27,7 +27,7 @@ author = u'Gabriel Antonius'
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'2.0.0'
+release = u'2.0.2'
 
 
 # -- General configuration ---------------------------------------------------

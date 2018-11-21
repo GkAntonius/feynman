@@ -14,10 +14,10 @@ Requirements
   * matplotlib 1.4+
 
 
-Installing from source
-----------------------
+Installing
+----------
 
-  python setup.py install
+  pip install feynman
 
 
 License
