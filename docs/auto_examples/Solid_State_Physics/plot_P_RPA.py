@@ -1,6 +1,6 @@
 """
-Polarization
-============
+RPA Polarization
+================
 
 A diagram containing an operator.
 """

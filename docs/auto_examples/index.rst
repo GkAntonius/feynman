@@ -74,6 +74,26 @@ Examples from solid state physics
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="A diagram containing different operators. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/Solid_State_Physics/images/thumb/sphx_glr_plot_P_thumb.png
+
+        :ref:`sphx_glr_auto_examples_Solid_State_Physics_plot_P.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/Solid_State_Physics/plot_P
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="A diagram containing loopy lines. ">
 
 .. only:: html
@@ -111,6 +131,26 @@ Examples from solid state physics
    :hidden:
 
    /auto_examples/Solid_State_Physics/plot_Dyson
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Example for multiple independent diagrams. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/Solid_State_Physics/images/thumb/sphx_glr_plot_multi_thumb.png
+
+        :ref:`sphx_glr_auto_examples_Solid_State_Physics_plot_multi.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/Solid_State_Physics/plot_multi
 
 .. raw:: html
 
@@ -311,13 +351,13 @@ Examples from particle physics
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/Antonius/Projects/feynman/documentation/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/Antonius/Projects/feynman/docs/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/Antonius/Projects/feynman/documentation/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/Antonius/Projects/feynman/docs/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
