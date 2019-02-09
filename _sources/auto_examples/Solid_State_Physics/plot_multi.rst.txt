@@ -20,10 +20,6 @@ Example for multiple independent diagrams.
 
 .. code-block:: python
 
-
-    from copy import deepcopy
-
-    import numpy as np
     from feynman import Diagram
     import matplotlib.pyplot as plt
 
@@ -86,7 +82,7 @@ Example for multiple independent diagrams.
     if __name__ == '__main__':
         main()
 
-**Total running time of the script:** ( 0 minutes  0.061 seconds)
+**Total running time of the script:** ( 0 minutes  0.052 seconds)
 
 
 
