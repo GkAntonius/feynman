@@ -4,10 +4,6 @@ Electron-phonon self-energy
 
 Example for multiple independent diagrams.
 """
-
-from copy import deepcopy
-
-import numpy as np
 from feynman import Diagram
 import matplotlib.pyplot as plt
 
