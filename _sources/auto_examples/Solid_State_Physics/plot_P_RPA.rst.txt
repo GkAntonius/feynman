@@ -3,8 +3,8 @@
 .. _sphx_glr_auto_examples_Solid_State_Physics_plot_P_RPA.py:
 
 
-Polarization
-============
+RPA Polarization
+================
 
 A diagram containing an operator.
 
@@ -60,7 +60,7 @@ A diagram containing an operator.
     D.plot()
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  0.044 seconds)
+**Total running time of the script:** ( 0 minutes  0.046 seconds)
 
 
 
