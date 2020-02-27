@@ -360,6 +360,10 @@ class Line(Drawable):
     def add_initial_arrow(self, kwargs):
         """Add the arrow, if requested at initiation."""
         arrow_param = kwargs.pop('arrow_param', dict())
+        # The keyword 'arrow_params' makes more sense than 'arrow_param'
+        # Let's make use of both.
+        arrow_params = kwargs.pop('arrow_params', dict())
+        arrow_param.update(arrow_params)
         if self.arrow:
             self.add_arrow(**arrow_param)
 
