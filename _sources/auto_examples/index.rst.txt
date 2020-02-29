@@ -338,6 +338,46 @@ Examples from particle physics
    :hidden:
 
    /auto_examples/Particle_Physics/plot_ggFZZ_EFT
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Doubly Charged Higgs Production ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/Particle_Physics/images/thumb/sphx_glr_plot_dchp2_thumb.png
+
+        :ref:`sphx_glr_auto_examples_Particle_Physics_plot_dchp2.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/Particle_Physics/plot_dchp2
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Doubly Charged Higgs Production ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/Particle_Physics/images/thumb/sphx_glr_plot_dchp1_thumb.png
+
+        :ref:`sphx_glr_auto_examples_Particle_Physics_plot_dchp1.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/Particle_Physics/plot_dchp1
 .. raw:: html
 
     <div style='clear:both'></div>
