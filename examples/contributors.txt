@@ -1,0 +1,5 @@
+Contributors to the examples database
+-------------------------------------
+Gabriel Antonius
+Vince Croft
+Blaž Leban
