@@ -41,6 +41,7 @@ class Diagram(Plotter):
 
     _scale = (1., 1.)
     _transform = None
+    _keep_me = {}
 
     def __init__(self, ax=None, xy0=(0.,0.), draggable=False, **kwargs):
 
@@ -54,6 +55,7 @@ class Diagram(Plotter):
             self.fig.canvas.mpl_connect("pick_event", self._on_pick_event)
             self.fig.canvas.mpl_connect("button_release_event",
                                         self._on_release_event)
+            self.fig.canvas.mpl_connect("close_event", self._on_close_event)
 
         self.line_length =  .2
         self.operator_size =  1.5
@@ -165,6 +167,10 @@ class Diagram(Plotter):
         for O in self.operators:
             O.draw(self.ax)
 
+        if self._draggable:
+            self._keep_me[self] = None # Prevent the diagram object from being
+                                       # destroyed until the figure is closed.
+
     def plot(self, *args, **kwargs):
         return self.draw(*args, **kwargs)
 
@@ -239,5 +245,14 @@ class Diagram(Plotter):
             obj, i = self._artists[self._dragged]
             obj._update_text_position(i, dx, dy)
             self._dragged = None
+
+        return True
+
+    def _on_close_event(self, event):
+        try:
+            del self._keep_me[self] # Remove reference once the figure is
+                                    # destroyed.
+        except KeyError:
+            pass
 
         return True
