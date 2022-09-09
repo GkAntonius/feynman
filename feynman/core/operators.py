@@ -57,6 +57,7 @@ class Operator(Drawable):
     _style = dict()
 
     def __init__(self, vertices, **kwargs):
+        super(Operator, self).__init__()
 
         # Default values
         default = dict(
@@ -234,8 +235,15 @@ class Operator(Drawable):
         for (s, x, y, kwargs) in self.texts:
             center = self.get_center()
             xtext, ytext = center + np.array([x,y])
+            if self.diagram._draggable:
+                # Allow drag and drop, if not explicitly disabled
+                if not "picker" in kwargs: kwargs["picker"] = True
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
+
+    def _update_text_position(self, i, dx, dy):
+        s, x, y, kwargs = self.texts[i]
+        self.texts[i] = (s, x + dx, y + dy, kwargs)
 
     def draw(self, ax):
         """Draw the diagram."""
@@ -243,8 +251,10 @@ class Operator(Drawable):
             line.draw(ax)
         patch = self.get_patch()
         ax.add_patch(patch)
-        for text in self.get_texts():
+        for i, text in enumerate(self.get_texts()):
             ax.add_artist(text)
+            if self.diagram._draggable:
+                self.diagram._artists[text] = (self, i)
         return
 
     def scale_width(self, x):

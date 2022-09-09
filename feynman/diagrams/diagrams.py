@@ -31,6 +31,9 @@ class Diagram(Plotter):
     xy0:
         Default reference point for creation of vertices.
 
+    draggable: :vartype: `bool`
+        If `True`, then text labels can eb dragged and droped.
+
     transparent: :vartype: `bool`
         Set the background as transparent.
 
@@ -39,9 +42,18 @@ class Diagram(Plotter):
     _scale = (1., 1.)
     _transform = None
 
-    def __init__(self, ax=None, xy0=(0.,0.), **kwargs):
+    def __init__(self, ax=None, xy0=(0.,0.), draggable=False, **kwargs):
 
         self._init_figure(ax=ax, **kwargs)
+
+        self._draggable = draggable
+        if draggable:
+            # Set matplotlib event handlers
+            self._dragged = None
+            self._artists = {}
+            self.fig.canvas.mpl_connect("pick_event", self._on_pick_event)
+            self.fig.canvas.mpl_connect("button_release_event",
+                                        self._on_release_event)
 
         self.line_length =  .2
         self.operator_size =  1.5
@@ -117,13 +129,13 @@ class Diagram(Plotter):
         Create a :class:`feynman.Line` instance.
         """
         l = Line(*args, **kwargs)
-        self.lines.append(l)
+        self.add_line(l)
         return l
 
     def operator(self, *args, **kwargs):
         """Create an :class:`feynman.Operator` instance."""
         o = Operator(*args, **kwargs)
-        self.operators.append(o)
+        self.add_operator(o)
         return o
 
     def add_vertex(self, vertex):
@@ -138,11 +150,8 @@ class Diagram(Plotter):
 
     def add_operator(self, operator):
         """Add an feynman.Operator instance."""
-        operator.diagram = self
+        operator._diagram = self
         self.operators.append(operator)
-        for v in operator.vertices:
-            #if v in self.vertices: continue  # Should avoid this check
-            self.add_vertex(v)
 
     def draw(self):
         """Draw the diagram."""
@@ -211,3 +220,24 @@ class Diagram(Plotter):
     #    raise NotImplementedError()
 
 
+    def _on_pick_event(self, event):
+        if isinstance(event.artist, mpt.Text):
+            self._dragged = event.artist
+            self._pick_pos = (event.mouseevent.xdata, event.mouseevent.ydata)
+
+        return True
+
+    def _on_release_event(self, event):
+        if self._dragged is not None:
+            dx = event.xdata - self._pick_pos[0]
+            dy = event.ydata - self._pick_pos[1]
+            old_pos = self._dragged.get_position()
+            new_pos = (old_pos[0] + dx, old_pos[1] + dy)
+            self._dragged.set_position(new_pos)
+            plt.draw()
+
+            obj, i = self._artists[self._dragged]
+            obj._update_text_position(i, dx, dy)
+            self._dragged = None
+
+        return True
