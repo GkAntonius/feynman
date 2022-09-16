@@ -138,13 +138,13 @@ class Line(Drawable):
     _tangent = np.zeros((2,2))
     _normal = np.zeros((2,2))
     _main_lines = None
-    _diagram = None
 
     _line_kwargs = dict()
 
     t =  np.linspace(0, 1, 2)
 
     def __init__(self, vstart, vend, **kwargs):
+        super(Line, self).__init__()
 
         # Tips of the line
         self.vstart = vstart
@@ -201,8 +201,10 @@ class Line(Drawable):
         for arrow in self.get_arrows():
             ax.add_patch(arrow)
         # Texts
-        for text in self.get_texts():
+        for i, text in enumerate(self.get_texts()):
             ax.add_artist(text)
+            if self.diagram._draggable:
+                self.diagram._artists[text] = (self, i)
         return
 
     def set_style(self, kwargs):
@@ -699,8 +701,31 @@ class Line(Drawable):
             middle = self.get_path_point(t)
             normal = self.get_normal_point(t)
             xtext, ytext = middle + y * normal
+            if self.diagram._draggable:
+                # Allow drag and drop, if not explicitly disabled
+                if not "picker" in kwargs: kwargs["picker"] = True
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
+
+    def _update_text_position(self, i, dx, dy):
+        if self.shape != 'linear': return
+        # XXX It is assumed that the curve is a line. Inverting for t and y
+        # in the general case is not trivial. In addition, t might take invalid
+        # values (outside [0, 1]).
+        #
+        # A solution could be to allow relative or absolute coordinates
+        # to be provided when placing the text object.
+
+        s, t, y, kwargs = self.texts[i]
+        middle = self.get_path_point(t)
+        normal = self.get_normal_point(t)
+        xtext, ytext = middle + y * normal
+
+        x0, y0 = self._xy[0]
+        v = np.array((xtext + dx - x0, ytext + dy - y0))
+        t = np.dot(v, self.tangent[0]) / norm(self._xy[-1] - self._xy[0])
+        y = np.dot(v, self.normal[0])
+        self.texts[i] = (s, t, y, kwargs)
 
     @property
     def main_lines(self):
@@ -1061,11 +1086,6 @@ class Line(Drawable):
                                  + str(self._arrow_style_allowed_values))
             arrows.append(arrow)
         return arrows
-
-    @property
-    def diagram(self):
-        """The diagram it belongs to."""
-        return self._diagram
 
     def scale_width(self, x):
         """Apply a scaling factor to the line width."""

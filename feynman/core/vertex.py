@@ -51,9 +51,9 @@ class Vertex(Drawable):
     _style = dict()
 
     _lines = list()
-    _diagram = None
 
     def __init__(self, xy=(0,0), **kwargs):
+        super(Vertex, self).__init__()
 
         dx = np.array(kwargs.pop('dx', 0.))
         dy = np.array(kwargs.pop('dy', 0.))
@@ -181,14 +181,23 @@ class Vertex(Drawable):
         texts = list()
         for (s, x, y, kwargs) in self.texts:
             xtext, ytext = self.xy + np.array([x,y])
+            if self.diagram._draggable:
+                # Allow drag and drop, if not explicitly disabled
+                if not "picker" in kwargs: kwargs["picker"] = True
             texts.append(mpt.Text(xtext, ytext, s, **kwargs))
         return texts
+
+    def _update_text_position(self, i, dx, dy):
+        s, x, y, kwargs = self.texts[i]
+        self.texts[i] = (s, x + dx, y + dy, kwargs)
 
     def draw(self, ax):
         marker = self.get_marker()
         ax.add_line(marker)
-        for text in self.get_texts():
+        for i, text in enumerate(self.get_texts()):
             ax.add_artist(text)
+            if self.diagram._draggable:
+                self.diagram._artists[text] = (self, i)
         return
 
     @property
@@ -199,11 +208,6 @@ class Vertex(Drawable):
     @lines.setter
     def lines(self, value):
         self._lines = value
-
-    @property
-    def diagram(self):
-        """The diagram it belongs to."""
-        return self._diagram
 
     def chunk(self, *args, **kwargs):
         self.diagram.add_chunk(self, *args, **kwargs)
