@@ -61,7 +61,7 @@ class Vertex(Drawable):
         angle = np.array(kwargs.pop('angle', 0.))
         radius = np.array(kwargs.pop('radius', 0.))
 
-        cxy = (np.complex(*xy) + np.complex(*dxy) + np.complex(dx, dy)
+        cxy = (complex(*xy) + complex(*dxy) + complex(dx, dy)
                + radius * np.e ** (1j * tau * angle))
         self.xy = np.array([cxy.real, cxy.imag])
         #self.xy = ( xy  + dxy + np.array([dx, dy])
@@ -110,7 +110,7 @@ class Vertex(Drawable):
 
     @property
     def ccenter(self):
-        return np.complex()
+        return complex()
 
     @property
     def xcc(self):
@@ -122,7 +122,7 @@ class Vertex(Drawable):
 
     @property
     def cxy(self):
-        return np.complex(self.x-self.xcc, self.y-self.ycc)
+        return complex(self.x-self.xcc, self.y-self.ycc)
 
     @cxy.setter
     def cxy(self, c):
