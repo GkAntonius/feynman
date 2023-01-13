@@ -414,7 +414,7 @@ class Line(Drawable):
     @property
     def angle(self):
         """The angle (units of tau) of the direct line between end points."""
-        return np.angle(np.complex(*self.dr)) / tau
+        return np.angle(complex(*self.dr)) / tau
 
     @property
     def xy(self):
