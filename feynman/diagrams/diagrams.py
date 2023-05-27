@@ -82,7 +82,7 @@ class Diagram(Plotter):
         -------
         :class:`feynman.Vertex`
         """
-        if xy is 'auto':
+        if xy == 'auto':
             xy = (self.x0, self.y0)
         v = Vertex(xy, **kwargs)
         self.add_vertex(v)
