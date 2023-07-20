@@ -112,7 +112,7 @@ def angle(v, units='rad'):
 def rotation_matrix(angle):
     """
     Return a 2x2 rotation matrix.
-    angle : float, the angle, in units of tau.
+    angle : float, the angle, in units of 2 pi.
     """
     theta = angle * tau
     R = np.array([[np.cos(theta), - np.sin(theta)],

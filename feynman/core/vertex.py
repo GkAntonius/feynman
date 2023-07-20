@@ -1,4 +1,3 @@
-
 from copy import deepcopy
 
 import numpy as np
@@ -8,12 +7,11 @@ import matplotlib.patches as mpa
 import matplotlib.text as mpt
 
 from . import Drawable
-
 from .. import vectors
 from .. import colors
 from ..constants import tau
 
-__all__ = ['Vertex', 'Verticle']
+__all__ = ['Vertex']
 
 class Vertex(Drawable):
     """
@@ -215,10 +213,4 @@ class Vertex(Drawable):
     def scale(self, x):
         """Apply a scaling factor to the size of the marker."""
         self.style['markersize'] *= x
-
-
-# =========================================================================== #
-
-# This is just an alias to maintain backward compatibility
-Verticle = Vertex
 

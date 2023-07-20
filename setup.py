@@ -20,7 +20,7 @@ my_package_data = {'' :
 
 setup_args = dict(
       name             = 'feynman',
-      version          = '2.0.4',
+      version          = '2.1.0',
       description      = 'Feynman diagrams with python-matplotlib.',
       author           = 'Gabriel Antonius',
       author_email     = 'gabriel.antonius@gmail.com',
