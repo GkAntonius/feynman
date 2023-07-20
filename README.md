@@ -9,7 +9,7 @@ Sharp-looking Feynman diagrams in python
 Requirements
 ------------
 
-  * python 2.7+
+  * python 3.7+
   * numpy 1.6+
   * matplotlib 1.4+
 
