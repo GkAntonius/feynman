@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "feynman"
-version = "2.1.0"
+version = "2.1.1"
 authors = [
   { name="Gabriel Antonius", email="gabriel.antonius@gmail.com" },
 ]
@@ -16,6 +16,11 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "matplotlib>=1.1",
+    "numpy>=1.6",
+    ]
+license = {text = "GPL"}
 
 [project.urls]
 "Homepage" = "https://github.com/GkAntonius/feynman"
