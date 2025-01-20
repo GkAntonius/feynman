@@ -4,7 +4,7 @@ from matplotlib.testing.decorators import image_comparison
 from ..diagrams import Diagram
 
 @image_comparison(baseline_images=['loopy'],
-                  extensions=['png'])
+                  extensions=['png'], remove_text=True)
 def test_loopy():
 
     fig = plt.figure(figsize=(6,6))

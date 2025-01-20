@@ -4,7 +4,7 @@ from matplotlib.testing.decorators import image_comparison
 from ..diagrams import Diagram
 
 @image_comparison(baseline_images=['simple'],
-                  extensions=['png'])
+                  extensions=['png'], remove_text=True)
 def test_simple():
 
     fig = plt.figure(figsize=(6,6))

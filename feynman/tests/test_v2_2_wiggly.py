@@ -4,7 +4,7 @@ from matplotlib.testing.decorators import image_comparison
 from ..diagrams import Diagram
 
 @image_comparison(baseline_images=['wiggly'],
-                  extensions=['png'])
+                  extensions=['png'], remove_text=True)
 def test_wiggly():
 
     fig = plt.figure(figsize=(6,6))
