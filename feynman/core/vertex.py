@@ -112,11 +112,11 @@ class Vertex(Drawable):
 
     @property
     def xcc(self):
-        return self.real(self.ccenter)
+        return np.real(self.ccenter)
 
     @property
     def ycc(self):
-        return self.imag(self.ccenter)
+        return np.imag(self.ccenter)
 
     @property
     def cxy(self):
